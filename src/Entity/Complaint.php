@@ -1,0 +1,575 @@
+<?php
+
+namespace App\Entity;
+
+use App\Doctrine\IdGenerator;
+use App\Repository\ComplaintRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: ComplaintRepository::class)]
+class Complaint
+{
+    const ID_PREFIX = "CP";
+
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(IdGenerator::class)]
+    #[ORM\Column(length: 16)]
+    private ?string $id = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?GeneralParameter $complaintType = null;
+
+    #[ORM\ManyToOne]
+    private ?WorkflowStep $currentWorkflowStep = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $declarationDate = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?GeneralParameter $incidentCause = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?RoadAxis $roadAxis = null;
+
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $locationDetail = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Location $location = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $latitude = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $longitude = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $receivabilityDecisionJustification = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $meritsAnalysis = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $resolutionProposal = null;
+
+    #[ORM\ManyToOne]
+    private ?GeneralParameter $internalResolutionDecision = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $internalDecisionComments = null;
+
+    #[ORM\ManyToOne]
+    private ?GeneralParameter $complainantDecision = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $executionActionsDescription = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $personInChargeOfExecution = null;
+
+    #[ORM\ManyToOne]
+    private ?GeneralParameter $satisfactionFollowUpResult = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $satisfactionFollowUpComments = null;
+
+    #[ORM\ManyToOne]
+    private ?GeneralParameter $escalationLevel = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $escalationComments = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $closureReason = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $closureDate = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Complainant $complainant = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?WorkflowAction $currentWorkflowAction = null;
+
+    /**
+     * @var Collection<int, Victim>
+     */
+    #[ORM\OneToMany(targetEntity: Victim::class, mappedBy: 'complaint', orphanRemoval: true)]
+    private Collection $victims;
+
+    /**
+     * @var Collection<int, ComplaintConsequence>
+     */
+    #[ORM\OneToMany(targetEntity: ComplaintConsequence::class, mappedBy: 'complaint', orphanRemoval: true)]
+    private Collection $consequences;
+
+    /**
+     * @var Collection<int, AttachedFile>
+     */
+    #[ORM\OneToMany(targetEntity: AttachedFile::class, mappedBy: 'complaint', orphanRemoval: true)]
+    private Collection $attachedFiles;
+
+    /**
+     * @var Collection<int, AffectedSpecies>
+     */
+    #[ORM\OneToMany(targetEntity: AffectedSpecies::class, mappedBy: 'complaint', orphanRemoval: true)]
+    private Collection $affectedSpecies;
+
+    public function __construct()
+    {
+        $this->victims = new ArrayCollection();
+        $this->consequences = new ArrayCollection();
+        $this->attachedFiles = new ArrayCollection();
+        $this->affectedSpecies = new ArrayCollection();
+    }
+
+    public function getId(): ?string
+    {
+        return $this->id;
+    }
+
+    public function getComplaintType(): ?GeneralParameter
+    {
+        return $this->complaintType;
+    }
+
+    public function setComplaintType(?GeneralParameter $complaintType): static
+    {
+        $this->complaintType = $complaintType;
+
+        return $this;
+    }
+
+    public function getCurrentWorkflowStep(): ?WorkflowStep
+    {
+        return $this->currentWorkflowStep;
+    }
+
+    public function setCurrentWorkflowStep(?WorkflowStep $currentWorkflowStep): static
+    {
+        $this->currentWorkflowStep = $currentWorkflowStep;
+
+        return $this;
+    }
+
+    public function getDeclarationDate(): ?\DateTimeImmutable
+    {
+        return $this->declarationDate;
+    }
+
+    public function setDeclarationDate(\DateTimeImmutable $declarationDate): static
+    {
+        $this->declarationDate = $declarationDate;
+
+        return $this;
+    }
+
+    public function getIncidentCause(): ?GeneralParameter
+    {
+        return $this->incidentCause;
+    }
+
+    public function setIncidentCause(?GeneralParameter $incidentCause): static
+    {
+        $this->incidentCause = $incidentCause;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getRoadAxis(): ?RoadAxis
+    {
+        return $this->roadAxis;
+    }
+
+    public function setRoadAxis(?RoadAxis $roadAxis): static
+    {
+        $this->roadAxis = $roadAxis;
+
+        return $this;
+    }
+
+    public function getLocationDetail(): ?string
+    {
+        return $this->locationDetail;
+    }
+
+    public function setLocationDetail(string $locationDetail): static
+    {
+        $this->locationDetail = $locationDetail;
+
+        return $this;
+    }
+
+    public function getLocation(): ?Location
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?Location $location): static
+    {
+        $this->location = $location;
+
+        return $this;
+    }
+
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?float $latitude): static
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?float $longitude): static
+    {
+        $this->longitude = $longitude;
+
+        return $this;
+    }
+
+    public function getReceivabilityDecisionJustification(): ?string
+    {
+        return $this->receivabilityDecisionJustification;
+    }
+
+    public function setReceivabilityDecisionJustification(?string $receivabilityDecisionJustification): static
+    {
+        $this->receivabilityDecisionJustification = $receivabilityDecisionJustification;
+
+        return $this;
+    }
+
+    public function getMeritsAnalysis(): ?string
+    {
+        return $this->meritsAnalysis;
+    }
+
+    public function setMeritsAnalysis(?string $meritsAnalysis): static
+    {
+        $this->meritsAnalysis = $meritsAnalysis;
+
+        return $this;
+    }
+
+    public function getResolutionProposal(): ?string
+    {
+        return $this->resolutionProposal;
+    }
+
+    public function setResolutionProposal(?string $resolutionProposal): static
+    {
+        $this->resolutionProposal = $resolutionProposal;
+
+        return $this;
+    }
+
+    public function getInternalResolutionDecision(): ?string
+    {
+        return $this->internalResolutionDecision;
+    }
+
+    public function setInternalResolutionDecision(?string $internalResolutionDecision): static
+    {
+        $this->internalResolutionDecision = $internalResolutionDecision;
+
+        return $this;
+    }
+
+    public function getInternalDecisionComments(): ?string
+    {
+        return $this->internalDecisionComments;
+    }
+
+    public function setInternalDecisionComments(?string $internalDecisionComments): static
+    {
+        $this->internalDecisionComments = $internalDecisionComments;
+
+        return $this;
+    }
+
+    public function getComplainantDecision(): ?GeneralParameter
+    {
+        return $this->complainantDecision;
+    }
+
+    public function setComplainantDecision(?GeneralParameter $complainantDecision): static
+    {
+        $this->complainantDecision = $complainantDecision;
+
+        return $this;
+    }
+
+    public function getExecutionActionsDescription(): ?string
+    {
+        return $this->executionActionsDescription;
+    }
+
+    public function setExecutionActionsDescription(?string $executionActionsDescription): static
+    {
+        $this->executionActionsDescription = $executionActionsDescription;
+
+        return $this;
+    }
+
+    public function getPersonInChargeOfExecution(): ?string
+    {
+        return $this->personInChargeOfExecution;
+    }
+
+    public function setPersonInChargeOfExecution(?string $personInChargeOfExecution): static
+    {
+        $this->personInChargeOfExecution = $personInChargeOfExecution;
+
+        return $this;
+    }
+
+    public function getSatisfactionFollowUpResult(): ?GeneralParameter
+    {
+        return $this->satisfactionFollowUpResult;
+    }
+
+    public function setSatisfactionFollowUpResult(?GeneralParameter $satisfactionFollowUpResult): static
+    {
+        $this->satisfactionFollowUpResult = $satisfactionFollowUpResult;
+
+        return $this;
+    }
+
+    public function getSatisfactionFollowUpComments(): ?string
+    {
+        return $this->satisfactionFollowUpComments;
+    }
+
+    public function setSatisfactionFollowUpComments(?string $satisfactionFollowUpComments): static
+    {
+        $this->satisfactionFollowUpComments = $satisfactionFollowUpComments;
+
+        return $this;
+    }
+
+    public function getEscalationLevel(): ?GeneralParameter
+    {
+        return $this->escalationLevel;
+    }
+
+    public function setEscalationLevel(?GeneralParameter $escalationLevel): static
+    {
+        $this->escalationLevel = $escalationLevel;
+
+        return $this;
+    }
+
+    public function getEscalationComments(): ?string
+    {
+        return $this->escalationComments;
+    }
+
+    public function setEscalationComments(?string $escalationComments): static
+    {
+        $this->escalationComments = $escalationComments;
+
+        return $this;
+    }
+
+    public function getClosureReason(): ?string
+    {
+        return $this->closureReason;
+    }
+
+    public function setClosureReason(?string $closureReason): static
+    {
+        $this->closureReason = $closureReason;
+
+        return $this;
+    }
+
+    public function getClosureDate(): ?\DateTimeImmutable
+    {
+        return $this->closureDate;
+    }
+
+    public function setClosureDate(?\DateTimeImmutable $closureDate): static
+    {
+        $this->closureDate = $closureDate;
+
+        return $this;
+    }
+
+    public function getComplainant(): ?Complainant
+    {
+        return $this->complainant;
+    }
+
+    public function setComplainant(?Complainant $complainant): static
+    {
+        $this->complainant = $complainant;
+
+        return $this;
+    }
+
+    public function getCurrentWorkflowAction(): ?WorkflowAction
+    {
+        return $this->currentWorkflowAction;
+    }
+
+    public function setCurrentWorkflowAction(?WorkflowAction $currentWorkflowAction): static
+    {
+        $this->currentWorkflowAction = $currentWorkflowAction;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Victim>
+     */
+    public function getVictims(): Collection
+    {
+        return $this->victims;
+    }
+
+    public function addVictim(Victim $victim): static
+    {
+        if (!$this->victims->contains($victim)) {
+            $this->victims->add($victim);
+            $victim->setComplaint($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVictim(Victim $victim): static
+    {
+        if ($this->victims->removeElement($victim)) {
+            // set the owning side to null (unless already changed)
+            if ($victim->getComplaint() === $this) {
+                $victim->setComplaint(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ComplaintConsequence>
+     */
+    public function getConsequences(): Collection
+    {
+        return $this->consequences;
+    }
+
+    public function addConsequence(ComplaintConsequence $consequence): static
+    {
+        if (!$this->consequences->contains($consequence)) {
+            $this->consequences->add($consequence);
+            $consequence->setComplaint($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConsequence(ComplaintConsequence $consequence): static
+    {
+        if ($this->consequences->removeElement($consequence)) {
+            // set the owning side to null (unless already changed)
+            if ($consequence->getComplaint() === $this) {
+                $consequence->setComplaint(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AttachedFile>
+     */
+    public function getAttachedFiles(): Collection
+    {
+        return $this->attachedFiles;
+    }
+
+    public function addAttachedFile(AttachedFile $attachedFile): static
+    {
+        if (!$this->attachedFiles->contains($attachedFile)) {
+            $this->attachedFiles->add($attachedFile);
+            $attachedFile->setComplaint($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttachedFile(AttachedFile $attachedFile): static
+    {
+        if ($this->attachedFiles->removeElement($attachedFile)) {
+            // set the owning side to null (unless already changed)
+            if ($attachedFile->getComplaint() === $this) {
+                $attachedFile->setComplaint(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AffectedSpecies>
+     */
+    public function getAffectedSpecies(): Collection
+    {
+        return $this->affectedSpecies;
+    }
+
+    public function addAffectedSpecies(AffectedSpecies $affectedSpecies): static
+    {
+        if (!$this->affectedSpecies->contains($affectedSpecies)) {
+            $this->affectedSpecies->add($affectedSpecies);
+            $affectedSpecies->setComplaint($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAffectedSpecies(AffectedSpecies $affectedSpecies): static
+    {
+        if ($this->affectedSpecies->removeElement($affectedSpecies)) {
+            // set the owning side to null (unless already changed)
+            if ($affectedSpecies->getComplaint() === $this) {
+                $affectedSpecies->setComplaint(null);
+            }
+        }
+
+        return $this;
+    }
+}
