@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
-    name: 'txm:create-user',
+    name: 'agp:create-user',
     description: 'Create new user',
 )]
 class CreateUserCommand extends Command
