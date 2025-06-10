@@ -39,6 +39,10 @@ class ComplaintHistory
     #[ORM\Column]
     private ?\DateTimeImmutable $actionDate = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $actor = null;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -112,6 +116,18 @@ class ComplaintHistory
     public function setActionDate(\DateTimeImmutable $actionDate): static
     {
         $this->actionDate = $actionDate;
+
+        return $this;
+    }
+
+    public function getActor(): ?User
+    {
+        return $this->actor;
+    }
+
+    public function setActor(?User $actor): static
+    {
+        $this->actor = $actor;
 
         return $this;
     }

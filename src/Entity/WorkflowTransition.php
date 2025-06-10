@@ -33,6 +33,9 @@ class WorkflowTransition
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[ORM\ManyToOne]
+    private ?Profile $roleRequired = null;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -82,6 +85,18 @@ class WorkflowTransition
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getRoleRequired(): ?Profile
+    {
+        return $this->roleRequired;
+    }
+
+    public function setRoleRequired(?Profile $roleRequired): static
+    {
+        $this->roleRequired = $roleRequired;
 
         return $this;
     }

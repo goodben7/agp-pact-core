@@ -2,6 +2,11 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
 use App\Repository\ComplaintRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -10,6 +15,25 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ComplaintRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['complaint:list']]
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['complaint:get']]
+        ),
+        new Post(
+            inputFormats: ['multipart' => ['multipart/form-data']],
+            processor: 'App\State\Processor\Complaint\CreateComplaintProcessor'
+        ),
+        new Patch(
+            inputFormats: ['multipart' => ['multipart/form-data']],
+            processor: 'App\State\Processor\Complaint\UpdateComplaintProcessor'
+        )
+    ],
+    normalizationContext: ['groups' => ['complaint:get']]
+)]
 class Complaint
 {
     const ID_PREFIX = "CP";
@@ -127,6 +151,12 @@ class Complaint
      */
     #[ORM\OneToMany(targetEntity: AffectedSpecies::class, mappedBy: 'complaint', orphanRemoval: true)]
     private Collection $affectedSpecies;
+
+    #[ORM\ManyToOne]
+    private ?User $assignedTo = null;
+
+    #[ORM\ManyToOne]
+    private ?User $currentAssignee = null;
 
     public function __construct()
     {
@@ -297,7 +327,7 @@ class Complaint
         return $this;
     }
 
-    public function getInternalResolutionDecision(): ?string
+    public function getInternalResolutionDecision(): ?GeneralParameter
     {
         return $this->internalResolutionDecision;
     }
@@ -569,6 +599,30 @@ class Complaint
                 $affectedSpecies->setComplaint(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAssignedTo(): ?User
+    {
+        return $this->assignedTo;
+    }
+
+    public function setAssignedTo(?User $assignedTo): static
+    {
+        $this->assignedTo = $assignedTo;
+
+        return $this;
+    }
+
+    public function getCurrentAssignee(): ?User
+    {
+        return $this->currentAssignee;
+    }
+
+    public function setCurrentAssignee(?User $currentAssignee): static
+    {
+        $this->currentAssignee = $currentAssignee;
 
         return $this;
     }

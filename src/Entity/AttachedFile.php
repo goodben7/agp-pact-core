@@ -5,8 +5,11 @@ namespace App\Entity;
 use App\Doctrine\IdGenerator;
 use App\Repository\AttachedFileRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: AttachedFileRepository::class)]
+#[Vich\Uploadable]
 class AttachedFile
 {
     const ID_PREFIX = "AF";
@@ -27,6 +30,9 @@ class AttachedFile
     #[ORM\Column(length: 255)]
     private ?string $filePath = null;
 
+    #[Vich\UploadableField(mapping: 'attached_files', fileNameProperty: 'filePath')]
+    private ?File $file = null;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?GeneralParameter $fileType = null;
@@ -42,6 +48,15 @@ class AttachedFile
 
     #[ORM\Column]
     private ?\DateTimeImmutable $uploadedAt = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $uploadedBy = null;
+
+    public function __construct()
+    {
+        $this->uploadedAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?string
     {
@@ -142,5 +157,27 @@ class AttachedFile
         $this->uploadedAt = $uploadedAt;
 
         return $this;
+    }
+
+    public function getUploadedBy(): ?User
+    {
+        return $this->uploadedBy;
+    }
+
+    public function setUploadedBy(?User $uploadedBy): static
+    {
+        $this->uploadedBy = $uploadedBy;
+
+        return $this;
+    }
+
+    public function getFile(): ?File
+    {
+        return $this->file;
+    }
+
+    public function setFile(?File $file): void
+    {
+        $this->file = $file;
     }
 }
