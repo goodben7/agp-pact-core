@@ -50,18 +50,16 @@ readonly class ComplaintWorkflowManager
                 $action->getName()
             ));
 
-        if ($transition->getRoleRequired() && !$this->security->isGranted($transition->getRoleRequired()->getPermissions(), $currentUser)) {
+        if ($transition->getRoleRequired() && !$this->security->isGranted($transition->getRoleRequired()->getPermissions(), $currentUser))
             throw new \LogicException(sprintf(
                 'user "%s" is not allowed to perform action "%s".',
                 $transition->getRoleRequired()->getLabel(),
                 $action->getName()
             ));
-        }
 
         $uiConfig = $complaint->getCurrentWorkflowStep()->getUiConfiguration();
-        if ($uiConfig && $uiConfig->getInputFields()) {
+        if ($uiConfig && $uiConfig->getInputFields())
             $this->validateDynamicFields($data, $uiConfig->getInputFields());
-        }
 
         if ($action->isRequiresComment() && empty($data['comment']))
             throw new \InvalidArgumentException('Comment is required for this action.');
@@ -90,44 +88,44 @@ readonly class ComplaintWorkflowManager
         }
 
         if (isset($data['file']) && $data['file'] instanceof UploadedFile) {
-            $attachedFile = new AttachedFile();
-            $attachedFile->setComplaint($complaint);
-            $attachedFile->setFileName($data['file']->getClientOriginalName());
-            $attachedFile->setFileSize($data['file']->getSize());
-            $attachedFile->setMimeType($data['file']->getMimeType());
+            $attachedFile = (new AttachedFile())
+                ->setComplaint($complaint)
+                ->setFileName($data['file']->getClientOriginalName())
+                ->setFileSize($data['file']->getSize())
+                ->setMimeType($data['file']->getMimeType());
 
             $fileTypeCategory = 'Document';
-            if (str_starts_with($data['file']->getMimeType(), 'image/')) {
+            if (str_starts_with($data['file']->getMimeType(), 'image/'))
                 $fileTypeCategory = 'Image';
-            } elseif (str_starts_with($data['file']->getMimeType(), 'video/')) {
+            elseif (str_starts_with($data['file']->getMimeType(), 'video/'))
                 $fileTypeCategory = 'Video';
-            } elseif (str_starts_with($data['file']->getMimeType(), 'audio/')) {
+            elseif (str_starts_with($data['file']->getMimeType(), 'audio/'))
                 $fileTypeCategory = 'Audio';
-            }
+
             $fileTypeParam = $this->em->getRepository(GeneralParameter::class)->findOneBy(['category' => GeneralParameterCategory::FILE_TYPE, 'value' => $fileTypeCategory]);
             if (!$fileTypeParam)
                 throw new \Exception(sprintf('Not found file type parameter for category "%s".', $fileTypeCategory));
-            $attachedFile->setFileType($fileTypeParam);
 
-            $attachedFile->setWorkflowStep($newStep);
-            $attachedFile->setUploadedBy($currentUser);
-            $attachedFile->setUploadedAt(new \DateTimeImmutable());
-
-            $attachedFile->setFile($data['file']);
+            ($attachedFile)
+                ->setFileType($fileTypeParam)
+                ->setWorkflowStep($newStep)
+                ->setUploadedBy($currentUser)
+                ->setUploadedAt(new \DateTimeImmutable())
+                ->setFile($data['file']);
 
             $this->em->persist($attachedFile);
         }
 
-        $history = new ComplaintHistory();
-        $history->setComplaint($complaint);
-        $history->setOldWorkflowStep($oldStep);
-        $history->setNewWorkflowStep($newStep);
-        $history->setAction($action);
-        $history->setComments($data['comment'] ?? null);
-        $history->setActor($currentUser);
-        $history->setActionDate(new \DateTimeImmutable());
-        $this->em->persist($history);
+        $history = (new ComplaintHistory())
+            ->setComplaint($complaint)
+            ->setOldWorkflowStep($oldStep)
+            ->setNewWorkflowStep($newStep)
+            ->setAction($action)
+            ->setComments($data['comment'] ?? null)
+            ->setActor($currentUser)
+            ->setActionDate(new \DateTimeImmutable());
 
+        $this->em->persist($history);
         $this->em->flush();
 
         $this->messageBus->dispatch(new ComplaintWorkflowMessage($complaint->getId(), $action->getName(), $newStep->getName()));
@@ -153,7 +151,7 @@ readonly class ComplaintWorkflowManager
             $fieldConstraints = [];
 
             if ($fieldRequired)
-                $fieldConstraints[] = new Assert\NotBlank(null, sprintf('%s est requis.', $fieldLabel));
+                $fieldConstraints[] = new Assert\NotBlank(null, sprintf('%s is required.', $fieldLabel));
 
             foreach ($validationRules as $rule) {
                 if (is_string($rule)) {
@@ -161,26 +159,26 @@ readonly class ComplaintWorkflowManager
                         case 'not_blank':
                             break;
                         case 'email':
-                            $fieldConstraints[] = new Assert\Email(null, sprintf('%s doit être une adresse email valide.', $fieldLabel));
+                            $fieldConstraints[] = new Assert\Email(null, sprintf('%s must be a valid email address.', $fieldLabel));
                             break;
                         case 'numeric':
-                            $fieldConstraints[] = new Assert\Type(['type' => 'numeric'], sprintf('%s doit être numérique.', $fieldLabel));
+                            $fieldConstraints[] = new Assert\Type(['type' => 'numeric'], sprintf('%s must be numeric.', $fieldLabel));
                             break;
                     }
                 } elseif (is_array($rule)) {
                     foreach ($rule as $ruleName => $ruleValue) {
                         switch ($ruleName) {
                             case 'min_length':
-                                $fieldConstraints[] = new Assert\Length(['min' => $ruleValue], sprintf('%s doit contenir au moins %s caractères.', $fieldLabel, $ruleValue));
+                                $fieldConstraints[] = new Assert\Length(['min' => $ruleValue], sprintf('%s must contain at least %s characters.', $fieldLabel, $ruleValue));
                                 break;
                             case 'max_length':
-                                $fieldConstraints[] = new Assert\Length(['max' => $ruleValue], sprintf('%s doit contenir au plus %s caractères.', $fieldLabel, $ruleValue));
+                                $fieldConstraints[] = new Assert\Length(['max' => $ruleValue], sprintf('%s must contain at most %s characters.', $fieldLabel, $ruleValue));
                                 break;
                             case 'min':
-                                $fieldConstraints[] = new Assert\GreaterThanOrEqual(['value' => $ruleValue], sprintf('%s doit être supérieur ou égal à %s.', $fieldLabel, $ruleValue));
+                                $fieldConstraints[] = new Assert\GreaterThanOrEqual(['value' => $ruleValue], sprintf('%s must be greater than or equal to %s.', $fieldLabel, $ruleValue));
                                 break;
                             case 'max':
-                                $fieldConstraints[] = new Assert\LessThanOrEqual(['value' => $ruleValue], sprintf('%s doit être inférieur ou égal à %s.', $fieldLabel, $ruleValue));
+                                $fieldConstraints[] = new Assert\LessThanOrEqual(['value' => $ruleValue], sprintf('%s must be less than or equal to %s.', $fieldLabel, $ruleValue));
                                 break;
                         }
                     }

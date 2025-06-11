@@ -18,15 +18,26 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: WorkflowActionRepository::class)]
 #[ApiResource(
     operations: [
-        new GetCollection(),
-        new Get(),
+        new GetCollection(
+            normalizationContext: ['groups' => ['workflow_action:list']],
+            security: "is_granted('ROLE_WORKFLOW_ACTION_LIST')"
+        ),
+        new Get(
+            security: "is_granted('ROLE_WORKFLOW_ACTION_VIEW')"
+        ),
         new Post(
+            security: "is_granted('ROLE_WORKFLOW_ACTION_CREATE')",
             input: WorkflowActionCreateDTO::class,
             processor: WorkflowActionCreateProcessor::class
         ),
-        new Patch(),
-        new Delete(),
-    ]
+        new Patch(
+            security: "is_granted('ROLE_WORKFLOW_ACTION_UPDATE')",
+        ),
+        new Delete(
+            security: "is_granted('ROLE_WORKFLOW_ACTION_DELETE')"
+        ),
+    ],
+    normalizationContext: ['groups' => ['workflow_action:get']]
 )]
 class WorkflowAction
 {

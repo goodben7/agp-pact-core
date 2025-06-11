@@ -17,14 +17,23 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: WorkflowStepRepository::class)]
 #[ApiResource(
     operations: [
-        new GetCollection(),
-        new Get(),
+        new GetCollection(
+            normalizationContext: ['groups' => ['workflow_step:list']],
+            security: "is_granted('ROLE_WORKFLOW_STEP_LIST')"
+        ),
+        new Get(
+            security: "is_granted('ROLE_WORKFLOW_STEP_VIEW')"
+        ),
         new Post(
+            security: "is_granted('ROLE_WORKFLOW_STEP_CREATE')",
             input: WorkflowStepCreateDTO::class,
             processor: WorkflowStepCreateProcessor::class
         ),
-        new Patch()
-    ]
+        new Patch(
+            security: "is_granted('ROLE_WORKFLOW_STEP_UPDATE')",
+        )
+    ],
+    normalizationContext: ['groups' => ['workflow_step:get']]
 )]
 class WorkflowStep
 {

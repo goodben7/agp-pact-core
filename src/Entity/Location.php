@@ -2,13 +2,52 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
+use App\Dto\Location\LocationCreateDTO;
 use App\Repository\LocationRepository;
+use App\State\Location\LocationCreateProcessor;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: LocationRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['location:list']],
+            security: "is_granted('ROLE_LOCATION_LIST')",
+        ),
+        new Get(
+            security: "is_granted('ROLE_LOCATION_VIEW')",
+        ),
+        new Post(
+            security: "is_granted('ROLE_LOCATION_CREATE')",
+            input: LocationCreateDTO::class,
+            processor: LocationCreateProcessor::class,
+        ),
+        new Patch(
+            security: "is_granted('ROLE_LOCATION_UPDATE')",
+        ),
+    ],
+    normalizationContext: ['groups' => ['location:get']],
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'id' => 'exact',
+        'name' => 'partial',
+        'level.id' => 'exact',
+        'level.category' => 'exact',
+        'parent.id' => 'exact',
+        'code' => 'exact',
+        'active' => 'exact'
+    ]
+)]
 class Location
 {
     const ID_PREFIX = "LC";

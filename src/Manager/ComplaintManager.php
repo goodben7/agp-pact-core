@@ -60,4 +60,8 @@ readonly class ComplaintManager
 
         return $complaint;
     }
+
+    public function update(mixed $data)
+    {
+    }
 }

@@ -2,11 +2,17 @@
 
 namespace App\Dto\Location;
 
+use App\Entity\Location;
+
 class LocationCreateDTO
 {
     public ?string $name = null;
+
     public ?string $level = null;
-    public ?string $parentId = null;
+
+    public ?Location $parent = null;
+
     public ?string $code = null;
-    public ?bool $isActive = true;
+
+    public ?bool $active = true;
 }

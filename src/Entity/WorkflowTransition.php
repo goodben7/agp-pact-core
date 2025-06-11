@@ -17,13 +17,21 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: WorkflowTransitionRepository::class)]
 #[ApiResource(
     operations: [
-        new GetCollection(),
-        new Get(),
+        new GetCollection(
+            normalizationContext: ['groups' => ['workflow_transition:list']],
+            security: "is_granted('ROLE_WORKFLOW_TRANSITION_LIST')"
+        ),
+        new Get(
+            security: "is_granted('ROLE_WORKFLOW_TRANSITION_VIEW')"
+        ),
         new Post(
+            security: "is_granted('ROLE_WORKFLOW_TRANSITION_CREATE')",
             input: WorkflowTransitionCreateDTO::class,
             processor: WorkflowTransitionCreateProcessor::class
         ),
-        new Patch(),
+        new Patch(
+            security: "is_granted('ROLE_WORKFLOW_TRANSITION_UPDATE')",
+        ),
     ]
 )]
 class WorkflowTransition
