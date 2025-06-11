@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Doctrine\IdGenerator;
 use App\Repository\ComplainantRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ComplainantRepository::class)]
+#[ApiResource]
 class Complainant
 {
     const ID_PREFIX = "CN";

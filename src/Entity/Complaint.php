@@ -8,7 +8,9 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
+use App\Dto\Complaint\ComplaintCreateDTO;
 use App\Repository\ComplaintRepository;
+use App\State\Complaint\CreateComplaintProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -24,8 +26,8 @@ use Doctrine\ORM\Mapping as ORM;
             normalizationContext: ['groups' => ['complaint:get']]
         ),
         new Post(
-            inputFormats: ['multipart' => ['multipart/form-data']],
-            processor: 'App\State\Processor\Complaint\CreateComplaintProcessor'
+            input: ComplaintCreateDTO::class,
+            processor: CreateComplaintProcessor::class
         ),
         new Patch(
             inputFormats: ['multipart' => ['multipart/form-data']],
@@ -157,6 +159,9 @@ class Complaint
 
     #[ORM\ManyToOne]
     private ?User $currentAssignee = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $incidentDate = null;
 
     public function __construct()
     {
@@ -623,6 +628,18 @@ class Complaint
     public function setCurrentAssignee(?User $currentAssignee): static
     {
         $this->currentAssignee = $currentAssignee;
+
+        return $this;
+    }
+
+    public function getIncidentDate(): ?\DateTimeImmutable
+    {
+        return $this->incidentDate;
+    }
+
+    public function setIncidentDate(?\DateTimeImmutable $incidentDate): static
+    {
+        $this->incidentDate = $incidentDate;
 
         return $this;
     }

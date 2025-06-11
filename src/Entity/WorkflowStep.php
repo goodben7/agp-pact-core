@@ -2,12 +2,30 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
+use App\Dto\Workflow\WorkflowStepCreateDTO;
 use App\Repository\WorkflowStepRepository;
+use App\State\Workflow\WorkflowStepCreateProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: WorkflowStepRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+        new Post(
+            input: WorkflowStepCreateDTO::class,
+            processor: WorkflowStepCreateProcessor::class
+        ),
+        new Patch()
+    ]
+)]
 class WorkflowStep
 {
     const ID_PREFIX = "WS";
@@ -41,6 +59,9 @@ class WorkflowStep
 
     #[ORM\ManyToOne]
     private ?GeneralParameter $durationUnit = null;
+
+    #[ORM\OneToOne(mappedBy: 'workflowStep', cascade: ['persist', 'remove'])]
+    private ?WorkflowStepUIConfiguration $uiConfiguration = null;
 
     public function getId(): ?string
     {
@@ -139,6 +160,23 @@ class WorkflowStep
     public function setDurationUnit(?GeneralParameter $durationUnit): static
     {
         $this->durationUnit = $durationUnit;
+
+        return $this;
+    }
+
+    public function getUIConfiguration(): ?WorkflowStepUIConfiguration
+    {
+        return $this->uiConfiguration;
+    }
+
+    public function setUIConfiguration(WorkflowStepUIConfiguration $uiConfiguration): static
+    {
+        // set the owning side of the relation if necessary
+        if ($uiConfiguration->getWorkflowStep() !== $this) {
+            $uiConfiguration->setWorkflowStep($this);
+        }
+
+        $this->uiConfiguration = $uiConfiguration;
 
         return $this;
     }
