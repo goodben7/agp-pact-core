@@ -18,6 +18,7 @@ use App\State\CreateUserProcessor;
 use App\State\DeleteUserProcessor;
 use App\State\SetProfileProcessor;
 use ApiPlatform\Metadata\ApiFilter;
+use App\Provider\UserAboutProvider;
 use ApiPlatform\Metadata\ApiResource;
 use App\State\ToggleLockUserProcessor;
 use ApiPlatform\Metadata\GetCollection;
@@ -37,6 +38,12 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_PHONE', fields: ['phone'])]
 #[ORM\HasLifecycleCallbacks]
+#[Get(
+    uriTemplate: 'users/about',
+    security: 'is_granted("ROLE_USER")',
+    normalizationContext: ['groups' => 'user:get'],
+    provider: UserAboutProvider::class,
+)]
 #[ApiResource(
     normalizationContext: ['groups' => 'user:get'], 
     operations:[
