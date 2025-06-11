@@ -20,4 +20,9 @@ return static function (): iterable {
     yield Permission::new('ROLE_PROFILE_UPDATE', "Modifier un profil utilisateur");
     yield Permission::new('ROLE_PROFILE_DETAILS', "Consulter les détails d'un profil utilisateur");
 
+    yield Permission::new('ROLE_NOTIFICATION_LIST', "Consulter la liste des notifications");
+    yield Permission::new('ROLE_NOTIFICATION_DETAILS', "Consulter les détails d'une notification");
+    yield Permission::new('ROLE_NOTIFICATION_CREATE', "Créer une notification");
+    yield Permission::new('ROLE_NOTIFICATION_UPDATE', "Modifier une notification");
+
 };

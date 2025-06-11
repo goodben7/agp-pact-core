@@ -18,3 +18,19 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Service\:
+        resource: '../src/Service/*'
+        tags: [ 'app.notification_sender' ]
+
+    App\Service\NotificationService:
+        arguments:
+            $em: '@doctrine.orm.entity_manager'
+            $senders: !tagged_iterator 'app.notification_sender'
+    
+    App\Service\SmsNotificationSender:
+        arguments:
+            $keccelApiToken: '%env(KECCEL_API_TOKEN)%'
+            $keccelSender: '%env(KECCEL_SENDER)%'
+            $keccelCampaignId: '%env(KECCEL_CAMPAIGN_ID)%'
+            $keccelRouteId: '%env(KECCEL_ROUTE_ID)%'
+        tags: [ 'app.notification_sender' ]
