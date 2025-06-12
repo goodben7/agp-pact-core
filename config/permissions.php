@@ -108,4 +108,6 @@ return static function (): iterable {
     yield Permission::new('ROLE_NOTIFICATION_TEMPLATE_CREATE', "Créer un modèle de notification");
     yield Permission::new('ROLE_NOTIFICATION_TEMPLATE_UPDATE', "Modifier un modèle de notification");
 
+    yield Permission::new('ROLE_ACTIVITY_LOG_LIST', "Consulter la liste des activités");
+
 };
