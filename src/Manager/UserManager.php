@@ -5,6 +5,7 @@ namespace App\Manager;
 use App\Entity\User;
 use App\Entity\Profile;
 use App\Model\NewUserModel;
+use App\Service\ActivityLogDispatcher;
 use App\Exception\UserCreationException;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Exception\UnavailableDataException;
@@ -17,6 +18,7 @@ class UserManager
     public function __construct(
         private EntityManagerInterface $em, 
         private UserPasswordHasherInterface $hasher,
+        private ActivityLogDispatcher  $dispatcher,
     )
     {
     }
@@ -41,9 +43,10 @@ class UserManager
             $this->em->persist($user);
             $this->em->flush();
 
+            $this->dispatcher->dispatch('create', $user);
+
             return $user;
         } catch (\Exception $e) {
-            $this->em->rollback();
             throw new UserCreationException($e->getMessage());
         }
     }
@@ -160,7 +163,6 @@ class UserManager
 
             return $user;
         } catch (\Exception $e) {
-            $this->em->rollback();
             error_log('User creation failed: ' . $e->getMessage());
             throw new UserCreationException('Failed to create user: ' . $e->getMessage());
         }
