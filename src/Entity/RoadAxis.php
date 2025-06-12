@@ -9,7 +9,6 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
 use App\Dto\Location\RoadAxisCreateDTO;
-use App\Dto\Location\RoadAxisUpdateDTO;
 use App\Repository\RoadAxisRepository;
 use App\State\Location\CreateRoadAxisProcessor;
 use Doctrine\Common\Collections\ArrayCollection;

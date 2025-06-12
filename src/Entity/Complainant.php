@@ -2,14 +2,59 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
+use App\Dto\Complainant\ComplainantCreateDTO;
 use App\Repository\ComplainantRepository;
+use App\State\Complainant\CreateComplainantProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ComplainantRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['complainant:list']],
+            security: "is_granted('ROLE_COMPLAINANT_LIST')"
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['complainant:get']],
+            security: "is_granted('ROLE_COMPLAINANT_VIEW')"
+        ),
+        new Post(
+            security: "is_granted('ROLE_COMPLAINANT_CREATE')",
+            input: ComplainantCreateDTO::class,
+            processor: CreateComplainantProcessor::class
+        ),
+        new Patch(
+            security: "is_granted('ROLE_COMPLAINANT_UPDATE')"
+        )
+    ]
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'id' => 'exact',
+        'lastName' => 'partial',
+        'firstName' => 'partial',
+        'middleName' => 'partial',
+        'contactPhone' => 'exact',
+        'contactEmail' => 'exact',
+        'personType.code' => 'exact',
+        'province.code' => 'exact',
+        'territory.code' => 'exact',
+        'commune.code' => 'exact',
+        'quartier.code' => 'exact',
+        'city.code' => 'exact',
+        'village.code' => 'exact'
+    ]
+)]
 class Complainant
 {
     const ID_PREFIX = "CN";

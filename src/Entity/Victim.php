@@ -2,12 +2,18 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Doctrine\IdGenerator;
 use App\Repository\VictimRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: VictimRepository::class)]
+#[ApiResource(
+    operations: [
+
+    ]
+)]
 class Victim
 {
     const ID_PREFIX = "VC";
