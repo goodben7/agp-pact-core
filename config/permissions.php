@@ -25,6 +25,7 @@ return static function (): iterable {
     yield Permission::new('ROLE_NOTIFICATION_CREATE', "Créer une notification");
     yield Permission::new('ROLE_NOTIFICATION_UPDATE', "Modifier une notification");
 
+
     yield Permission::new('ROLE_GENERAL_PARAMETER_LIST', "Consulter la liste des paramètres généraux");
     yield Permission::new('ROLE_GENERAL_PARAMETER_DETAILS', "Consulter un paramètre général");
     yield Permission::new('ROLE_GENERAL_PARAMETER_CREATE', "Créer un paramètre général");
@@ -101,4 +102,10 @@ return static function (): iterable {
     yield Permission::new('ROLE_WORKFLOW_TRANSITION_DETAILS', 'Consulter les détails d\'une transition de workflow');
     yield Permission::new('ROLE_WORKFLOW_TRANSITION_CREATE', 'Créer une transition de workflow');
     yield Permission::new('ROLE_WORKFLOW_TRANSITION_UPDATE', 'Modifier une transition de workflow');
+
+    yield Permission::new('ROLE_NOTIFICATION_TEMPLATE_LIST', "Consulter la liste des modèles de notification");
+    yield Permission::new('ROLE_NOTIFICATION_TEMPLATE_VIEW', "Consulter les détails d'un modèle de notification");
+    yield Permission::new('ROLE_NOTIFICATION_TEMPLATE_CREATE', "Créer un modèle de notification");
+    yield Permission::new('ROLE_NOTIFICATION_TEMPLATE_UPDATE', "Modifier un modèle de notification");
+
 };
