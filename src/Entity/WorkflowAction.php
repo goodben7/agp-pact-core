@@ -2,12 +2,43 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
+use App\Dto\Workflow\WorkflowActionCreateDTO;
 use App\Repository\WorkflowActionRepository;
+use App\State\Workflow\WorkflowActionCreateProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: WorkflowActionRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['workflow_action:list']],
+            security: "is_granted('ROLE_WORKFLOW_ACTION_LIST')"
+        ),
+        new Get(
+            security: "is_granted('ROLE_WORKFLOW_ACTION_VIEW')"
+        ),
+        new Post(
+            security: "is_granted('ROLE_WORKFLOW_ACTION_CREATE')",
+            input: WorkflowActionCreateDTO::class,
+            processor: WorkflowActionCreateProcessor::class
+        ),
+        new Patch(
+            security: "is_granted('ROLE_WORKFLOW_ACTION_UPDATE')",
+        ),
+        new Delete(
+            security: "is_granted('ROLE_WORKFLOW_ACTION_DELETE')"
+        ),
+    ],
+    normalizationContext: ['groups' => ['workflow_action:get']]
+)]
 class WorkflowAction
 {
     const ID_PREFIX = "WA";

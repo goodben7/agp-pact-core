@@ -8,7 +8,7 @@ class GeneralParameterCreateDTO
     public ?string $value = null;
     public ?string $code = null;
     public ?string $description = null;
-    public ?bool $isActive = true;
+    public ?bool $active = true;
     public ?int $displayOrder = null;
 }
 

@@ -2,14 +2,41 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
+use App\Dto\Location\RoadAxisCreateDTO;
 use App\Repository\RoadAxisRepository;
+use App\State\Location\CreateRoadAxisProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RoadAxisRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['road_axis:list']],
+            security: "is_granted('ROLE_ROAD_AXIS_LIST')",
+        ),
+        new Get(
+            security: "is_granted('ROLE_ROAD_AXIS_VIEW')",
+        ),
+        new Post(
+            security: "is_granted('ROLE_ROAD_AXIS_CREATE')",
+            input: RoadAxisCreateDTO::class,
+            processor: CreateRoadAxisProcessor::class
+        ),
+        new Patch(
+            security: "is_granted('ROLE_ROAD_AXIS_UPDATE')"
+        ),
+    ],
+    normalizationContext: ['groups' => ['road_axis:get']],
+)]
 class RoadAxis
 {
     const ID_PREFIX = "RA";

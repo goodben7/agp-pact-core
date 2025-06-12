@@ -2,11 +2,19 @@
 
 namespace App\Dto\Workflow;
 
+use App\Entity\Profile;
+use App\Entity\WorkflowAction;
+use App\Entity\WorkflowStep;
+
 class WorkflowTransitionCreateDTO
 {
-    public ?string $fromStepId = null;
-    public ?string $toStepId = null;
-    public ?string $actionId = null;
-    public ?string $roleRequiredId = null;
+    public ?WorkflowStep $fromStep = null;
+
+    public ?WorkflowStep $toStep = null;
+
+    public ?WorkflowAction $action = null;
+
+    public ?Profile $roleRequired = null;
+
     public ?string $description = null;
 }

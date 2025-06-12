@@ -2,11 +2,52 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
+use App\Dto\Location\SpeciesPriceCreateDTO;
 use App\Repository\SpeciesPriceRepository;
+use App\State\Location\CreateSpeciesPriceProcessor;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SpeciesPriceRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['species_price:list']],
+            security: "is_granted('ROLE_SPECIES_PRICE_LIST')"
+        ),
+        new Get(
+            security: "is_granted('ROLE_SPECIES_PRICE_VIEW')"
+        ),
+        new Post(
+            security: "is_granted('ROLE_SPECIES_PRICE_CREATE')",
+            input: SpeciesPriceCreateDTO::class,
+            processor: CreateSpeciesPriceProcessor::class,
+        ),
+        new Patch(
+            security: "is_granted('ROLE_SPECIES_PRICE_UPDATE')"
+        ),
+    ],
+    normalizationContext: ['groups' => ['species_price:get']]
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'id' => 'exact',
+        'speciesType.code' => 'exact',
+        'roadAxis.code' => 'exact',
+        'unit.code' => 'exact',
+        'currency.code' => 'exact',
+        'effectiveDate' => 'exact',
+        'expirationDate' => 'exact'
+    ]
+)]
 class SpeciesPrice
 {
     const ID_PREFIX = "SP";

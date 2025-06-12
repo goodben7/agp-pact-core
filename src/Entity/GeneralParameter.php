@@ -2,12 +2,54 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
+use App\Dto\GeneralParameter\GeneralParameterCreateDTO;
 use App\Repository\GeneralParameterRepository;
+use App\State\GeneralParameter\GeneralParameterCreateProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GeneralParameterRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['general_parameter:list']],
+            security: "is_granted('ROLE_GENERAL_PARAMETER_LIST')"
+        ),
+        new Get(
+            security: "is_granted('ROLE_GENERAL_PARAMETER_VIEW')"
+        ),
+        new Post(
+            security: "is_granted('ROLE_GENERAL_PARAMETER_CREATE')",
+            input: GeneralParameterCreateDTO::class,
+            processor: GeneralParameterCreateProcessor::class
+        ),
+        new Patch(
+            security: "is_granted('ROLE_GENERAL_PARAMETER_UPDATE')",
+        ),
+        new Delete(
+            security: "is_granted('ROLE_GENERAL_PARAMETER_DELETE')",
+        ),
+    ]
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'id' => 'exact',
+        'category' => 'partial',
+        'value' => 'partial',
+        'code' => 'exact',
+        'active' => 'exact',
+    ]
+)]
 class GeneralParameter
 {
     const ID_PREFIX = "GP";

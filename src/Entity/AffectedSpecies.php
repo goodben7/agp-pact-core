@@ -2,12 +2,51 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
+use App\Dto\Complaint\AffectedSpeciesCreateDTO;
 use App\Repository\AffectedSpeciesRepository;
+use App\State\AffectedSpecies\CreateAffectedSpeciesProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AffectedSpeciesRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['affected_species:list']],
+            security: "is_granted('ROLE_AFFECTED_SPECIES_LIST')"
+        ),
+        new Get(
+            security: "is_granted('ROLE_AFFECTED_SPECIES_VIEW')"
+        ),
+        new Post(
+            security: "is_granted('ROLE_AFFECTED_SPECIES_CREATE')",
+            input: AffectedSpeciesCreateDTO::class,
+            processor: CreateAffectedSpeciesProcessor::class
+        ),
+        new Patch(
+            security: "is_granted('ROLE_AFFECTED_SPECIES_UPDATE')"
+        ),
+    ],
+    normalizationContext: ['groups' => ['affected_species:get']]
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'id' => 'exact',
+        'complaint.id' => 'exact',
+        'speciesType.code' => 'exact',
+        'affectedUnit.code' => 'exact',
+        'assetType.code' => 'exact'
+    ]
+)]
 class AffectedSpecies
 {
     const ID_PREFIX = "AS";

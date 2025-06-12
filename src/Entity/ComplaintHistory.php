@@ -2,12 +2,47 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use App\Doctrine\IdGenerator;
 use App\Repository\ComplaintHistoryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ComplaintHistoryRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['complaint_history:list']],
+            security: "is_granted('ROLE_COMPLAINT_HISTORY_LIST')"
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['complaint_history:get']],
+            security: "is_granted('ROLE_COMPLAINT_HISTORY_GET')"
+        ),
+    ]
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'id' => 'exact',
+        'complaint.id' => 'exact',
+        'oldWorkflowStep.id' => 'exact',
+        'newWorkflowStep.id' => 'exact',
+        'action.id' => 'exact',
+        'actor.id' => 'exact',
+    ]
+)]
+#[ApiFilter(
+    OrderFilter::class,
+    properties: [
+        'actionDate'
+    ]
+)]
 class ComplaintHistory
 {
     const ID_PREFIX = "CH";

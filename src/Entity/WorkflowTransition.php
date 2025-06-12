@@ -2,12 +2,38 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
+use App\Dto\Workflow\WorkflowTransitionCreateDTO;
 use App\Repository\WorkflowTransitionRepository;
+use App\State\Workflow\WorkflowTransitionCreateProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: WorkflowTransitionRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['workflow_transition:list']],
+            security: "is_granted('ROLE_WORKFLOW_TRANSITION_LIST')"
+        ),
+        new Get(
+            security: "is_granted('ROLE_WORKFLOW_TRANSITION_VIEW')"
+        ),
+        new Post(
+            security: "is_granted('ROLE_WORKFLOW_TRANSITION_CREATE')",
+            input: WorkflowTransitionCreateDTO::class,
+            processor: WorkflowTransitionCreateProcessor::class
+        ),
+        new Patch(
+            security: "is_granted('ROLE_WORKFLOW_TRANSITION_UPDATE')",
+        ),
+    ]
+)]
 class WorkflowTransition
 {
     const ID_PREFIX = "WT";

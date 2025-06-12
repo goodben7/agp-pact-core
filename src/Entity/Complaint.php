@@ -2,13 +2,19 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
+use App\Dto\Complaint\ComplaintCreateDTO;
 use App\Repository\ComplaintRepository;
+use App\State\Complaint\CreateComplaintProcessor;
+use App\State\Complaint\UpdateComplaintProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -18,21 +24,44 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['complaint:list']]
+            normalizationContext: ['groups' => ['complaint:list']],
+            security: "is_granted('ROLE_COMPLAINT_LIST')"
         ),
         new Get(
-            normalizationContext: ['groups' => ['complaint:get']]
+            security: "is_granted('ROLE_COMPLAINT_VIEW')"
         ),
         new Post(
-            inputFormats: ['multipart' => ['multipart/form-data']],
-            processor: 'App\State\Processor\Complaint\CreateComplaintProcessor'
+            security: "is_granted('ROLE_COMPLAINT_CREATE')",
+            input: ComplaintCreateDTO::class,
+            processor: CreateComplaintProcessor::class
         ),
         new Patch(
-            inputFormats: ['multipart' => ['multipart/form-data']],
-            processor: 'App\State\Processor\Complaint\UpdateComplaintProcessor'
+            security: "is_granted('ROLE_COMPLAINT_UPDATE')",
+            processor: UpdateComplaintProcessor::class
         )
     ],
     normalizationContext: ['groups' => ['complaint:get']]
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'id' => 'exact',
+        'complaintType.id' => 'exact',
+        'currentWorkflowStep.id' => 'exact',
+        'incidentCause.id' => 'exact',
+        'roadAxis.id' => 'exact',
+        'location.id' => 'exact',
+        'complainant.id' => 'exact',
+        'currentWorkflowAction.id' => 'exact'
+    ]
+)]
+#[ApiFilter(
+    DateFilter::class,
+    properties: [
+        'declarationDate',
+        'closureDate',
+        'incidentDate',
+    ]
 )]
 class Complaint
 {
@@ -157,6 +186,9 @@ class Complaint
 
     #[ORM\ManyToOne]
     private ?User $currentAssignee = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $incidentDate = null;
 
     public function __construct()
     {
@@ -623,6 +655,18 @@ class Complaint
     public function setCurrentAssignee(?User $currentAssignee): static
     {
         $this->currentAssignee = $currentAssignee;
+
+        return $this;
+    }
+
+    public function getIncidentDate(): ?\DateTimeImmutable
+    {
+        return $this->incidentDate;
+    }
+
+    public function setIncidentDate(?\DateTimeImmutable $incidentDate): static
+    {
+        $this->incidentDate = $incidentDate;
 
         return $this;
     }
