@@ -2,7 +2,6 @@
 
 namespace App\Dto\Workflow;
 
-use App\Entity\Profile;
 use App\Entity\WorkflowAction;
 use App\Entity\WorkflowStep;
 
@@ -14,7 +13,7 @@ class WorkflowTransitionCreateDTO
 
     public ?WorkflowAction $action = null;
 
-    public ?Profile $roleRequired = null;
+    public ?array $roleRequired = null;
 
     public ?string $description = null;
 }

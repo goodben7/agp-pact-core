@@ -14,8 +14,10 @@ use App\Repository\WorkflowActionRepository;
 use App\State\Workflow\WorkflowActionCreateProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: WorkflowActionRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_WORKFLOW_ACTION_NAME', columns: ['name'])]
 #[ApiResource(
     operations: [
         new GetCollection(
@@ -47,21 +49,27 @@ class WorkflowAction
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
+    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list'])]
     private ?string $label = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['workflow_action:get', 'workflow_transition:get', 'workflow_transition:list'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list'])]
     private ?bool $requiresComment = null;
 
     #[ORM\Column]
+    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list'])]
     private ?bool $requiresFile = null;
 
     public function getId(): ?string

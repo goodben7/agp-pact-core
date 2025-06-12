@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: RoadAxisRepository::class)]
 #[ApiResource(
@@ -45,27 +46,34 @@ class RoadAxis
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
+    #[Groups(['road_axis:get', 'road_axis:list'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['road_axis:get', 'road_axis:list'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['road_axis:get', 'road_axis:list'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['road_axis:get', 'road_axis:list'])]
     private ?bool $active = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['road_axis:get', 'road_axis:list'])]
     private ?Location $startLocation = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['road_axis:get', 'road_axis:list'])]
     private ?Location $endLocation = null;
 
     /**
      * @var Collection<int, Location>
      */
     #[ORM\ManyToMany(targetEntity: Location::class)]
+    #[Groups(['road_axis:get', 'road_axis:list'])]
     private Collection $traversedLocations;
 
     /**

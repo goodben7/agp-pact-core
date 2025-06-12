@@ -50,10 +50,10 @@ readonly class ComplaintWorkflowManager
                 $action->getName()
             ));
 
-        if ($transition->getRoleRequired() && !$this->security->isGranted($transition->getRoleRequired()->getPermissions(), $currentUser))
+        if ($transition->getRoleRequired() && !$this->security->isGranted($transition->getRoleRequired(), $currentUser))
             throw new \LogicException(sprintf(
                 'user "%s" is not allowed to perform action "%s".',
-                $transition->getRoleRequired()->getLabel(),
+                $currentUser->getDisplayName(),
                 $action->getName()
             ));
 

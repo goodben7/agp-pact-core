@@ -16,6 +16,7 @@ use App\Repository\GeneralParameterRepository;
 use App\State\GeneralParameter\GeneralParameterCreateProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: GeneralParameterRepository::class)]
 #[ApiResource(
@@ -58,24 +59,31 @@ class GeneralParameter
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list'])]
     private ?string $category = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list'])]
     private ?string $value = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list'])]
     private ?string $code = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['general_parameter:get', 'general_parameter:list'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list'])]
     private ?bool $active = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['general_parameter:get', 'general_parameter:list'])]
     private ?int $displayOrder = null;
 
     public function getId(): ?string

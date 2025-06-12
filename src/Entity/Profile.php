@@ -24,7 +24,7 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 #[ORM\Entity(repositoryClass: ProfileRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
-    normalizationContext: ['groups' => 'profile:get'], 
+    normalizationContext: ['groups' => 'profile:get'],
     operations:[
         new Get(
             security: 'is_granted("ROLE_PROFILE_DETAILS")',
@@ -55,26 +55,26 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 ])]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt', 'updatedAt'])]
 #[ApiFilter(DateFilter::class, properties: ['createdAt', 'updatedAt'])]
-class Profile 
+class Profile
 {
     public const ID_PREFIX = "PR";
 
     #[ORM\Id]
     #[ORM\GeneratedValue( strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
-    #[Groups(['profile:get', 'user:get'])]
+    #[Groups(['profile:get', 'user:get', 'workflow_transition:get', 'workflow_transition:list'])]
     #[ORM\Column(length: 16)]
     private ?string $id = null;
 
     #[ORM\Column(length: 120)]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
-    #[Groups(['profile:get', 'profile:post', 'profile:patch', 'user:get'])]
+    #[Groups(['profile:get', 'profile:post', 'profile:patch', 'user:get', 'workflow_transition:get', 'workflow_transition:list'])]
     private ?string $label = null;
 
     #[ORM\Column(type: Types::SIMPLE_ARRAY)]
     #[Assert\Count(min: 1)]
-    #[Groups(['profile:get', 'profile:post', 'profile:patch'])]
+    #[Groups(['profile:get', 'profile:post', 'profile:patch', 'workflow_transition:get', 'workflow_transition:list'])]
     private array $permissions = [];
 
     #[ORM\Column(length: 3)]

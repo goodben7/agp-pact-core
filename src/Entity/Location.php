@@ -14,6 +14,7 @@ use App\Dto\Location\LocationCreateDTO;
 use App\Repository\LocationRepository;
 use App\State\Location\LocationCreateProcessor;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: LocationRepository::class)]
 #[ApiResource(
@@ -56,23 +57,28 @@ class Location
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
+    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list'])]
     private ?GeneralParameter $level = null;
 
     #[ORM\ManyToOne(targetEntity: self::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list'])]
     private ?self $parent = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list'])]
     private ?string $code = null;
 
     #[ORM\Column]
+    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list'])]
     private ?bool $active = null;
 
     public function getId(): ?string

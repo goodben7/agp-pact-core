@@ -4,6 +4,7 @@ namespace App\Manager;
 
 
 use App\Dto\Location\RoadAxisCreateDTO;
+use App\Entity\Location;
 use App\Entity\RoadAxis;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -23,15 +24,18 @@ readonly class RoadAxisManager
             ->setName($data->name)
             ->setDescription($data->description)
             ->setStartLocation($data->startLocation)
-            ->setEndLocation($data->endLocation);
+            ->setEndLocation($data->endLocation)
+            ->setActive($data->active);
+
+        foreach ($data->traversedLocationIds as $traversedLocationId) {
+            $traversedLocation = $this->em->getRepository(Location::class)->find($traversedLocationId);
+            if ($traversedLocation)
+                $roadAxis->addTraversedLocation($traversedLocation);
+        }
 
         $this->em->persist($roadAxis);
         $this->em->flush();
 
         return $roadAxis;
-    }
-
-    public function update(mixed $data)
-    {
     }
 }
