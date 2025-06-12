@@ -20,7 +20,6 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 
 #[ORM\Entity(repositoryClass: NotificationTemplateRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => 'notification_template:get'],
     operations: [
         new GetCollection(
             security: 'is_granted("ROLE_NOTIFICATION_TEMPLATE_LIST")',
@@ -40,7 +39,8 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
             security: 'is_granted("ROLE_NOTIFICATION_TEMPLATE_UPDATE")',
             processor: PersistProcessor::class,
         ),
-    ]
+    ],
+    normalizationContext: ['groups' => 'notification_template:get']
 )]
 class NotificationTemplate
 {
@@ -85,6 +85,10 @@ class NotificationTemplate
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
     private ?string $senderName = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
+    private ?string $sentVia = null;
 
     public function getId(): ?string
     {
@@ -183,6 +187,18 @@ class NotificationTemplate
     public function setSenderName(?string $senderName): static
     {
         $this->senderName = $senderName;
+
+        return $this;
+    }
+
+    public function getSentVia(): ?string
+    {
+        return $this->sentVia;
+    }
+
+    public function setSentVia(string $sentVia): static
+    {
+        $this->sentVia = $sentVia;
 
         return $this;
     }

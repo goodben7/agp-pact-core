@@ -11,7 +11,7 @@ use App\Dto\SetUserProfileDto;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
-use App\Model\UserProxyIntertace;
+use App\Model\UserProxyInterface;
 use App\Manager\PermissionManager;
 use App\Repository\UserRepository;
 use App\State\CreateUserProcessor;
@@ -45,7 +45,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     provider: UserAboutProvider::class,
 )]
 #[ApiResource(
-    normalizationContext: ['groups' => 'user:get'], 
+    normalizationContext: ['groups' => 'user:get'],
     operations:[
         new Get(
             security: 'is_granted("ROLE_USER_DETAILS")',
@@ -165,7 +165,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 8, nullable: true)]
     #[Groups(['user:get'])]
     private ?string $personType = null;
-    
+
     public function getId(): ?string
     {
         return $this->id;
@@ -204,14 +204,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles[] = 'ROLE_USER';
         $roles[] = $this->getPersonRole();
 
-        if (UserProxyIntertace::PERSON_ADMIN === $this->personType) {
+        if (UserProxyInterface::PERSON_ADMIN === $this->personType) {
             $roles = array_merge($roles, array_values((array)PermissionManager::getInstance()->getPermissionsAsListChoices()));
         } elseif (null !== $this->profile) {
             $roles = array_merge($roles, $this->profile->getPermissions());
         }
-        
+
         return array_unique($roles);
-    
+
     }
 
     /**
@@ -313,11 +313,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->updatedAt = new \DateTimeImmutable();
     }
-    
+
 
     /**
      * Get the value of plainPassword
-     */ 
+     */
     public function getPlainPassword()
     {
         return $this->plainPassword;
@@ -327,7 +327,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Set the value of plainPassword
      *
      * @return  self
-     */ 
+     */
     public function setPlainPassword($plainPassword)
     {
         $this->plainPassword = $plainPassword;
@@ -337,7 +337,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Get the value of locked
-     */ 
+     */
     public function isLocked(): bool|null
     {
         return $this->locked;
@@ -347,7 +347,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Set the value of locked
      *
      * @return  self
-     */ 
+     */
     public function setLocked($locked): static
     {
         $this->locked = $locked;
@@ -357,7 +357,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Get the value of profile
-     */ 
+     */
     public function getProfile(): Profile|null
     {
         return $this->profile;
@@ -367,7 +367,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Set the value of profile
      *
      * @return  self
-     */ 
+     */
     public function setProfile($profile): static
     {
         $this->profile = $profile;
@@ -377,7 +377,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Get the value of personType
-     */ 
+     */
     public function getPersonType(): string|null
     {
         return $this->personType;
@@ -387,7 +387,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Set the value of personType
      *
      * @return  self
-     */ 
+     */
     public function setPersonType($personType): static
     {
         $this->personType = $personType;
@@ -398,39 +398,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private function getPersonRole(): string
     {
         return array_search($this->personType, [
-            "ROLE_COMMITTEE" => UserProxyIntertace::PERSON_COMMITTEE,
-            "ROLE_NGO" => UserProxyIntertace::PERSON_NGO,
-            "ROLE_COMPANY" => UserProxyIntertace::PERSON_COMPANY,
-            "ROLE_CONTROL_MISSION" => UserProxyIntertace::PERSON_CONTROL_MISSION,
-            "ROLE_INFRASTRUCTURE_CELL" => UserProxyIntertace::PERSON_INFRASTRUCTURE_CELL,
-            "ROLE_WORLD_BANK" => UserProxyIntertace::PERSON_WORLD_BANK,
-            "ROLE_ADMIN" => UserProxyIntertace::PERSON_ADMIN,
+            "ROLE_COMMITTEE" => UserProxyInterface::PERSON_COMMITTEE,
+            "ROLE_NGO" => UserProxyInterface::PERSON_NGO,
+            "ROLE_COMPANY" => UserProxyInterface::PERSON_COMPANY,
+            "ROLE_CONTROL_MISSION" => UserProxyInterface::PERSON_CONTROL_MISSION,
+            "ROLE_INFRASTRUCTURE_CELL" => UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
+            "ROLE_WORLD_BANK" => UserProxyInterface::PERSON_WORLD_BANK,
+            "ROLE_ADMIN" => UserProxyInterface::PERSON_ADMIN,
         ]);
     }
 
     public static function getAcceptedPersonList(): array
     {
         return [
-            UserProxyIntertace::PERSON_COMMITTEE,
-            UserProxyIntertace::PERSON_NGO,
-            UserProxyIntertace::PERSON_COMPANY,
-            UserProxyIntertace::PERSON_CONTROL_MISSION,
-            UserProxyIntertace::PERSON_INFRASTRUCTURE_CELL,
-            UserProxyIntertace::PERSON_WORLD_BANK,
-            UserProxyIntertace::PERSON_ADMIN
+            UserProxyInterface::PERSON_COMMITTEE,
+            UserProxyInterface::PERSON_NGO,
+            UserProxyInterface::PERSON_COMPANY,
+            UserProxyInterface::PERSON_CONTROL_MISSION,
+            UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
+            UserProxyInterface::PERSON_WORLD_BANK,
+            UserProxyInterface::PERSON_ADMIN
         ];
     }
 
     public static function getPersonTypesAsChoices(): array
     {
         return [
-            "Comité" => UserProxyIntertace::PERSON_COMMITTEE,
-            "ONG" => UserProxyIntertace::PERSON_NGO,
-            "Entreprise" => UserProxyIntertace::PERSON_COMPANY,
-            "Mission de contrôle" => UserProxyIntertace::PERSON_CONTROL_MISSION,
-            "Cellule d'infrastructure" => UserProxyIntertace::PERSON_INFRASTRUCTURE_CELL,
-            "Banque mondiale" => UserProxyIntertace::PERSON_WORLD_BANK,
-            "Administrateur" => UserProxyIntertace::PERSON_ADMIN
+            "Comité" => UserProxyInterface::PERSON_COMMITTEE,
+            "ONG" => UserProxyInterface::PERSON_NGO,
+            "Entreprise" => UserProxyInterface::PERSON_COMPANY,
+            "Mission de contrôle" => UserProxyInterface::PERSON_CONTROL_MISSION,
+            "Cellule d'infrastructure" => UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
+            "Banque mondiale" => UserProxyInterface::PERSON_WORLD_BANK,
+            "Administrateur" => UserProxyInterface::PERSON_ADMIN
         ];
     }
 

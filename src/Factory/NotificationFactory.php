@@ -29,13 +29,13 @@ class NotificationFactory
 
         // Map properties from NotificationTemplate to Notification
         $notification->setType($template->getType());
-        $notification->setSubject($template->getSubject());
+        $notification->setSubject($data['subject'] ?? $template->getSubject()); // Use template subject if not provided
         // The content from template becomes the body of the notification
-        $notification->setBody($template->getContent() ?? ''); // Ensure body is not null
+        $notification->setBody($data['content'] ?? ''); // Ensure body is not null
 
         // Set recipient information
         $notification->setRecipient($recipient);
-        
+
         // Validate recipient type
         if (!in_array($recipientType, Notification::getRecipientTypeChoices())) {
             throw new \InvalidArgumentException(sprintf('Invalid recipient type "%s" provided.', $recipientType));
