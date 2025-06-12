@@ -2,13 +2,14 @@
 
 namespace App\Dto\Location;
 
+use App\Entity\GeneralParameter;
 use App\Entity\Location;
 
 class LocationCreateDTO
 {
     public ?string $name = null;
 
-    public ?string $level = null;
+    public ?GeneralParameter $level = null;
 
     public ?Location $parent = null;
 

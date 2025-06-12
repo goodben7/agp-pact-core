@@ -13,6 +13,7 @@ use App\Repository\WorkflowTransitionRepository;
 use App\State\Workflow\WorkflowTransitionCreateProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: WorkflowTransitionRepository::class)]
 #[ApiResource(
@@ -42,25 +43,30 @@ class WorkflowTransition
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
+    #[Groups(['workflow_transition:get', 'workflow_transition:list'])]
     private ?string $id = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['workflow_transition:get', 'workflow_transition:list'])]
     private ?WorkflowStep $fromStep = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['workflow_transition:get', 'workflow_transition:list'])]
     private ?WorkflowStep $toStep = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['workflow_transition:get', 'workflow_transition:list'])]
     private ?WorkflowAction $action = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['workflow_transition:get'])]
     private ?string $description = null;
 
-    #[ORM\ManyToOne]
-    private ?Profile $roleRequired = null;
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $roleRequired = null;
 
     public function getId(): ?string
     {
@@ -115,12 +121,12 @@ class WorkflowTransition
         return $this;
     }
 
-    public function getRoleRequired(): ?Profile
+    public function getRoleRequired(): ?array
     {
         return $this->roleRequired;
     }
 
-    public function setRoleRequired(?Profile $roleRequired): static
+    public function setRoleRequired(?array $roleRequired): static
     {
         $this->roleRequired = $roleRequired;
 

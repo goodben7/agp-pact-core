@@ -2,7 +2,8 @@
 
 namespace App\Dto\Location;
 
-use phpDocumentor\Reflection\Location;
+
+use App\Entity\Location;
 
 class RoadAxisCreateDTO
 {
@@ -10,7 +11,7 @@ class RoadAxisCreateDTO
 
     public ?string $description = null;
 
-    public ?bool $isActive = true;
+    public ?bool $active = true;
 
     public ?Location $startLocation = null;
 
