@@ -80,9 +80,8 @@ class Complainant
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $contactEmail = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?GeneralParameter $personType = null;
+    #[ORM\Column(length: 10)]
+    private ?string $personType = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $address = null;
@@ -176,12 +175,12 @@ class Complainant
         return $this;
     }
 
-    public function getPersonType(): ?GeneralParameter
+    public function getPersonType(): ?string
     {
         return $this->personType;
     }
 
-    public function setPersonType(?GeneralParameter $personType): static
+    public function setPersonType(?string $personType): static
     {
         $this->personType = $personType;
 

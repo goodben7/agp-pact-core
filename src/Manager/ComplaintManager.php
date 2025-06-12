@@ -25,7 +25,7 @@ readonly class ComplaintManager
     {
         $complaint = (new Complaint())
             ->setComplaintType($data->complaintType)
-            ->setIncidentDate(new \DateTimeImmutable($data->incidentDate))
+            ->setIncidentDate($data->incidentDate)
             ->setIncidentCause($data->incidentCause)
             ->setDescription($data->description)
             ->setRoadAxis($data->roadAxis)
@@ -34,7 +34,8 @@ readonly class ComplaintManager
             ->setLatitude($data->latitude)
             ->setLongitude($data->longitude)
             ->setComplainant($data->complainant)
-            ->setAssignedTo($data->assignedTo);
+            ->setAssignedTo($data->assignedTo)
+            ->setDeclarationDate(new \DateTimeImmutable());
 
         $initialStep = $this->em->getRepository(WorkflowStep::class)->findOneBy(['isInitial' => true]);
         if (!$initialStep)
@@ -59,9 +60,5 @@ readonly class ComplaintManager
         );
 
         return $complaint;
-    }
-
-    public function update(mixed $data)
-    {
     }
 }

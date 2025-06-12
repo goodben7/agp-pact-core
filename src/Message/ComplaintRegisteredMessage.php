@@ -13,4 +13,19 @@ class ComplaintRegisteredMessage implements EventMessageInterface
     )
     {
     }
+
+    public function getComplaintId(): string
+    {
+        return $this->complaintId;
+    }
+
+    public function getComplaintEmail(): string
+    {
+        return $this->complaintEmail;
+    }
+
+    public function getComplaintPhone(): string
+    {
+        return $this->complaintPhone;
+    }
 }
