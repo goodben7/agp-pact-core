@@ -31,6 +31,11 @@ readonly class CreateComplainantProcessor implements ProcessorInterface
             $data->territory,
             $data->commune,
             $data->quartier,
+            $data->city,
+            $data->village,
+            $data->secteur,
+            $data->organizationStatus,
+            $data->legalPersonality,
        );
 
        return $this->manager->create($model);

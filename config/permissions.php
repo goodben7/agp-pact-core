@@ -30,7 +30,6 @@ return static function (): iterable {
     yield Permission::new('ROLE_GENERAL_PARAMETER_DETAILS', "Consulter un paramètre général");
     yield Permission::new('ROLE_GENERAL_PARAMETER_CREATE', "Créer un paramètre général");
     yield Permission::new('ROLE_GENERAL_PARAMETER_UPDATE', "Modifier un paramètre général");
-    yield Permission::new('ROLE_GENERAL_PARAMETER_UPDATE', "Modifier un paramètre général");
 
     yield Permission::new('ROLE_COMPLAINT_LIST', "Consulter la liste des plaintes");
     yield Permission::new('ROLE_COMPLAINT_DETAILS', "Consulter les détails d'une plainte");

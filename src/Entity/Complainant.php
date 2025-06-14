@@ -60,7 +60,11 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
         'commune.code' => 'exact',
         'quartier.code' => 'exact',
         'city.code' => 'exact',
-        'village.code' => 'exact'
+        'village.code' => 'exact',
+        'secteur.code' => 'exact',
+        'userId' => 'exact',
+        'organizationStatus.code' => 'exact',
+        'legalPersonality.code' => 'exact',
     ]
 )]
 class Complainant
@@ -74,11 +78,11 @@ class Complainant
     #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list', 'complainant:patch'])]
     private ?string $id = null;
 
-    #[ORM\Column(length: 120)]
+    #[ORM\Column(length: 120, nullable: true)]
     #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list', 'complainant:patch'])]
     private ?string $lastName = null;
 
-    #[ORM\Column(length: 120)]
+    #[ORM\Column(length: 120, nullable: true)]
     #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list', 'complainant:patch'])]
     private ?string $firstName = null;
 
@@ -98,9 +102,10 @@ class Complainant
     #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list', 'complainant:patch'])]
     private ?string $contactEmail = null;
 
-    #[ORM\Column(length: 10)]
-    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
-    private ?string $personType = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['complainant:list', 'complainant:get'])]
+    private ?GeneralParameter $personType = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list', 'complainant:patch'])]
@@ -136,9 +141,24 @@ class Complainant
     #[Groups(['complainant:list', 'complainant:get', 'complainant:patch'])]
     private ?Location $village = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['complainant:list', 'complainant:get', 'complainant:patch'])]
+    private ?Location $secteur = null;
+
     #[ORM\Column(length: 16, nullable: true)]
     #[Groups(groups: ['complainant:get', 'complainant:list'])]
     private ?string $userId = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['complainant:list', 'complainant:get', 'complainant:patch'])]
+    private ?GeneralParameter $organizationStatus = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['complainant:list', 'complainant:get', 'complainant:patch'])]
+    private ?GeneralParameter $legalPersonality = null;
 
     public function getId(): ?string
     {
@@ -201,18 +221,6 @@ class Complainant
     public function setContactEmail(?string $contactEmail): static
     {
         $this->contactEmail = $contactEmail;
-
-        return $this;
-    }
-
-    public function getPersonType(): ?string
-    {
-        return $this->personType;
-    }
-
-    public function setPersonType(?string $personType): static
-    {
-        $this->personType = $personType;
 
         return $this;
     }
@@ -344,6 +352,86 @@ class Complainant
     public function setDisplayName($displayName): static
     {
         $this->displayName = $displayName;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of secteur
+     */ 
+    public function getSecteur(): Location|null
+    {
+        return $this->secteur;
+    }
+
+    /**
+     * Set the value of secteur
+     *
+     * @return  self
+     */ 
+    public function setSecteur($secteur): static
+    {
+        $this->secteur = $secteur;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of personType
+     */ 
+    public function getPersonType(): GeneralParameter|null
+    {
+        return $this->personType;
+    }
+
+    /**
+     * Set the value of personType
+     *
+     * @return  self
+     */ 
+    public function setPersonType(?GeneralParameter $personType)
+    {
+        $this->personType = $personType;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of organizationStatus
+     */ 
+    public function getOrganizationStatus(): GeneralParameter|null
+    {
+        return $this->organizationStatus;
+    }
+
+    /**
+     * Set the value of organizationStatus
+     *
+     * @return  self
+     */ 
+    public function setOrganizationStatus(?GeneralParameter $organizationStatus): static
+    {
+        $this->organizationStatus = $organizationStatus;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of legalPersonality
+     */ 
+    public function getLegalPersonality(): GeneralParameter|null
+    {
+        return $this->legalPersonality;
+    }
+
+    /**
+     * Set the value of legalPersonality
+     *
+     * @return  self
+     */ 
+    public function setLegalPersonality(?GeneralParameter $legalPersonality): static
+    {
+        $this->legalPersonality = $legalPersonality;
 
         return $this;
     }

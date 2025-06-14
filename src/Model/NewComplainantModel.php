@@ -2,9 +2,8 @@
 
 namespace App\Model;
 
-use App\Entity\User; 
 use App\Entity\Location;
-use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\GeneralParameter;
 
 class NewComplainantModel
 {
@@ -16,8 +15,7 @@ class NewComplainantModel
         public ?string $contactEmail = null,
         public ?string $plainPassword = null, 
 
-        #[Assert\Choice(callback: [User::class, 'getPersonTypesAsList'])]
-        public ?string $personType = null, 
+        public ?GeneralParameter $personType = null, 
 
         public ?string $address = null,
         public ?Location $province = null,
@@ -26,6 +24,9 @@ class NewComplainantModel
         public ?Location $quartier = null,
         public ?Location $city = null,
         public ?Location $village = null,
+        public ?Location $secteur = null,
+        public ?GeneralParameter $organizationStatus = null, 
+        public ?GeneralParameter $legalPersonality = null, 
     ) {
     }
 }
