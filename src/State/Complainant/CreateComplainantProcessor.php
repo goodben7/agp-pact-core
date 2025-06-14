@@ -7,6 +7,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Dto\Complainant\ComplainantCreateDTO;
 use App\Entity\Complainant;
 use App\Manager\ComplainantManager;
+use App\Model\NewComplainantModel;
 
 readonly class CreateComplainantProcessor implements ProcessorInterface
 {
@@ -17,6 +18,22 @@ readonly class CreateComplainantProcessor implements ProcessorInterface
     /** @var ComplainantCreateDTO $data */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Complainant
     {
-        return $this->manager->create($data);
+       $model = new NewComplainantModel(
+            $data->firstName,
+            $data->lastName,
+            $data->middleName,
+            $data->contactPhone,
+            $data->contactEmail,
+            $data->plainPassword,
+            $data->personType,
+            $data->address,
+            $data->province,
+            $data->territory,
+            $data->commune,
+            $data->quartier,
+       );
+
+       return $this->manager->create($model);
+
     }
 }

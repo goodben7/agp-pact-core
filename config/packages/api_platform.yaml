@@ -16,6 +16,7 @@ api_platform:
         App\Exception\InvalidActionInputException: 400
         App\Exception\UnavailableDataException: 404
         App\Exception\UserCreationException: 400
+        App\Exception\ComplainantCreationException: 400
         pp\Exception\UnauthorizedActionException: 403
     defaults:
         stateless: true
