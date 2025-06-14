@@ -2,23 +2,26 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\Get;
+use App\Doctrine\IdGenerator;
+use ApiPlatform\Metadata\Post;
+use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\Patch;
+use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use App\Doctrine\IdGenerator;
-use App\Dto\Complainant\ComplainantCreateDTO;
 use App\Repository\ComplainantRepository;
-use App\State\Complainant\CreateComplainantProcessor;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
+use App\Dto\Complainant\ComplainantCreateDTO;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Attribute\Groups;
+use App\State\Complainant\CreateComplainantProcessor;
+use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 
 #[ORM\Entity(repositoryClass: ComplainantRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USER', fields: ['userId'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_CONTACT_PHONE', fields: ['contactPhone'])]
+#[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     operations: [
         new GetCollection(
@@ -35,7 +38,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
             processor: CreateComplainantProcessor::class
         ),
         new Patch(
-            security: "is_granted('ROLE_COMPLAINANT_UPDATE')"
+            security: "is_granted('ROLE_COMPLAINANT_UPDATE')",
+            denormalizationContext: ['groups' => 'complainant:patch'],
+            processor: PersistProcessor::class,
         )
     ]
 )]
@@ -43,9 +48,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
     SearchFilter::class,
     properties: [
         'id' => 'exact',
-        'lastName' => 'partial',
-        'firstName' => 'partial',
-        'middleName' => 'partial',
+        'lastName' => 'ipartial',
+        'firstName' => 'ipartial',
+        'middleName' => 'ipartial',
+        'displayName' => 'ipartial',
         'contactPhone' => 'exact',
         'contactEmail' => 'exact',
         'personType.code' => 'exact',
@@ -65,27 +71,31 @@ class Complainant
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list', 'complainant:patch'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 120)]
-    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list', 'complainant:patch'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 120)]
-    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list', 'complainant:patch'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 120, nullable: true)]
-    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list', 'complainant:patch'])]
     private ?string $middleName = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
+    private ?string $displayName = null;
 
     #[ORM\Column(length: 14)]
     #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
     private ?string $contactPhone = null;
 
     #[ORM\Column(length: 180, nullable: true)]
-    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list', 'complainant:patch'])]
     private ?string $contactEmail = null;
 
     #[ORM\Column(length: 10)]
@@ -93,37 +103,37 @@ class Complainant
     private ?string $personType = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list', 'complainant:patch'])]
     private ?string $address = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['complainant:list', 'complainant:get'])]
+    #[Groups(['complainant:list', 'complainant:get', 'complainant:patch'])]
     private ?Location $province = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['complainant:list', 'complainant:get'])]
+    #[Groups(['complainant:list', 'complainant:get', 'complainant:patch'])]
     private ?Location $territory = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['complainant:list', 'complainant:get'])]
+    #[Groups(['complainant:list', 'complainant:get', 'complainant:patch'])]
     private ?Location $commune = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['complainant:list', 'complainant:get'])]
+    #[Groups(['complainant:list', 'complainant:get', 'complainant:patch'])]
     private ?Location $quartier = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['complainant:list', 'complainant:get'])]
+    #[Groups(['complainant:list', 'complainant:get', 'complainant:patch'])]
     private ?Location $city = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['complainant:list', 'complainant:get'])]
+    #[Groups(['complainant:list', 'complainant:get', 'complainant:patch'])]
     private ?Location $village = null;
 
     #[ORM\Column(length: 16, nullable: true)]
@@ -307,6 +317,33 @@ class Complainant
     public function setUserId($userId): static
     {
         $this->userId = $userId;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function buildFullName()
+    {
+        return $this->displayName = $this->firstName . ' ' . $this->middleName . ' ' . $this->lastName;
+    }
+
+    /**
+     * Get the value of displayName
+     */ 
+    public function getDisplayName(): string|null
+    {
+        return $this->displayName;
+    }
+
+    /**
+     * Set the value of displayName
+     *
+     * @return  self
+     */ 
+    public function setDisplayName($displayName): static
+    {
+        $this->displayName = $displayName;
 
         return $this;
     }

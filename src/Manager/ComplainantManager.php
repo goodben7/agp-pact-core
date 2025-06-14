@@ -48,14 +48,16 @@ readonly class ComplainantManager
             ->setProvince($model->province);
 
         try {
-            $this->em->persist($complainant);
-            $this->em->flush();
 
             $profile = $this->profileRepository->findOneBy(['personType' => UserProxyInterface::PERSON_COMPLAINANT]);
 
             if (null === $profile) {
                 throw new UnavailableDataException('cannot find profile');
             }
+
+
+            $this->em->persist($complainant);
+            $this->em->flush();
 
             $user = $this->bus->dispatch(
                 new CreateUserCommand(
@@ -85,7 +87,7 @@ readonly class ComplainantManager
                     ['message' => $e->getMessage(), 'exception' => $e]
                 );
             }
-            throw new ComplainantCreationException("An error occurred while creating the complainant.");
+            throw new ComplainantCreationException("An error occurred while creating the complainant. : ". $e->getMessage());
         }
     }
 }
