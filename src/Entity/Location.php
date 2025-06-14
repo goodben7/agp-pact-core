@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             security: "is_granted('ROLE_LOCATION_LIST')",
         ),
         new Get(
-            security: "is_granted('ROLE_LOCATION_VIEW')",
+            security: "is_granted('ROLE_LOCATION_DETAILS')",
         ),
         new Post(
             security: "is_granted('ROLE_LOCATION_CREATE')",

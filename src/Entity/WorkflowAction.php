@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             security: "is_granted('ROLE_WORKFLOW_ACTION_LIST')"
         ),
         new Get(
-            security: "is_granted('ROLE_WORKFLOW_ACTION_VIEW')"
+            security: "is_granted('ROLE_WORKFLOW_ACTION_DETAILS')"
         ),
         new Post(
             security: "is_granted('ROLE_WORKFLOW_ACTION_CREATE')",

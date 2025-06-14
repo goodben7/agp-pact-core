@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             security: "is_granted('ROLE_WORKFLOW_TRANSITION_LIST')"
         ),
         new Get(
-            security: "is_granted('ROLE_WORKFLOW_TRANSITION_VIEW')"
+            security: "is_granted('ROLE_WORKFLOW_TRANSITION_DETAILS')"
         ),
         new Post(
             security: "is_granted('ROLE_WORKFLOW_TRANSITION_CREATE')",

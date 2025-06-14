@@ -26,7 +26,7 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
             provider: CollectionProvider::class
         ),
         new Get(
-            security: 'is_granted("ROLE_NOTIFICATION_TEMPLATE_VIEW")',
+            security: 'is_granted("ROLE_NOTIFICATION_TEMPLATE_DETAILS")',
             provider: ItemProvider::class
         ),
         new Post(

@@ -31,7 +31,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             security: "is_granted('ROLE_COMPLAINT_LIST')"
         ),
         new Get(
-            security: "is_granted('ROLE_COMPLAINT_VIEW')"
+            security: "is_granted('ROLE_COMPLAINT_DETAILS')"
         ),
         new Post(
             security: "is_granted('ROLE_COMPLAINT_CREATE')",

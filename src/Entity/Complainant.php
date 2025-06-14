@@ -30,7 +30,7 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
         ),
         new Get(
             normalizationContext: ['groups' => ['complainant:get']],
-            security: "is_granted('ROLE_COMPLAINANT_VIEW')"
+            security: "is_granted('ROLE_COMPLAINANT_DETAILS')"
         ),
         new Post(
             security: "is_granted('ROLE_COMPLAINANT_CREATE')",
@@ -303,7 +303,7 @@ class Complainant
 
     /**
      * Get the value of userId
-     */ 
+     */
     public function getUserId(): string|null
     {
         return $this->userId;
@@ -313,7 +313,7 @@ class Complainant
      * Set the value of userId
      *
      * @return  self
-     */ 
+     */
     public function setUserId($userId): static
     {
         $this->userId = $userId;
@@ -330,7 +330,7 @@ class Complainant
 
     /**
      * Get the value of displayName
-     */ 
+     */
     public function getDisplayName(): string|null
     {
         return $this->displayName;
@@ -340,7 +340,7 @@ class Complainant
      * Set the value of displayName
      *
      * @return  self
-     */ 
+     */
     public function setDisplayName($displayName): static
     {
         $this->displayName = $displayName;

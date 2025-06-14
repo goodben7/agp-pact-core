@@ -24,7 +24,7 @@ use Doctrine\ORM\Mapping as ORM;
             security: "is_granted('ROLE_AFFECTED_SPECIES_LIST')"
         ),
         new Get(
-            security: "is_granted('ROLE_AFFECTED_SPECIES_VIEW')"
+            security: "is_granted('ROLE_AFFECTED_SPECIES_DETAILS')"
         ),
         new Post(
             security: "is_granted('ROLE_AFFECTED_SPECIES_CREATE')",

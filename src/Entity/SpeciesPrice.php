@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
             security: "is_granted('ROLE_SPECIES_PRICE_LIST')"
         ),
         new Get(
-            security: "is_granted('ROLE_SPECIES_PRICE_VIEW')"
+            security: "is_granted('ROLE_SPECIES_PRICE_DETAILS')"
         ),
         new Post(
             security: "is_granted('ROLE_SPECIES_PRICE_CREATE')",
