@@ -112,4 +112,9 @@ return static function (): iterable {
     yield Permission::new('ROLE_CLASSIFY_ASSIGN_COMPLAINT', "Pour classer et assigner (action `classify_assign_action`)");
 
     yield Permission::new('ROLE_ACTIVITY_LOG_LIST', "Consulter la liste des activités");
+
+    yield Permission::new('ROLE_COMPANY_CREATE', "Créer une entité");
+    yield Permission::new('ROLE_COMPANY_LIST', "Consulter la liste des entités");
+    yield Permission::new('ROLE_COMPANY_UPDATE', "Modifier une entité");
+    yield Permission::new('ROLE_COMPANY_DETAILS', "Consulter les détails d'une entité");
 };
