@@ -36,6 +36,7 @@ return static function (): iterable {
     yield Permission::new('ROLE_COMPLAINT_DETAILS', "Consulter les détails d'une plainte");
     yield Permission::new('ROLE_COMPLAINT_CREATE', "Créer une plainte");
     yield Permission::new('ROLE_COMPLAINT_UPDATE', "Modifier une plainte");
+    yield Permission::new('ROLE_COMPLAINT_APPLY_ACTION', "Appliquer une action sur une plainte");
 
     yield Permission::new('ROLE_COMPLAINANT_LIST', 'Consulter la liste des plaintants');
     yield Permission::new('ROLE_COMPLAINANT_DETAILS', 'Consulter les détails d\'un plaintant');
@@ -107,5 +108,7 @@ return static function (): iterable {
     yield Permission::new('ROLE_NOTIFICATION_TEMPLATE_VIEW', "Consulter les détails d'un modèle de notification");
     yield Permission::new('ROLE_NOTIFICATION_TEMPLATE_CREATE', "Créer un modèle de notification");
     yield Permission::new('ROLE_NOTIFICATION_TEMPLATE_UPDATE', "Modifier un modèle de notification");
+
+    yield Permission::new('ROLE_CLASSIFY_ASSIGN_COMPLAINT', "Pour classer et assigner (action `classify_assign_action`)");
 
 };

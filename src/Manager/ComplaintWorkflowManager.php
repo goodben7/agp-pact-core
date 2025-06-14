@@ -24,7 +24,7 @@ readonly class ComplaintWorkflowManager
 
     public function __construct(
         private EntityManagerInterface $em,
-        private MessageBusInterface    $messageBus,
+        private MessageBusInterface    $bus,
         private Security               $security,
         private ValidatorInterface     $validator,
     )
@@ -47,10 +47,10 @@ readonly class ComplaintWorkflowManager
                 'No valid transition found for action "%s" from step "%s" on complaint ID %d.',
                 $complaint->getId(),
                 $complaint->getCurrentWorkflowStep() ? $complaint->getCurrentWorkflowStep()->getName() : 'NULL',
-                $action->getName()
+                $action->getName() ?: 'NULL'
             ));
 
-        if ($transition->getRoleRequired() && !$this->security->isGranted($transition->getRoleRequired(), $currentUser))
+        if (in_array($currentUser->getRoles(), $transition->getRoleRequired()))
             throw new \LogicException(sprintf(
                 'user "%s" is not allowed to perform action "%s".',
                 $currentUser->getDisplayName(),
@@ -128,7 +128,7 @@ readonly class ComplaintWorkflowManager
         $this->em->persist($history);
         $this->em->flush();
 
-        $this->messageBus->dispatch(new ComplaintWorkflowMessage($complaint->getId(), $action->getName(), $newStep->getName()));
+        $this->bus->dispatch(new ComplaintWorkflowMessage($complaint->getId(), $action->getName(), $newStep->getName()));
 
         return $complaint;
     }

@@ -25,7 +25,7 @@ use Psr\Log\LoggerInterface;
 class ComplaintWorkflowMessageHandler
 {
     public function __construct(
-        private MessageBusInterface $messageBus,
+        private MessageBusInterface $bus,
         private ComplaintRepository $complaintRepository,
         private LoggerInterface     $logger
     )
@@ -54,7 +54,7 @@ class ComplaintWorkflowMessageHandler
 
         switch ($actionName) {
             case 'create_complaint_action':
-                $this->messageBus->dispatch(new ComplaintRegisteredMessage(
+                $this->bus->dispatch(new ComplaintRegisteredMessage(
                     $complaint->getId(),
                     $complaint->getComplainant()->getContactEmail(),
                     $complaint->getComplainant()->getContactPhone()
@@ -63,7 +63,7 @@ class ComplaintWorkflowMessageHandler
 
             case 'classify_assign_action':
                 if ($complaint->getAssignedTo()) {
-                    $this->messageBus->dispatch(new ComplaintClassifiedAssignedMessage(
+                    $this->bus->dispatch(new ComplaintClassifiedAssignedMessage(
                         $complaint->getId(),
                         $complaint->getAssignedTo()->getId()
                     ));
@@ -72,7 +72,7 @@ class ComplaintWorkflowMessageHandler
 
             case 'verify_receivability_action':
                 $isReceivable = ($newStepName === WorkflowStepName::RECEIVABLE);
-                $this->messageBus->dispatch(new ComplaintReceivabilityVerifiedMessage(
+                $this->bus->dispatch(new ComplaintReceivabilityVerifiedMessage(
                     $complaint->getId(),
                     $isReceivable,
                     $complaint->getComplainant()->getContactEmail(),
@@ -81,21 +81,21 @@ class ComplaintWorkflowMessageHandler
                 break;
 
             case 'examine_merits_action':
-                $this->messageBus->dispatch(new MeritsExaminedMessage(
+                $this->bus->dispatch(new MeritsExaminedMessage(
                     $complaint->getId(),
                     $complaint->getMeritsAnalysis()
                 ));
                 break;
 
             case 'propose_resolution_action':
-                $this->messageBus->dispatch(new ResolutionProposedMessage(
+                $this->bus->dispatch(new ResolutionProposedMessage(
                     $complaint->getId()
                 ));
                 break;
 
             case 'internal_decision_action':
                 if ($complaint->getInternalResolutionDecision()) {
-                    $this->messageBus->dispatch(new InternalDecisionMadeMessage(
+                    $this->bus->dispatch(new InternalDecisionMadeMessage(
                         $complaint->getId(),
                         $complaint->getInternalResolutionDecision()->getId()
                     ));
@@ -104,7 +104,7 @@ class ComplaintWorkflowMessageHandler
 
             case 'complainant_decision_action':
                 if ($complaint->getComplainantDecision()) {
-                    $this->messageBus->dispatch(new ComplainantDecisionMessage(
+                    $this->bus->dispatch(new ComplainantDecisionMessage(
                         $complaint->getId(),
                         $complaint->getComplainantDecision()->getId()
                     ));
@@ -112,14 +112,14 @@ class ComplaintWorkflowMessageHandler
                 break;
 
             case 'execute_resolution_action':
-                $this->messageBus->dispatch(new ResolutionExecutedMessage(
+                $this->bus->dispatch(new ResolutionExecutedMessage(
                     $complaint->getId()
                 ));
                 break;
 
             case 'satisfaction_follow_up_action':
                 if ($complaint->getSatisfactionFollowUpResult()) {
-                    $this->messageBus->dispatch(new SatisfactionFollowedUpMessage(
+                    $this->bus->dispatch(new SatisfactionFollowedUpMessage(
                         $complaint->getId(),
                         $complaint->getSatisfactionFollowUpResult()->getId()
                     ));
@@ -128,7 +128,7 @@ class ComplaintWorkflowMessageHandler
 
             case 'escalate_action':
                 if ($complaint->getEscalationLevel()) {
-                    $this->messageBus->dispatch(new ComplaintEscalatedMessage(
+                    $this->bus->dispatch(new ComplaintEscalatedMessage(
                         $complaint->getId(),
                         $complaint->getEscalationLevel()->getId()
                     ));
@@ -136,14 +136,14 @@ class ComplaintWorkflowMessageHandler
                 break;
 
             case 'close_complaint_action':
-                $this->messageBus->dispatch(new ComplaintClosedMessage(
+                $this->bus->dispatch(new ComplaintClosedMessage(
                     $complaint->getId(),
                     $complaint->getClosureReason() ?? 'Reason not specified'
                 ));
                 break;
 
             // case 'generate_report_from_workflow_action':
-            //     $this->messageBus->dispatch(new GenerateReportCommand(...));
+            //     $this->bus->dispatch(new GenerateReportCommand(...));
             //     break;
 
             default:

@@ -15,6 +15,7 @@ use App\Repository\ComplainantRepository;
 use App\State\Complainant\CreateComplainantProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ComplainantRepository::class)]
 #[ApiResource(
@@ -63,51 +64,65 @@ class Complainant
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 120)]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 120)]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 120, nullable: true)]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
     private ?string $middleName = null;
 
     #[ORM\Column(length: 14)]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
     private ?string $contactPhone = null;
 
     #[ORM\Column(length: 180, nullable: true)]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
     private ?string $contactEmail = null;
 
     #[ORM\Column(length: 10)]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
     private ?string $personType = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
     private ?string $address = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complainant:list', 'complainant:get'])]
     private ?Location $province = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complainant:list', 'complainant:get'])]
     private ?Location $territory = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complainant:list', 'complainant:get'])]
     private ?Location $commune = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complainant:list', 'complainant:get'])]
     private ?Location $quartier = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complainant:list', 'complainant:get'])]
     private ?Location $city = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complainant:list', 'complainant:get'])]
     private ?Location $village = null;
 
     public function getId(): ?string

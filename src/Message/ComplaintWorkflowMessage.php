@@ -2,7 +2,9 @@
 
 namespace App\Message;
 
-class ComplaintWorkflowMessage
+use App\Event\EventMessageInterface;
+
+class ComplaintWorkflowMessage implements EventMessageInterface
 {
     public function __construct(
         public string $complaintId,
