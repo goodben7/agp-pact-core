@@ -115,7 +115,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(groups: ['user:get'])]
     private ?string $id = null;
 
-    #[ORM\Column(length: 180)]
+    #[ORM\Column(length: 180, nullable:true)]
     #[Groups(groups: ['user:get'])]
     private ?string $email = null;
 
@@ -176,7 +176,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function setEmail(?string $email): static
     {
         $this->email = $email;
 
@@ -405,6 +405,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             "ROLE_INFRASTRUCTURE_CELL" => UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
             "ROLE_WORLD_BANK" => UserProxyInterface::PERSON_WORLD_BANK,
             "ROLE_ADMIN" => UserProxyInterface::PERSON_ADMIN,
+            "ROLE_COMPLAINANT" => UserProxyInterface::PERSON_COMPLAINANT,
         ]);
     }
 
@@ -417,7 +418,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             UserProxyInterface::PERSON_CONTROL_MISSION,
             UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
             UserProxyInterface::PERSON_WORLD_BANK,
-            UserProxyInterface::PERSON_ADMIN
+            UserProxyInterface::PERSON_ADMIN,
+            UserProxyInterface::PERSON_COMPLAINANT,
         ];
     }
 
@@ -430,7 +432,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             "Mission de contrôle" => UserProxyInterface::PERSON_CONTROL_MISSION,
             "Cellule d'infrastructure" => UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
             "Banque mondiale" => UserProxyInterface::PERSON_WORLD_BANK,
-            "Administrateur" => UserProxyInterface::PERSON_ADMIN
+            "Administrateur" => UserProxyInterface::PERSON_ADMIN,
+            "Plaignant" => UserProxyInterface::PERSON_COMPLAINANT
         ];
     }
 

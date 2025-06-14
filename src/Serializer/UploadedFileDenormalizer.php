@@ -8,12 +8,12 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class UploadedFileDenormalizer implements DenormalizerInterface
 {
-    public function denormalize($data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         return $data;
     }
 
-    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         return $data instanceof UploadedFile && ($type === File::class || $type === UploadedFile::class);
     }

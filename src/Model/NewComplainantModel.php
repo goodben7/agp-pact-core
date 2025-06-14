@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Dto\Complainant;
+namespace App\Model;
 
+use App\Entity\User; 
 use App\Entity\Location;
-use App\Entity\User;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class ComplainantCreateDTO
+class NewComplainantModel
 {
     public function __construct(
         public ?string $lastName = null,
@@ -28,5 +28,4 @@ class ComplainantCreateDTO
         public ?Location $village = null,
     ) {
     }
-
 }

@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ComplainantRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USER', fields: ['userId'])]
 #[ApiResource(
     operations: [
         new GetCollection(
@@ -58,7 +59,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 class Complainant
 {
-    const ID_PREFIX = "CN";
+    public const ID_PREFIX = "CN";
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -96,34 +97,38 @@ class Complainant
     private ?string $address = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['complainant:list', 'complainant:get'])]
     private ?Location $province = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['complainant:list', 'complainant:get'])]
     private ?Location $territory = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['complainant:list', 'complainant:get'])]
     private ?Location $commune = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['complainant:list', 'complainant:get'])]
     private ?Location $quartier = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['complainant:list', 'complainant:get'])]
     private ?Location $city = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['complainant:list', 'complainant:get'])]
     private ?Location $village = null;
+
+    #[ORM\Column(length: 16, nullable: true)]
+    #[Groups(groups: ['complainant:get', 'complainant:list'])]
+    private ?string $userId = null;
 
     public function getId(): ?string
     {
@@ -282,6 +287,26 @@ class Complainant
     public function setVillage(?Location $village): static
     {
         $this->village = $village;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of userId
+     */ 
+    public function getUserId(): string|null
+    {
+        return $this->userId;
+    }
+
+    /**
+     * Set the value of userId
+     *
+     * @return  self
+     */ 
+    public function setUserId($userId): static
+    {
+        $this->userId = $userId;
 
         return $this;
     }
