@@ -20,64 +20,59 @@ class StringTemplateRenderer
 
     /**
      * Renders a template string by replacing placeholders with values from a context object.
-     * Placeholders format: #{object.property.subProperty} or #{object.id}
+     * Placeholders format:
+     * - #{object.property.subProperty}
+     * - #{object.id}
+     * - #{object.date|format('d/m/Y')} for custom date formatting
      *
-     * @param string $templateContent The string containing placeholders (e.g., "Plainte #{complaint.id} de #{complainant.fullName}")
-     * @param object $context The primary object from which to resolve properties (e.g., a Complaint entity).
+     * @param string $templateContent The string containing placeholders
+     * @param object $context The primary object from which to resolve properties
      * @return string The rendered string.
      * @throws \ReflectionException
      */
     public function render(string $templateContent, object $context): string
     {
-        // Regex pour trouver les placeholders #{object.property}
-        return preg_replace_callback('/#\{([a-zA-Z0-9_\-\.]+)\}/', function ($matches) use ($context) {
-            $propertyPath = $matches[1]; // Ex: "complaint.id" ou "complainant.fullName"
-            $parts = explode('.', $propertyPath);
+        // Regex pour trouver les placeholders #{object.property} avec support des formats optionnels
+        return preg_replace_callback('/#\{([a-zA-Z0-9_\-\.]+)(\|format\([\'"]([^\'"]+)[\'"]\))?\}/', function ($matches) use ($context) {
+            $propertyPath = $matches[1]; // Ex: "complaint.declarationDate"
+            $customFormat = $matches[3] ?? null; // Ex: "d/m/Y" si format spécifié
 
+            $parts = explode('.', $propertyPath);
             $currentObject = $context;
             $resolvedValue = null;
 
             foreach ($parts as $index => $part) {
-                // Pour la première partie (ex: "complaint" ou "complainant"), on essaie de la récupérer
-                // à partir du contexte si le nom correspond, ou si c'est le contexte lui-même.
-                // Sinon, si c'est une relation, on essaie de l'obtenir via un getter.
                 if ($index === 0) {
                     if (strtolower($part) === strtolower((new \ReflectionClass($context))->getShortName())) {
-                        // Si la première partie du chemin est le nom court de l'objet de contexte (ex: 'complaint' pour une Complaint entity)
                         $currentObject = $context;
                     } elseif ($this->propertyAccessor->isReadable($context, $part)) {
-                        // Si la première partie est une propriété ou une relation de l'objet de contexte
                         $currentObject = $this->propertyAccessor->getValue($context, $part);
                     } else {
-                        // Si la première partie n'est pas l'objet de contexte et n'est pas une propriété/relation,
-                        // cela signifie qu'elle est probablement une relation non chargée ou invalide.
                         $this->logger->warning(sprintf('Cannot resolve placeholder "%s": Initial property "%s" not found on context object.', $propertyPath, $part));
-                        return $matches[0]; // Retourne le placeholder tel quel
+                        return $matches[0];
                     }
                 } else {
-                    // Pour les parties suivantes, on accède aux propriétés de l'objet courant
                     if ($currentObject === null) {
-                        break; // Si un objet précédent est null, on ne peut pas continuer
+                        break;
                     }
                     if ($this->propertyAccessor->isReadable($currentObject, $part)) {
                         $currentObject = $this->propertyAccessor->getValue($currentObject, $part);
                     } else {
                         $this->logger->warning(sprintf('Cannot resolve placeholder "%s": Property "%s" not found on intermediate object.', $propertyPath, $part));
-                        return $matches[0]; // Retourne le placeholder tel quel
+                        return $matches[0];
                     }
                 }
             }
 
             $resolvedValue = $currentObject;
 
-            // Formatter les DateTimeImmutable si besoin
+            // Formatter les DateTimeImmutable avec format personnalisé ou par défaut
             if ($resolvedValue instanceof \DateTimeInterface) {
-                // Vous pouvez ajouter une logique de formatage plus sophistiquée ici
-                // Par exemple, en fonction de la langue de l'utilisateur ou d'un format spécifique dans le placeholder (ex: #{date|format('Y-m-d')})
-                return $resolvedValue->format('Y-m-d H:i:s');
+                $format = $customFormat ?? 'd-m-Y H:i:s';
+                return $resolvedValue->format($format);
             }
 
-            // Gérer les objets (ex: GeneralParameter) pour retourner leur 'value' ou 'name'
+            // Gérer les objets pour retourner leur 'value' ou 'name'
             if (is_object($resolvedValue)) {
                 if ($this->propertyAccessor->isReadable($resolvedValue, 'value')) {
                     return (string)$this->propertyAccessor->getValue($resolvedValue, 'value');
@@ -85,11 +80,10 @@ class StringTemplateRenderer
                 if ($this->propertyAccessor->isReadable($resolvedValue, 'name')) {
                     return (string)$this->propertyAccessor->getValue($resolvedValue, 'name');
                 }
-                // Si c'est un objet sans 'value' ou 'name', convertissez-le en chaîne (par exemple, un UUID)
                 return (string)$resolvedValue;
             }
 
-            return (string)$resolvedValue; // Convertir tout le reste en string
+            return (string)$resolvedValue;
         }, $templateContent);
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\MessageHandler;
 
-use App\Message\ComplaintClassifiedAssignedMessage;
 use App\Message\ResolutionProposedMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

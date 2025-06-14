@@ -46,19 +46,19 @@ class RoadAxis
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['road_axis:get', 'road_axis:list'])]
+    #[Groups(['road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['road_axis:get', 'road_axis:list'])]
+    #[Groups(['road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['road_axis:get', 'road_axis:list'])]
+    #[Groups(['road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['road_axis:get', 'road_axis:list'])]
+    #[Groups(['road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
     private ?bool $active = null;
 
     #[ORM\ManyToOne]

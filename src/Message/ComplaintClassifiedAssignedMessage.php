@@ -12,4 +12,14 @@ class ComplaintClassifiedAssignedMessage implements EventMessageInterface
     )
     {
     }
+
+    public function getComplaintId(): string
+    {
+        return $this->complaintId;
+    }
+
+    public function getAssignedToUserId(): string
+    {
+        return $this->assignedToUserId;
+    }
 }

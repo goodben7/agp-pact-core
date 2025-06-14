@@ -11,8 +11,10 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
+use App\Dto\Complaint\ApplyActionRequest;
 use App\Dto\Complaint\ComplaintCreateDTO;
 use App\Repository\ComplaintRepository;
+use App\State\Complaint\ComplaintApplyActionProcessor;
 use App\State\Complaint\CreateComplaintProcessor;
 use App\State\Complaint\UpdateComplaintProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -39,6 +41,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Patch(
             security: "is_granted('ROLE_COMPLAINT_UPDATE')",
             processor: UpdateComplaintProcessor::class
+        ),
+        new Patch(
+            uriTemplate: '/complaints/{id}/apply-action',
+            security: "is_granted('ROLE_COMPLAINT_APPLY_ACTION')",
+            input: ApplyActionRequest::class,
+            processor: ComplaintApplyActionProcessor::class
         )
     ],
     normalizationContext: ['groups' => ['complaint:get']]
@@ -77,119 +85,151 @@ class Complaint
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?GeneralParameter $complaintType = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?WorkflowStep $currentWorkflowStep = null;
 
     #[ORM\Column]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?\DateTimeImmutable $declarationDate = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?GeneralParameter $incidentCause = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $description = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?RoadAxis $roadAxis = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $locationDetail = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?Location $location = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?float $latitude = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?float $longitude = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $receivabilityDecisionJustification = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $meritsAnalysis = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $resolutionProposal = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?GeneralParameter $internalResolutionDecision = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $internalDecisionComments = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?GeneralParameter $complainantDecision = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $executionActionsDescription = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $personInChargeOfExecution = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?GeneralParameter $satisfactionFollowUpResult = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $satisfactionFollowUpComments = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?GeneralParameter $escalationLevel = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $escalationComments = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $closureReason = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?\DateTimeImmutable $closureDate = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?Complainant $complainant = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?WorkflowAction $currentWorkflowAction = null;
 
     /**
      * @var Collection<int, Victim>
      */
     #[ORM\OneToMany(targetEntity: Victim::class, mappedBy: 'complaint', orphanRemoval: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private Collection $victims;
 
     /**
      * @var Collection<int, ComplaintConsequence>
      */
     #[ORM\OneToMany(targetEntity: ComplaintConsequence::class, mappedBy: 'complaint', orphanRemoval: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private Collection $consequences;
 
     /**
      * @var Collection<int, AttachedFile>
      */
     #[ORM\OneToMany(targetEntity: AttachedFile::class, mappedBy: 'complaint', orphanRemoval: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private Collection $attachedFiles;
 
     /**
      * @var Collection<int, AffectedSpecies>
      */
     #[ORM\OneToMany(targetEntity: AffectedSpecies::class, mappedBy: 'complaint', orphanRemoval: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private Collection $affectedSpecies;
 
     #[ORM\ManyToOne]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?User $assignedTo = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?User $currentAssignee = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?\DateTimeImmutable $incidentDate = null;
 
     public function __construct()
