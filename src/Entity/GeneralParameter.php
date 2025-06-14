@@ -2,21 +2,22 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\Get;
+use App\Doctrine\IdGenerator;
+use ApiPlatform\Metadata\Post;
+use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use App\Doctrine\IdGenerator;
-use App\Dto\GeneralParameter\GeneralParameterCreateDTO;
 use App\Repository\GeneralParameterRepository;
-use App\State\GeneralParameter\GeneralParameterCreateProcessor;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Attribute\Groups;
+use ApiPlatform\Doctrine\Common\State\PersistProcessor;
+use App\Dto\GeneralParameter\GeneralParameterCreateDTO;
+use App\State\GeneralParameter\GeneralParameterCreateProcessor;
 
 #[ORM\Entity(repositoryClass: GeneralParameterRepository::class)]
 #[ApiResource(
@@ -35,6 +36,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
         ),
         new Patch(
             security: "is_granted('ROLE_GENERAL_PARAMETER_UPDATE')",
+            denormalizationContext: ['groups' => 'general_parameter:patch'],
+            processor: PersistProcessor::class,
         ),
         new Delete(
             security: "is_granted('ROLE_GENERAL_PARAMETER_DELETE')",
@@ -59,31 +62,31 @@ class GeneralParameter
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch'])]
     private ?string $category = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch'])]
     private ?string $value = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch'])]
     private ?string $code = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['general_parameter:get', 'general_parameter:list'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'general_parameter:patch'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'general_parameter:patch'])]
     private ?bool $active = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['general_parameter:get', 'general_parameter:list'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list','general_parameter:patch'])]
     private ?int $displayOrder = null;
 
     public function getId(): ?string

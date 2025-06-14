@@ -2,19 +2,20 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\Get;
+use App\Doctrine\IdGenerator;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
+use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use App\Doctrine\IdGenerator;
-use App\Dto\Location\LocationCreateDTO;
 use App\Repository\LocationRepository;
+use ApiPlatform\Metadata\GetCollection;
+use App\Dto\Location\LocationCreateDTO;
 use App\State\Location\LocationCreateProcessor;
-use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Attribute\Groups;
+use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 
 #[ORM\Entity(repositoryClass: LocationRepository::class)]
 #[ApiResource(
@@ -33,6 +34,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
         ),
         new Patch(
             security: "is_granted('ROLE_LOCATION_UPDATE')",
+            denormalizationContext: ['groups' => 'location:patch'],
+            processor: PersistProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => ['location:get']],
@@ -61,24 +64,24 @@ class Location
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list', 'location:patch'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list', 'location:patch'])]
     private ?GeneralParameter $level = null;
 
     #[ORM\ManyToOne(targetEntity: self::class)]
-    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list', 'location:patch'])]
     private ?self $parent = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list', 'location:patch'])]
     private ?string $code = null;
 
     #[ORM\Column]
-    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list', 'location:patch'])]
     private ?bool $active = null;
 
     public function getId(): ?string

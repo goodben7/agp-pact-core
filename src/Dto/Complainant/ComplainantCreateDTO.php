@@ -2,9 +2,8 @@
 
 namespace App\Dto\Complainant;
 
+use App\Entity\GeneralParameter;
 use App\Entity\Location;
-use App\Entity\User;
-use Symfony\Component\Validator\Constraints as Assert;
 
 class ComplainantCreateDTO
 {
@@ -16,8 +15,9 @@ class ComplainantCreateDTO
         public ?string $contactEmail = null,
         public ?string $plainPassword = null, 
 
-        #[Assert\Choice(callback: [User::class, 'getPersonTypesAsList'])]
-        public ?string $personType = null, 
+        public ?GeneralParameter $personType = null, 
+        public ?GeneralParameter $organizationStatus = null, 
+        public ?GeneralParameter $legalPersonality = null, 
 
         public ?string $address = null,
         public ?Location $province = null,
@@ -26,6 +26,7 @@ class ComplainantCreateDTO
         public ?Location $quartier = null,
         public ?Location $city = null,
         public ?Location $village = null,
+        public ?Location $secteur = null,
     ) {
     }
 

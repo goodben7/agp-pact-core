@@ -30,7 +30,6 @@ return static function (): iterable {
     yield Permission::new('ROLE_GENERAL_PARAMETER_DETAILS', "Consulter un paramètre général");
     yield Permission::new('ROLE_GENERAL_PARAMETER_CREATE', "Créer un paramètre général");
     yield Permission::new('ROLE_GENERAL_PARAMETER_UPDATE', "Modifier un paramètre général");
-    yield Permission::new('ROLE_GENERAL_PARAMETER_UPDATE', "Modifier un paramètre général");
 
     yield Permission::new('ROLE_COMPLAINT_LIST', "Consulter la liste des plaintes");
     yield Permission::new('ROLE_COMPLAINT_DETAILS', "Consulter les détails d'une plainte");
@@ -112,4 +111,9 @@ return static function (): iterable {
     yield Permission::new('ROLE_CLASSIFY_ASSIGN_COMPLAINT', "Pour classer et assigner (action `classify_assign_action`)");
 
     yield Permission::new('ROLE_ACTIVITY_LOG_LIST', "Consulter la liste des activités");
+
+    yield Permission::new('ROLE_COMPANY_CREATE', "Créer une entité");
+    yield Permission::new('ROLE_COMPANY_LIST', "Consulter la liste des entités");
+    yield Permission::new('ROLE_COMPANY_UPDATE', "Modifier une entité");
+    yield Permission::new('ROLE_COMPANY_DETAILS', "Consulter les détails d'une entité");
 };

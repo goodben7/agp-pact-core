@@ -45,7 +45,11 @@ readonly class ComplainantManager
             ->setVillage($model->village)
             ->setQuartier($model->quartier)
             ->setTerritory($model->territory)
-            ->setProvince($model->province);
+            ->setProvince($model->province)
+            ->setSecteur($model->secteur)
+            ->setOrganizationStatus($model->organizationStatus)
+            ->setLegalPersonality($model->legalPersonality)
+        ;
 
         try {
 
