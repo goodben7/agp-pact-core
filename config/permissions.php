@@ -111,4 +111,5 @@ return static function (): iterable {
 
     yield Permission::new('ROLE_CLASSIFY_ASSIGN_COMPLAINT', "Pour classer et assigner (action `classify_assign_action`)");
 
+    yield Permission::new('ROLE_ACTIVITY_LOG_LIST', "Consulter la liste des activités");
 };
