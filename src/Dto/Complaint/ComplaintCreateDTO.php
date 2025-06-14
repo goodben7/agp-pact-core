@@ -3,6 +3,7 @@
 namespace App\Dto\Complaint;
 
 use App\Entity\AffectedSpecies;
+use App\Entity\Company;
 use App\Entity\Complainant;
 use App\Entity\GeneralParameter;
 use App\Entity\Location;
@@ -33,7 +34,7 @@ class ComplaintCreateDTO
 
     public ?User $assignedTo = null;
 
-    public ?string $involvedCompanyId = null;
+    public ?Company $involvedCompany = null;
 
     /** @var AffectedSpeciesCreateDTO[] $affectedSpecies */
     public ?array $affectedSpecies = null;
