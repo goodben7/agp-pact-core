@@ -37,7 +37,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 class WorkflowTransition
 {
-    const ID_PREFIX = "WT";
+    public const ID_PREFIX = "WT";
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -62,7 +62,7 @@ class WorkflowTransition
     private ?WorkflowAction $action = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['workflow_transition:get'])]
+    #[Groups(['workflow_transition:get', 'workflow_transition:list'])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
