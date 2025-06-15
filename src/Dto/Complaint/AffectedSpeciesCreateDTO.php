@@ -2,13 +2,21 @@
 
 namespace App\Dto\Complaint;
 
+use App\Entity\GeneralParameter;
+
 class AffectedSpeciesCreateDTO
 {
     public ?string $complaintId = null;
-    public ?string $speciesType = null;
+
+    public ?GeneralParameter $speciesType = null;
+
     public ?string $speciesNature = null;
+
     public ?float $affectedQuantity = null;
-    public ?string $affectedUnitId = null;
+
+    public ?GeneralParameter $affectedUnit = null;
+
     public ?string $description = null;
-    public ?string $assetType = null;
+
+    public ?GeneralParameter $assetType = null;
 }
