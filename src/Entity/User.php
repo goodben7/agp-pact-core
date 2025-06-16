@@ -210,7 +210,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $roles = array_merge($roles, $this->profile->getPermissions());
         }
 
-        return array_unique($roles);
+        return array_values(array_unique($roles));
 
     }
 
