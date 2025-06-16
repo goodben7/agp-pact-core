@@ -127,4 +127,9 @@ return static function (): iterable {
     yield Permission::new('ROLE_VICTIM_CREATE', 'Créer de nouvelles victimes');
     yield Permission::new('ROLE_VICTIM_UPDATE', 'Modifier les victimes');
 
+    yield Permission::new('ROLE_FAQ_LIST', 'Consulter la liste des FAQ');
+    yield Permission::new('ROLE_FAQ_DETAILS', 'Voir les détails des FAQ');
+    yield Permission::new('ROLE_FAQ_CREATE', 'Créer de nouvelles FAQ');
+    yield Permission::new('ROLE_FAQ_UPDATE', 'Modifier les FAQ');
+
 };
