@@ -3,10 +3,12 @@
 namespace App\Manager;
 
 
-use App\Dto\Location\RoadAxisCreateDTO;
 use App\Entity\Location;
 use App\Entity\RoadAxis;
+use App\Model\UpdateRoadAxisModel;
+use App\Dto\Location\RoadAxisCreateDTO;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Exception\UnavailableDataException;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class RoadAxisManager
@@ -37,5 +39,30 @@ readonly class RoadAxisManager
         $this->em->flush();
 
         return $roadAxis;
+    }
+
+    public function updateFrom(UpdateRoadAxisModel $model, string $roadAxisId): RoadAxis
+    {
+        $r = $this->findDelivery($roadAxisId);
+
+        $r->setName($model->name);
+        $r->setDescription($model->description);
+        $r->setStartLocation($model->startLocation);
+        $r->setEndLocation($model->endLocation);
+        $r->setActive($model->active);
+
+        $this->em->flush();
+        return $r;
+    }
+
+    private function findDelivery(string $roadAxisId): RoadAxis 
+    {
+        $roadAxis = $this->em->find(RoadAxis::class, $roadAxisId);
+
+        if (null === $roadAxis) {
+            throw new UnavailableDataException(sprintf('cannot find RoadAxis with id: %s', $roadAxisId));
+        }
+
+        return $roadAxis; 
     }
 }
