@@ -66,6 +66,7 @@ class WorkflowTransition
     private ?string $description = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[Groups(['workflow_transition:get', 'workflow_transition:list'])]
     private ?array $roleRequired = null;
 
     public function getId(): ?string
