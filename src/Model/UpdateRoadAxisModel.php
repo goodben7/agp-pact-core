@@ -12,6 +12,7 @@ class UpdateRoadAxisModel
         public ?bool $active = true,
         public ?Location $startLocation = null,
         public ?Location $endLocation = null,
+        public ?array $traversedLocationIds = [],
     )
     {
     }

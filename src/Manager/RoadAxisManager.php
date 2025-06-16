@@ -51,6 +51,12 @@ readonly class RoadAxisManager
         $r->setEndLocation($model->endLocation);
         $r->setActive($model->active);
 
+        foreach ($model->traversedLocationIds as $traversedLocationId) {
+            $traversedLocation = $this->em->getRepository(Location::class)->find($traversedLocationId);
+            if ($traversedLocation)
+                $r->addTraversedLocation($traversedLocation);
+        }
+
         $this->em->flush();
         return $r;
     }
