@@ -4,7 +4,9 @@ namespace App\Manager;
 
 
 use App\Dto\Complaint\ComplaintCreateDTO;
+use App\Entity\AffectedSpecies;
 use App\Entity\Complaint;
+use App\Entity\ComplaintConsequence;
 use App\Entity\WorkflowStep;
 use App\Entity\WorkflowTransition;
 use App\Exception\UnavailableDataException;
@@ -47,6 +49,34 @@ readonly class ComplaintManager
             $complaint->setCurrentWorkflowAction($firstTransition->getAction());
         else
             $complaint->setCurrentWorkflowAction(null);
+
+        if ($data->affectedSpecies) {
+            foreach ($data->affectedSpecies as $affectedSpeciesDto) {
+                $affectedSpecie = (new AffectedSpecies())
+                    ->setDescription($affectedSpeciesDto->description)
+                    ->setSpeciesType($affectedSpeciesDto->speciesType)
+                    ->setAffectedQuantity($affectedSpeciesDto->affectedQuantity)
+                    ->setAffectedUnit($affectedSpeciesDto->affectedUnit)
+                    ->setAssetType($affectedSpeciesDto->assetType);
+
+                $complaint->addAffectedSpecies($affectedSpecie);
+            }
+        }
+
+        if ($data->complaintConsequences) {
+            foreach ($data->complaintConsequences as $consequenceDto) {
+                $consequence = (new ComplaintConsequence())
+                    ->setConsequenceType($consequenceDto->consequenceType)
+                    ->setSeverity($consequenceDto->severity)
+                    ->setEstimatedCost($consequenceDto->estimatedCost)
+                    ->setImpactDescription($consequenceDto->impactDescription)
+                    ->setAffectedQuantity($consequenceDto->affectedQuantity)
+                    ->setAffectedUnit($consequenceDto->affectedUnit)
+                    ->setAffectedAssetType($consequenceDto->affectedAssetType);
+
+                $complaint->addConsequence($consequence);
+            }
+        }
 
         $this->em->persist($complaint);
         $this->em->flush();
