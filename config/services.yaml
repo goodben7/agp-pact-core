@@ -28,6 +28,25 @@ services:
             $keccelCampaignId: '%env(KECCEL_CAMPAIGN_ID)%'
             $keccelRouteId: '%env(KECCEL_ROUTE_ID)%'
         tags: [ 'app.notification_sender' ]
+
     App\Provider\Auth\MultiFieldUserProvider:
         arguments:
             $entityManager: '@doctrine.orm.entity_manager'
+
+    App\MessageHandler\GenerateReportHandler:
+        arguments:
+            $projectDir: '%kernel.project_dir%' # Injecte le chemin racine du projet
+
+    App\Service\Generator\PdfGeneratorService:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    App\Service\Generator\ExcelGeneratorService:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    App\Service\Generator\CsvGeneratorService:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    App\Service\ReportDataCollectorService:

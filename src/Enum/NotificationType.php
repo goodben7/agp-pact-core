@@ -77,6 +77,7 @@ class NotificationType
             ],
             'system' => [
                 self::USER_ACCOUNT_CREATED,
+                self::RESET_PASSWORD,
                 self::ROLE_ASSIGNED,
                 self::SYSTEM_UPDATE,
             ],

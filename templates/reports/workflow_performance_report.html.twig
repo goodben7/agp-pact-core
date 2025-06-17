@@ -1,0 +1,125 @@
+{# templates/reports/workflow_performance_report.html.twig #}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport de Performance du Workflow - AGP-PACT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20mm;
+            font-size: 10pt;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .footer {
+            font-size: 8pt;
+            text-align: center;
+            margin-top: 50px;
+            color: #777;
+        }
+
+        .section-summary {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #e0ffe0;
+            border: 1px solid #c0ffc0;
+        }
+
+        .section-summary p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+<h1>Rapport de Performance du Workflow</h1>
+<h2>Généré par AGP-PACT</h2>
+
+<div class="filter-info">
+    <h3>Filtres Appliqués</h3>
+    {% if reportData.filters %}
+        {% if reportData.filters.startDate is defined and reportData.filters.startDate is not empty %}
+            <p><strong>Période du :</strong> {{ reportData.filters.startDate|date('d/m/Y') }}</p>
+        {% endif %}
+        {% if reportData.filters.endDate is defined and reportData.filters.endDate is not empty %}
+            <p><strong>Au :</strong> {{ reportData.filters.endDate|date('d/m/Y') }}</p>
+        {% endif %}
+        {% if reportData.filters.complaintTypeName is defined %}
+            <p><strong>Type de Plainte :</strong> {{ reportData.filters.complaintTypeName }}</p>
+        {% endif %}
+    {% else %}
+        <p>Aucun filtre spécifique appliqué (rapport général).</p>
+    {% endif %}
+</div>
+
+<div class="section-summary">
+    <h3>Résumé des Performances</h3>
+    <p><strong>Plaintes terminées durant la période
+            :</strong> {{ reportData.summary.completedComplaintsCount|default('N/A') }}</p>
+    <p><strong>Temps moyen passé par étape :</strong></p>
+    <ul>
+        {% for step in reportData.summary.averageTimePerStep %}
+            <li><strong>{{ step.stepName }} :</strong> {{ step.averageTime|number_format(1) }} jours</li>
+        {% else %}
+            <li>Aucune donnée disponible.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<h2>Historique des Transitions Clés</h2>
+<p>Ce tableau présente un échantillon des transitions de workflow les plus récentes ou pertinentes.</p>
+{% if reportData.results is not empty %}
+    <table>
+        <thead>
+        <tr>
+            <th>ID Plainte</th>
+            <th>Ancienne Étape</th>
+            <th>Nouvelle Étape</th>
+            <th>Action</th>
+            <th>Date Action</th>
+            <th>Acteur</th>
+            <th>Durée Étape (jours)</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for history in reportData.results %}
+            <tr>
+                <td>{{ history.complaintId|slice(0, 8) }}...</td>
+                <td>{{ history.oldWorkflowStepName|default('N/A') }}</td>
+                <td>{{ history.newWorkflowStepName }}</td>
+                <td>{{ history.actionName }}</td>
+                <td>{{ history.actionDate|date('d/m/Y H:i') }}</td>
+                <td>{{ history.actorName }}</td>
+                <td>{{ history.durationInDays|default('N/A') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Aucune historique de transition trouvée pour les critères spécifiés.</p>
+{% endif %}
+
+<div class="footer">
+    Généré le {{ reportData.generatedAt|date('d/m/Y H:i') }} par {{ reportData.generatedBy|default('Système') }}.
+</div>
+</body>
+</html>

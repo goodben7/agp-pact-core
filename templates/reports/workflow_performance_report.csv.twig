@@ -1,0 +1,5 @@
+{# templates/reports/workflow_performance_report.csv.twig #}
+"ID Plainte","Ancienne Étape","Nouvelle Étape","Action","Date Action","Acteur","Durée Étape (jours)","Commentaires"
+{% for history in reportData.results %}
+"{{ history.complaintId }}","{{ history.oldWorkflowStepName|replace('"', '""') }}","{{ history.newWorkflowStepName|replace('"', '""') }}","{{ history.actionName|replace('"', '""') }}","{{ history.actionDate|date('Y-m-d H:i:s') }}","{{ history.actorName|replace('"', '""') }}","{{ history.durationInDays }}","{{ history.comments|replace('"', '""') }}"
+{% endfor %}

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport Récapitulatif des Plaintes - AGP-PACT</title>
+    <style>
+        /* Styles CSS pour l'impression ou le PDF */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20mm;
+            font-size: 10pt;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .footer {
+            font-size: 8pt;
+            text-align: center;
+            margin-top: 50px;
+            color: #777;
+        }
+
+        .filter-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+        }
+
+        .filter-info p {
+            margin: 5px 0;
+        }
+
+        .summary-box {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #e6f7ff;
+        }
+
+        .summary-box p {
+            margin: 0 0 5px 0;
+        }
+    </style>
+</head>
+<body>
+<h1>Rapport Récapitulatif des Plaintes</h1>
+<h2>Généré par AGP-PACT</h2>
+
+<div class="summary-box">
+    <h3>Résumé Général</h3>
+    <p><strong>Total des plaintes :</strong> {{ reportData.summary.totalComplaints|default('N/A') }}</p>
+    <p><strong>Plaintes ouvertes :</strong> {{ reportData.summary.openComplaints|default('N/A') }}</p>
+    <p><strong>Temps moyen de résolution
+            :</strong> {{ reportData.summary.averageResolutionTimeDays|number_format(1, ',', ' ')|default('N/A') }}
+        jours</p>
+</div>
+
+<div class="filter-info">
+    <h3>Filtres Appliqués</h3>
+    {% if reportData.filters %}
+        {% if reportData.filters.locationName is defined %}
+            <p><strong>Localisation :</strong> {{ reportData.filters.locationName }}</p>
+        {% endif %}
+        {% if reportData.filters.complaintTypeName is defined %}
+            <p><strong>Type de Plainte :</strong> {{ reportData.filters.complaintTypeName }}</p>
+        {% endif %}
+        {% if reportData.filters.startDate is defined and reportData.filters.startDate is not empty %}
+            <p><strong>Date de Début :</strong> {{ reportData.filters.startDate|date('d/m/Y') }}</p>
+        {% endif %}
+        {% if reportData.filters.endDate is defined and reportData.filters.endDate is not empty %}
+            <p><strong>Date de Fin :</strong> {{ reportData.filters.endDate|date('d/m/Y') }}</p>
+        {% endif %}
+        {% if reportData.filters.statusName is defined and reportData.filters.statusName is not empty %}
+            <p><strong>Statut :</strong> {{ reportData.filters.statusName }}</p>
+        {% endif %}
+    {% else %}
+        <p>Aucun filtre spécifique appliqué (rapport général).</p>
+    {% endif %}
+</div>
+
+<h2>Détails des Plaintes</h2>
+{% if reportData.results is not empty %}
+    <table>
+        <thead>
+        <tr>
+            <th>ID Plainte</th>
+            <th>Date Décl.</th>
+            <th>Plaignant</th>
+            <th>Type</th>
+            <th>Statut</th>
+            <th>Cause Incident</th>
+            <th>Localisation</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for complaint in reportData.results %}
+            <tr>
+                <td>{{ complaint.id|slice(0, 8) }}...</td> {# Affiche juste le début de l'UUID #}
+                <td>{{ complaint.declarationDate|date('d/m/Y') }}</td>
+                <td>{{ complaint.complainantFullName }}</td>
+                <td>{{ complaint.complaintTypeName }}</td>
+                <td>{{ complaint.currentWorkflowStepName }}</td>
+                <td>{{ complaint.incidentCauseName }}</td>
+                <td>{{ complaint.locationName }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Aucune plainte trouvée pour les critères spécifiés.</p>
+{% endif %}
+
+<div class="footer">
+    Généré le {{ reportData.generatedAt|date('d/m/Y H:i') }} par {{ reportData.generatedBy|default('Système') }}.
+</div>
+</body>
+</html>
