@@ -2,18 +2,18 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\Get;
+use App\Doctrine\IdGenerator;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
+use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use App\Doctrine\IdGenerator;
-use App\Dto\Location\SpeciesPriceCreateDTO;
 use App\Repository\SpeciesPriceRepository;
-use App\State\Location\CreateSpeciesPriceProcessor;
-use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 
 #[ORM\Entity(repositoryClass: SpeciesPriceRepository::class)]
 #[ApiResource(
@@ -27,11 +27,13 @@ use Doctrine\ORM\Mapping as ORM;
         ),
         new Post(
             security: "is_granted('ROLE_SPECIES_PRICE_CREATE')",
-            input: SpeciesPriceCreateDTO::class,
-            processor: CreateSpeciesPriceProcessor::class,
+            denormalizationContext: ['groups' => 'species_price:post',],
+            processor: PersistProcessor::class,
         ),
         new Patch(
-            security: "is_granted('ROLE_SPECIES_PRICE_UPDATE')"
+            security: "is_granted('ROLE_SPECIES_PRICE_UPDATE')",
+            denormalizationContext: ['groups' =>'species_price:patch',],
+            processor: PersistProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => ['species_price:get']]
@@ -50,36 +52,44 @@ use Doctrine\ORM\Mapping as ORM;
 )]
 class SpeciesPrice
 {
-    const ID_PREFIX = "SP";
+    public const ID_PREFIX = "SP";
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
+    #[Groups(['species_price:list', 'species_price:get'])]
     private ?string $id = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['species_price:list', 'species_price:get', 'species_price:post','species_price:patch'])]
     private ?GeneralParameter $speciesType = null;
 
     #[ORM\ManyToOne(inversedBy: 'speciesPrices')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['species_price:list', 'species_price:get', 'species_price:post','species_price:patch'])]
     private ?RoadAxis $roadAxis = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['species_price:list', 'species_price:get', 'species_price:post','species_price:patch'])]
     private ?float $pricePerUnit = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['species_price:list', 'species_price:get', 'species_price:post','species_price:patch'])]
     private ?GeneralParameter $unit = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['species_price:list', 'species_price:get', 'species_price:post','species_price:patch'])]
     private ?GeneralParameter $currency = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['species_price:list', 'species_price:get', 'species_price:post','species_price:patch'])]
     private ?\DateTimeImmutable $effectiveDate = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['species_price:list', 'species_price:get', 'species_price:post','species_price:patch'])]
     private ?\DateTimeImmutable $expirationDate = null;
 
     public function getId(): ?string

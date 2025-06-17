@@ -2,19 +2,20 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\Get;
+use App\Doctrine\IdGenerator;
+use ApiPlatform\Metadata\Post;
+use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\Patch;
+use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use App\Doctrine\IdGenerator;
-use App\Dto\Complaint\AffectedSpeciesCreateDTO;
 use App\Repository\AffectedSpeciesRepository;
+use App\Dto\Complaint\AffectedSpeciesCreateDTO;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
 use App\State\AffectedSpecies\CreateAffectedSpeciesProcessor;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AffectedSpeciesRepository::class)]
 #[ApiResource(
@@ -49,12 +50,13 @@ use Doctrine\ORM\Mapping as ORM;
 )]
 class AffectedSpecies
 {
-    const ID_PREFIX = "AS";
+    public const  ID_PREFIX = "AS";
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
+    #[Groups(['affected_species:list', 'affected_species:get'])]
     private ?string $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'affectedSpecies')]
@@ -63,20 +65,25 @@ class AffectedSpecies
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['affected_species:list', 'affected_species:get'])]
     private ?GeneralParameter $speciesType = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['affected_species:list', 'affected_species:get'])]
     private ?float $affectedQuantity = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['affected_species:list', 'affected_species:get'])]
     private ?GeneralParameter $affectedUnit = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['affected_species:list', 'affected_species:get'])]
     private ?string $description = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['affected_species:list', 'affected_species:get'])]
     private ?GeneralParameter $assetType = null;
 
     public function getId(): ?string

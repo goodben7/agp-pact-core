@@ -2,13 +2,8 @@
 
 namespace App\Dto\Location;
 
+use App\Model\UpdateRoadAxisModel;
 
-class RoadAxisUpdateDTO
+class RoadAxisUpdateDTO extends UpdateRoadAxisModel
 {
-    public ?string $name = null;
-    public ?string $description = null;
-    public ?bool $isActive = null;
-    public ?string $startLocationId = null;
-    public ?string $endLocationId = null;
-    public ?array $traversedLocationIds = null;
 }

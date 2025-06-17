@@ -2,19 +2,21 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
-use App\Dto\Location\RoadAxisCreateDTO;
-use App\Repository\RoadAxisRepository;
-use App\State\Location\CreateRoadAxisProcessor;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\Patch;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+use App\Repository\RoadAxisRepository;
+use ApiPlatform\Metadata\GetCollection;
+use App\Dto\Location\RoadAxisCreateDTO;
+use App\Dto\Location\RoadAxisUpdateDTO;
+use Doctrine\Common\Collections\Collection;
+use App\State\Location\CreateRoadAxisProcessor;
+use App\State\Location\UpdateRoadAxisProcessor;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: RoadAxisRepository::class)]
@@ -33,14 +35,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
             processor: CreateRoadAxisProcessor::class
         ),
         new Patch(
-            security: "is_granted('ROLE_ROAD_AXIS_UPDATE')"
+            security: "is_granted('ROLE_ROAD_AXIS_UPDATE')",
+            input: RoadAxisUpdateDTO::class,
+            processor: UpdateRoadAxisProcessor::class
         ),
     ],
     normalizationContext: ['groups' => ['road_axis:get']],
 )]
 class RoadAxis
 {
-    const ID_PREFIX = "RA";
+    public const ID_PREFIX = "RA";
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
