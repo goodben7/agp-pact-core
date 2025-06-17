@@ -132,4 +132,10 @@ return static function (): iterable {
     yield Permission::new('ROLE_FAQ_CREATE', 'Créer de nouvelles FAQ');
     yield Permission::new('ROLE_FAQ_UPDATE', 'Modifier les FAQ');
 
+    yield Permission::new('ROLE_PAP_DETAILS', "Consulter les détails d'une Personne Affectée au Projet (PAP)");
+    yield Permission::new('ROLE_PAP_LIST', "Consulter la liste des Personnes Affectées au Projet (PAP)");
+    yield Permission::new('ROLE_PAP_CREATE', "Créer une Personne Affectée au Projet (PAP)");
+    yield Permission::new('ROLE_PAP_UPDATE', "Modifier une Personne Affectée au Projet (PAP)");
+
+
 };
