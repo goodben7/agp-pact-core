@@ -20,27 +20,27 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 
 #[ORM\Entity(repositoryClass: ComplaintConsequenceRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => 'complaint_consequence:get'],
-    operations:[
-        new Get(
-            security: 'is_granted("ROLE_COMPLAINT_CONSEQUENCE_DETAILS")',
-            provider: ItemProvider::class
-        ),
+    operations: [
         new GetCollection(
             security: 'is_granted("ROLE_COMPLAINT_CONSEQUENCE_LIST")',
             provider: CollectionProvider::class
         ),
+        new Get(
+            security: 'is_granted("ROLE_COMPLAINT_CONSEQUENCE_DETAILS")',
+            provider: ItemProvider::class
+        ),
         new Post(
-            security: 'is_granted("ROLE_COMPLAINT_CONSEQUENCE_CREATE")',
             denormalizationContext: ['groups' => 'complaint_consequence:post',],
+            security: 'is_granted("ROLE_COMPLAINT_CONSEQUENCE_CREATE")',
             processor: PersistProcessor::class,
         ),
         new Patch(
-            security: 'is_granted("ROLE_COMPLAINT_CONSEQUENCE_UPDATE")',
             denormalizationContext: ['groups' => 'complaint_consequence:patch',],
+            security: 'is_granted("ROLE_COMPLAINT_CONSEQUENCE_UPDATE")',
             processor: PersistProcessor::class,
         ),
-    ]
+    ],
+    normalizationContext: ['groups' => 'complaint_consequence:get']
 )]
 #[ApiFilter(
     SearchFilter::class,

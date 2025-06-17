@@ -21,13 +21,13 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 #[ApiResource(
     operations: [
-        new Get(
-            security: 'is_granted("ROLE_COMPANY_DETAILS")',
-            provider: ItemProvider::class
-        ),
         new GetCollection(
             security: 'is_granted("ROLE_COMPANY_LIST")',
             provider: CollectionProvider::class
+        ),
+        new Get(
+            security: 'is_granted("ROLE_COMPANY_DETAILS")',
+            provider: ItemProvider::class
         ),
         new Post(
             denormalizationContext: ['groups' => 'company:post',],

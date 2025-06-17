@@ -20,11 +20,8 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
     operations: [
         new GetCollection(
             normalizationContext: ['groups' => ['species_price:list']],
-            security: "is_granted('ROLE_SPECIES_PRICE_LIST')"
         ),
-        new Get(
-            security: "is_granted('ROLE_SPECIES_PRICE_DETAILS')"
-        ),
+        new Get(),
         new Post(
             security: "is_granted('ROLE_SPECIES_PRICE_CREATE')",
             denormalizationContext: ['groups' => 'species_price:post',],

@@ -24,11 +24,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new GetCollection(
             normalizationContext: ['groups' => ['road_axis:list']],
-            security: "is_granted('ROLE_ROAD_AXIS_LIST')",
         ),
-        new Get(
-            security: "is_granted('ROLE_ROAD_AXIS_DETAILS')",
-        ),
+        new Get(),
         new Post(
             security: "is_granted('ROLE_ROAD_AXIS_CREATE')",
             input: RoadAxisCreateDTO::class,

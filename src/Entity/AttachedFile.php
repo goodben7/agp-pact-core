@@ -11,7 +11,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: AttachedFileRepository::class)]
 #[Vich\Uploadable]
-#[ApiResource()]
+#[ApiResource]
 class AttachedFile
 {
     const ID_PREFIX = "AF";
