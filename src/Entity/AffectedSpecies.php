@@ -56,7 +56,7 @@ class AffectedSpecies
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['affected_species:list', 'affected_species:get'])]
+    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list'])]
     private ?string $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'affectedSpecies')]
@@ -65,25 +65,25 @@ class AffectedSpecies
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['affected_species:list', 'affected_species:get'])]
+    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list'])]
     private ?GeneralParameter $speciesType = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['affected_species:list', 'affected_species:get'])]
+    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list'])]
     private ?float $affectedQuantity = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['affected_species:list', 'affected_species:get'])]
+    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list'])]
     private ?GeneralParameter $affectedUnit = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['affected_species:list', 'affected_species:get'])]
+    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list'])]
     private ?string $description = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['affected_species:list', 'affected_species:get'])]
+    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list'])]
     private ?GeneralParameter $assetType = null;
 
     public function getId(): ?string

@@ -49,27 +49,27 @@ class WorkflowAction
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list'])]
+    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list'])]
+    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list'])]
+    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list'])]
     private ?string $label = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['workflow_action:get', 'workflow_transition:get', 'workflow_transition:list'])]
+    #[Groups(['workflow_action:get', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list'])]
+    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list'])]
     private ?bool $requiresComment = null;
 
     #[ORM\Column]
-    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list'])]
+    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list'])]
     private ?bool $requiresFile = null;
 
     public function getId(): ?string

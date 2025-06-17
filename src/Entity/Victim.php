@@ -66,7 +66,7 @@ class Victim
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['victim:get'])]
+    #[Groups(['victim:get', 'complaint:get', 'complaint:list'])]
     private ?string $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'victims')]
@@ -75,44 +75,44 @@ class Victim
     private ?Complaint $complaint = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch', 'complaint:get', 'complaint:list'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 120, nullable: true)]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch', 'complaint:get', 'complaint:list'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch', 'complaint:get', 'complaint:list'])]
     private ?string $middleName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['victim:get'])]
+    #[Groups(['victim:get', 'complaint:get', 'complaint:list'])]
     private ?string $fullName = null;
 
     #[ORM\ManyToOne]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch', 'complaint:get', 'complaint:list'])]
     private ?GeneralParameter $gender = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch', 'complaint:get', 'complaint:list'])]
     private ?int $age = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch', 'complaint:get', 'complaint:list'])]
     private ?GeneralParameter $vulnerabilityDegree = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch', 'complaint:get', 'complaint:list'])]
     private ?string $victimDescription = null;
 
     #[ORM\ManyToOne]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch', 'complaint:get', 'complaint:list'])]
     private ?GeneralParameter $familyRelationship = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch', 'complaint:get', 'complaint:list'])]
     private ?\DateTimeImmutable $dateOfbirth = null;
 
     public function getId(): ?string
