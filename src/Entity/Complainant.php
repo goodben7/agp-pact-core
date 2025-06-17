@@ -38,8 +38,8 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
             processor: CreateComplainantProcessor::class
         ),
         new Patch(
-            security: "is_granted('ROLE_COMPLAINANT_UPDATE')",
             denormalizationContext: ['groups' => 'complainant:patch'],
+            security: "is_granted('ROLE_COMPLAINANT_UPDATE')",
             processor: PersistProcessor::class,
         )
     ]
@@ -358,7 +358,7 @@ class Complainant
 
     /**
      * Get the value of secteur
-     */ 
+     */
     public function getSecteur(): Location|null
     {
         return $this->secteur;
@@ -368,7 +368,7 @@ class Complainant
      * Set the value of secteur
      *
      * @return  self
-     */ 
+     */
     public function setSecteur($secteur): static
     {
         $this->secteur = $secteur;
@@ -378,7 +378,7 @@ class Complainant
 
     /**
      * Get the value of personType
-     */ 
+     */
     public function getPersonType(): GeneralParameter|null
     {
         return $this->personType;
@@ -388,7 +388,7 @@ class Complainant
      * Set the value of personType
      *
      * @return  self
-     */ 
+     */
     public function setPersonType(?GeneralParameter $personType)
     {
         $this->personType = $personType;
@@ -398,7 +398,7 @@ class Complainant
 
     /**
      * Get the value of organizationStatus
-     */ 
+     */
     public function getOrganizationStatus(): GeneralParameter|null
     {
         return $this->organizationStatus;
@@ -408,7 +408,7 @@ class Complainant
      * Set the value of organizationStatus
      *
      * @return  self
-     */ 
+     */
     public function setOrganizationStatus(?GeneralParameter $organizationStatus): static
     {
         $this->organizationStatus = $organizationStatus;
@@ -418,7 +418,7 @@ class Complainant
 
     /**
      * Get the value of legalPersonality
-     */ 
+     */
     public function getLegalPersonality(): GeneralParameter|null
     {
         return $this->legalPersonality;
@@ -428,7 +428,7 @@ class Complainant
      * Set the value of legalPersonality
      *
      * @return  self
-     */ 
+     */
     public function setLegalPersonality(?GeneralParameter $legalPersonality): static
     {
         $this->legalPersonality = $legalPersonality;

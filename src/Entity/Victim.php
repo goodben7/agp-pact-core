@@ -21,8 +21,7 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 #[ORM\Entity(repositoryClass: VictimRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
-    normalizationContext: ['groups' => 'victim:get'],
-    operations:[
+    operations: [
         new Get(
             security: 'is_granted("ROLE_VICTIM_DETAILS")',
             provider: ItemProvider::class
@@ -32,16 +31,17 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
             provider: CollectionProvider::class
         ),
         new Post(
-            security: 'is_granted("ROLE_VICTIM_CREATE")',
             denormalizationContext: ['groups' => 'victim:post',],
+            security: 'is_granted("ROLE_VICTIM_CREATE")',
             processor: PersistProcessor::class,
         ),
         new Patch(
-            security: 'is_granted("ROLE_VICTIM_UPDATE")',
             denormalizationContext: ['groups' => 'victim:patch',],
+            security: 'is_granted("ROLE_VICTIM_UPDATE")',
             processor: PersistProcessor::class,
         ),
-    ]
+    ],
+    normalizationContext: ['groups' => 'victim:get']
 )]
 #[ApiFilter(
     SearchFilter::class,
@@ -66,7 +66,7 @@ class Victim
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['victim:get'] )]
+    #[Groups(['victim:get'])]
     private ?string $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'victims')]
@@ -75,37 +75,41 @@ class Victim
     private ?Complaint $complaint = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'] )]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 120, nullable: true)]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'] )]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'] )]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
     private ?string $middleName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['victim:get'] )]
+    #[Groups(['victim:get'])]
     private ?string $fullName = null;
 
     #[ORM\ManyToOne]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'] )]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
     private ?GeneralParameter $gender = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'] )]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
     private ?int $age = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'] )]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
     private ?GeneralParameter $vulnerabilityDegree = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['victim:get', 'victim:post', 'victim:patch'] )]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
     private ?string $victimDescription = null;
+
+    #[ORM\ManyToOne]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
+    private ?GeneralParameter $familyRelationship = null;
 
     public function getId(): ?string
     {
@@ -225,5 +229,17 @@ class Victim
     public function buildFullName()
     {
         return $this->fullName = $this->firstName . ' ' . $this->middleName . ' ' . $this->lastName;
+    }
+
+    public function getFamilyRelationship(): ?GeneralParameter
+    {
+        return $this->familyRelationship;
+    }
+
+    public function setFamilyRelationship(?GeneralParameter $familyRelationship): static
+    {
+        $this->familyRelationship = $familyRelationship;
+
+        return $this;
     }
 }

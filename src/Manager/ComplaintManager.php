@@ -7,6 +7,7 @@ use App\Dto\Complaint\ComplaintCreateDTO;
 use App\Entity\AffectedSpecies;
 use App\Entity\Complaint;
 use App\Entity\ComplaintConsequence;
+use App\Entity\Victim;
 use App\Entity\WorkflowStep;
 use App\Entity\WorkflowTransition;
 use App\Exception\UnavailableDataException;
@@ -49,6 +50,22 @@ readonly class ComplaintManager
             $complaint->setCurrentWorkflowAction($firstTransition->getAction());
         else
             $complaint->setCurrentWorkflowAction(null);
+
+        if ($data->victims) {
+            foreach ($data->victims as $victimDto) {
+                $victim = (new Victim())
+                    ->setFirstName($victimDto->firstName)
+                    ->setLastName($victimDto->lastName)
+                    ->setMiddleName($victimDto->middleName)
+                    ->setGender($victimDto->gender)
+                    ->setAge($victimDto->age)
+                    ->setVulnerabilityDegree($victimDto->vulnerabilityDegree)
+                    ->setVictimDescription($victimDto->victimDescription)
+                    ->setFamilyRelationship($victimDto->familyRelationship);
+
+                $complaint->addVictim($victim);
+            }
+        }
 
         if ($data->affectedSpecies) {
             foreach ($data->affectedSpecies as $affectedSpeciesDto) {

@@ -10,8 +10,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Message\Command\CreateUserCommand;
 use App\Exception\UnavailableDataException;
 use App\Message\Command\CommandBusInterface;
-use Psr\Log\LoggerInterface; // Good practice for logging errors
-use App\Exception\ComplainantCreationException; // Import your custom exception
+use Psr\Log\LoggerInterface;
+use App\Exception\ComplainantCreationException;
 
 readonly class ComplainantManager
 {
@@ -26,9 +26,8 @@ readonly class ComplainantManager
 
     /**
      * Creates a new Complainant entity from the provided DTO.
-     * @param NewComplainantModel $data The data transfer object containing complainant details.
+     * @param NewComplainantModel $model
      * @return Complainant The newly created Complainant entity.
-     * @throws ComplainantCreationException If there's an error during the creation or persistence process.
      */
     public function create(NewComplainantModel $model): Complainant
     {
@@ -81,16 +80,13 @@ readonly class ComplainantManager
 
             $this->em->persist($complainant);
             $this->em->flush();
-        
+
             return $complainant;
         } catch (\Exception $e) {
-    
-            if ($this->logger) {
-                $this->logger->error(
-                    'Failed to create complainant: {message}',
-                    ['message' => $e->getMessage(), 'exception' => $e]
-                );
-            }
+            $this->logger?->error(
+                'Failed to create complainant: {message}',
+                ['message' => $e->getMessage(), 'exception' => $e]
+            );
             throw new ComplainantCreationException("An error occurred while creating the complainant. : ". $e->getMessage());
         }
     }
