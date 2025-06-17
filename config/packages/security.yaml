@@ -6,9 +6,10 @@ security:
     providers:
         # used to reload user from session & other features (e.g. switch_user)
         app_user_provider:
-            entity:
-                class: App\Entity\User
-                property: email
+            id: App\Provider\Auth\MultiFieldUserProvider
+            #entity:
+                #class: App\Entity\User
+                #property: email
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -19,7 +20,7 @@ security:
             provider: app_user_provider
             json_login:
                 check_path: /api/authentication_token
-                username_path: email
+                username_path: username
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure

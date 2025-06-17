@@ -24,10 +24,10 @@ use App\State\GeneralParameter\GeneralParameterCreateProcessor;
     operations: [
         new GetCollection(
             normalizationContext: ['groups' => ['general_parameter:list']],
-            security: "is_granted('ROLE_GENERAL_PARAMETER_LIST')"
+            //security: "is_granted('ROLE_GENERAL_PARAMETER_LIST')"
         ),
         new Get(
-            security: "is_granted('ROLE_GENERAL_PARAMETER_DETAILS')"
+            //security: "is_granted('ROLE_GENERAL_PARAMETER_DETAILS')"
         ),
         new Post(
             security: "is_granted('ROLE_GENERAL_PARAMETER_CREATE')",
