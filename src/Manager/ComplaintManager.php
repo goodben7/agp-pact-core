@@ -35,7 +35,7 @@ readonly class ComplaintManager
 
         $complainant = $data->complainant;
         if (is_null($complainant)) {
-            $complainant = $this->em->getRepository(Complainant::class)->findBy(['userId' => $user->getId()]);
+            $complainant = $this->em->getRepository(Complainant::class)->findOneBy(['userId' => $user->getId()]);
             if (!$complainant)
                 throw new UnavailableDataException('No complainant found for user');
         }
