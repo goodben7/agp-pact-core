@@ -195,28 +195,28 @@ class Complaint
     /**
      * @var Collection<int, Victim>
      */
-    #[ORM\OneToMany(targetEntity: Victim::class, mappedBy: 'complaint', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Victim::class, mappedBy: 'complaint', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['complaint:get', 'complaint:list'])]
     private Collection $victims;
 
     /**
      * @var Collection<int, ComplaintConsequence>
      */
-    #[ORM\OneToMany(targetEntity: ComplaintConsequence::class, mappedBy: 'complaint', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: ComplaintConsequence::class, mappedBy: 'complaint', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['complaint:get', 'complaint:list'])]
     private Collection $consequences;
 
     /**
      * @var Collection<int, AttachedFile>
      */
-    #[ORM\OneToMany(targetEntity: AttachedFile::class, mappedBy: 'complaint', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: AttachedFile::class, mappedBy: 'complaint', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['complaint:get', 'complaint:list'])]
     private Collection $attachedFiles;
 
     /**
      * @var Collection<int, AffectedSpecies>
      */
-    #[ORM\OneToMany(targetEntity: AffectedSpecies::class, mappedBy: 'complaint', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: AffectedSpecies::class, mappedBy: 'complaint', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['complaint:get', 'complaint:list'])]
     private Collection $affectedSpecies;
 

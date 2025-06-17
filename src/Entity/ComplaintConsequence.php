@@ -79,7 +79,6 @@ class ComplaintConsequence
     private ?GeneralParameter $consequenceType = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
     #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch'] )]
     private ?GeneralParameter $severity = null;
 
@@ -87,7 +86,7 @@ class ComplaintConsequence
     #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch'] )]
     private ?float $estimatedCost = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch'] )]
     private ?string $impactDescription = null;
 
@@ -161,7 +160,7 @@ class ComplaintConsequence
         return $this->impactDescription;
     }
 
-    public function setImpactDescription(string $impactDescription): static
+    public function setImpactDescription(?string $impactDescription): static
     {
         $this->impactDescription = $impactDescription;
 

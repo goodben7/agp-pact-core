@@ -249,7 +249,7 @@ class Victim
 
     /**
      * Get the value of dateOfbirth
-     */ 
+     */
     public function getDateOfbirth(): \DateTimeImmutable|null
     {
         return $this->dateOfbirth;
@@ -259,11 +259,16 @@ class Victim
      * Set the value of dateOfbirth
      *
      * @return  self
-     */ 
+     */
     public function setDateOfbirth($dateOfbirth): static
     {
         $this->dateOfbirth = $dateOfbirth;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getFullName();
     }
 }

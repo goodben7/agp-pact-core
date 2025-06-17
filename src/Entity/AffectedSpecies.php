@@ -162,4 +162,9 @@ class AffectedSpecies
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return $this->getSpeciesType()->getValue();
+    }
 }
