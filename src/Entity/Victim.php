@@ -111,6 +111,10 @@ class Victim
     #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
     private ?GeneralParameter $familyRelationship = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch'])]
+    private ?\DateTimeImmutable $dateOfbirth = null;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -239,6 +243,26 @@ class Victim
     public function setFamilyRelationship(?GeneralParameter $familyRelationship): static
     {
         $this->familyRelationship = $familyRelationship;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of dateOfbirth
+     */ 
+    public function getDateOfbirth(): \DateTimeImmutable|null
+    {
+        return $this->dateOfbirth;
+    }
+
+    /**
+     * Set the value of dateOfbirth
+     *
+     * @return  self
+     */ 
+    public function setDateOfbirth($dateOfbirth): static
+    {
+        $this->dateOfbirth = $dateOfbirth;
 
         return $this;
     }
