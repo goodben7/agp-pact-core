@@ -35,8 +35,8 @@ use App\State\GeneralParameter\GeneralParameterCreateProcessor;
             processor: GeneralParameterCreateProcessor::class
         ),
         new Patch(
-            security: "is_granted('ROLE_GENERAL_PARAMETER_UPDATE')",
             denormalizationContext: ['groups' => 'general_parameter:patch'],
+            security: "is_granted('ROLE_GENERAL_PARAMETER_UPDATE')",
             processor: PersistProcessor::class,
         ),
         new Delete(
