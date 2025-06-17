@@ -22,19 +22,16 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
     operations: [
         new GetCollection(
             normalizationContext: ['groups' => ['location:list']],
-            security: "is_granted('ROLE_LOCATION_LIST')",
         ),
-        new Get(
-            security: "is_granted('ROLE_LOCATION_DETAILS')",
-        ),
+        new Get(),
         new Post(
             security: "is_granted('ROLE_LOCATION_CREATE')",
             input: LocationCreateDTO::class,
             processor: LocationCreateProcessor::class,
         ),
         new Patch(
-            security: "is_granted('ROLE_LOCATION_UPDATE')",
             denormalizationContext: ['groups' => 'location:patch'],
+            security: "is_granted('ROLE_LOCATION_UPDATE')",
             processor: PersistProcessor::class,
         ),
     ],
@@ -47,7 +44,10 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
         'name' => 'partial',
         'level.id' => 'exact',
         'level.category' => 'exact',
+        'level.code' => 'exact',
         'parent.id' => 'exact',
+        'parent.category' => 'exact',
+        'parent.code' => 'exact',
         'code' => 'exact',
         'active' => 'exact'
     ]
