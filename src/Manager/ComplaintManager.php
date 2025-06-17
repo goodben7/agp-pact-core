@@ -5,20 +5,24 @@ namespace App\Manager;
 
 use App\Dto\Complaint\ComplaintCreateDTO;
 use App\Entity\AffectedSpecies;
+use App\Entity\Complainant;
 use App\Entity\Complaint;
 use App\Entity\ComplaintConsequence;
+use App\Entity\User;
 use App\Entity\Victim;
 use App\Entity\WorkflowStep;
 use App\Entity\WorkflowTransition;
 use App\Exception\UnavailableDataException;
 use App\Message\ComplaintRegisteredMessage;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class ComplaintManager
 {
     public function __construct(
         private EntityManagerInterface $em,
+        private Security $security,
         private MessageBusInterface    $bus
     )
     {
@@ -26,6 +30,16 @@ readonly class ComplaintManager
 
     public function create(ComplaintCreateDTO $data): Complaint
     {
+        /** @var User $user */
+        $user = $this->security->getUser();
+
+        $complainant = $data->complainant;
+        if (is_null($complainant)) {
+            $complainant = $this->em->getRepository(Complainant::class)->findBy(['user' => $user]);
+            if (!$complainant)
+                throw new UnavailableDataException('No complainant found for user');
+        }
+
         $complaint = (new Complaint())
             ->setComplaintType($data->complaintType)
             ->setIncidentDate($data->incidentDate)
@@ -36,7 +50,7 @@ readonly class ComplaintManager
             ->setLocation($data->location)
             ->setLatitude($data->latitude)
             ->setLongitude($data->longitude)
-            ->setComplainant($data->complainant)
+            ->setComplainant($complainant)
             ->setAssignedTo($data->assignedTo)
             ->setDeclarationDate(new \DateTimeImmutable());
 
@@ -101,8 +115,8 @@ readonly class ComplaintManager
         $this->bus->dispatch(
             new ComplaintRegisteredMessage(
                 complaintId: $complaint->getId(),
-                complaintEmail: $data->complainant->getContactEmail(),
-                complaintPhone: $data->complainant->getContactPhone(),
+                complaintEmail: $complainant->getContactEmail(),
+                complaintPhone: $complainant->getContactPhone(),
             )
         );
 

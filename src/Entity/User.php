@@ -40,13 +40,12 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\HasLifecycleCallbacks]
 #[Get(
     uriTemplate: 'users/about',
-    security: 'is_granted("ROLE_USER")',
     normalizationContext: ['groups' => 'user:get'],
+    security: 'is_granted("ROLE_USER")',
     provider: UserAboutProvider::class,
 )]
 #[ApiResource(
-    normalizationContext: ['groups' => 'user:get'],
-    operations:[
+    operations: [
         new Get(
             security: 'is_granted("ROLE_USER_DETAILS")',
             provider: ItemProvider::class
@@ -75,22 +74,23 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         ),
         new Post(
             uriTemplate: "users/{id}/profiles",
-            security: 'is_granted("ROLE_USER_SET_PROFILE")',
+            status: 200,
             normalizationContext: ['groups' => 'user:get'],
+            security: 'is_granted("ROLE_USER_SET_PROFILE")',
             input: SetUserProfileDto::class,
             processor: SetProfileProcessor::class,
-            status: 200,
         ),
         new Patch(
-            security: 'is_granted("ROLE_USER_EDIT")',
             denormalizationContext: ['groups' => 'user:patch'],
+            security: 'is_granted("ROLE_USER_EDIT")',
             processor: PersistProcessor::class,
         ),
         new Delete(
             security: 'is_granted("ROLE_USER_DELETE")',
             processor: DeleteUserProcessor::class
         ),
-    ]
+    ],
+    normalizationContext: ['groups' => 'user:get']
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'id' => 'exact',
