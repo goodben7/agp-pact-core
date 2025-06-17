@@ -33,7 +33,6 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
             security: "is_granted('ROLE_COMPLAINANT_DETAILS')"
         ),
         new Post(
-            security: "is_granted('ROLE_COMPLAINANT_CREATE')",
             input: ComplainantCreateDTO::class,
             processor: CreateComplainantProcessor::class
         ),

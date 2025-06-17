@@ -93,7 +93,7 @@ class WorkflowStep
     private ?GeneralParameter $durationUnit = null;
 
     #[ORM\OneToOne(mappedBy: 'workflowStep', cascade: ['persist', 'remove'])]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:list', 'complaint:get', 'complaint:list'])]
     private ?WorkflowStepUIConfiguration $uiConfiguration = null;
 
     public function getId(): ?string

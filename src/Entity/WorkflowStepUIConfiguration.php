@@ -14,7 +14,7 @@ class WorkflowStepUIConfiguration
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:list', 'complaint:get', 'complaint:list'])]
     private ?int $id = null;
 
     #[ORM\OneToOne(inversedBy: 'uiConfiguration', cascade: ['persist', 'remove'])]
@@ -26,7 +26,7 @@ class WorkflowStepUIConfiguration
     private ?string $mainComponentKey = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:list', 'complaint:get', 'complaint:list'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

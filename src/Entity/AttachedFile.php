@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Doctrine\IdGenerator;
 use App\Repository\AttachedFileRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -10,6 +11,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: AttachedFileRepository::class)]
 #[Vich\Uploadable]
+#[ApiResource()]
 class AttachedFile
 {
     const ID_PREFIX = "AF";
