@@ -20,8 +20,7 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => 'company:get'],
-    operations:[
+    operations: [
         new Get(
             security: 'is_granted("ROLE_COMPANY_DETAILS")',
             provider: ItemProvider::class
@@ -31,16 +30,17 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
             provider: CollectionProvider::class
         ),
         new Post(
-            security: 'is_granted("ROLE_COMPANY_CREATE")',
             denormalizationContext: ['groups' => 'company:post',],
+            security: 'is_granted("ROLE_COMPANY_CREATE")',
             processor: PersistProcessor::class,
         ),
         new Patch(
-            security: 'is_granted("ROLE_COMPANY_UPDATE")',
             denormalizationContext: ['groups' => 'company:patch',],
+            security: 'is_granted("ROLE_COMPANY_UPDATE")',
             processor: PersistProcessor::class,
         ),
-    ]
+    ],
+    normalizationContext: ['groups' => 'company:get']
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'id' => 'exact',
@@ -58,6 +58,7 @@ class Company
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
+    #[Groups(['company:get'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
