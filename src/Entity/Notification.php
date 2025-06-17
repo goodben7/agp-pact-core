@@ -59,12 +59,13 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
     'isRead' => 'exact',
 ])]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt', 'readAt'])]
-class Notification 
+class Notification
 {
     public const ID_PREFIX = "NF";
 
     public const SENT_VIA_SYSTEM = 'system';
     public const SENT_VIA_SMS = 'sms';
+    public const SENT_VIA_EMAIL = 'email';
     public const SENT_VIA_GMAIL = 'gmail';
     public const SENT_VIA_WHATSAPP = 'whatsapp';
 
@@ -73,7 +74,7 @@ class Notification
     public const RECIPIENT_TYPE_PHONE = 'phone';
     public const RECIPIENT_TYPE_WHATSAPP = 'whatsapp';
     public const RECIPIENT_TYPE_EXTERNAL_CONTACT = 'external_contact';
-    
+
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
@@ -247,7 +248,7 @@ class Notification
     {
         return 'instance';
     }
-    
+
     public static function getRecipientTypeChoices(): array
     {
         return [
