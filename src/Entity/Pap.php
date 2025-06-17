@@ -20,8 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PapRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => 'pap:get'],
-    operations:[
+    operations: [
         new Get(
             security: 'is_granted("ROLE_PAP_DETAILS")',
             provider: ItemProvider::class
@@ -31,16 +30,17 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: CollectionProvider::class
         ),
         new Post(
-            security: 'is_granted("ROLE_PAP_CREATE")',
             denormalizationContext: ['groups' => 'pap:post',],
+            security: 'is_granted("ROLE_PAP_CREATE")',
             processor: PersistProcessor::class,
         ),
         new Patch(
-            security: 'is_granted("ROLE_PAP_UPDATE")',
             denormalizationContext: ['groups' => 'pap:patch',],
+            security: 'is_granted("ROLE_PAP_UPDATE")',
             processor: PersistProcessor::class,
         ),
-    ]
+    ],
+    normalizationContext: ['groups' => 'pap:get']
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'id' => 'exact',
@@ -77,7 +77,7 @@ class Pap
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
     #[Groups(['pap:get'])]
-    private ?string $id = null; 
+    private ?string $id = null;
 
     #[ORM\Column(length: 120)]
     #[Groups(['pap:get', 'pap:post', 'pap:patch'])]
@@ -327,7 +327,7 @@ class Pap
 
         return $this;
     }
-    
+
     public function getReferenceKilometerPoint(): ?string
     {
         return $this->referenceKilometerPoint;
@@ -546,7 +546,7 @@ class Pap
 
     /**
      * Get the value of code
-     */ 
+     */
     public function getCode(): string|null
     {
         return $this->code;
@@ -556,7 +556,7 @@ class Pap
      * Set the value of code
      *
      * @return  self
-     */ 
+     */
     public function setCode($code): static
     {
         $this->code = $code;
@@ -566,7 +566,7 @@ class Pap
 
     /**
      * Get the value of territory
-     */ 
+     */
     public function getTerritory(): Location|null
     {
         return $this->territory;
@@ -576,7 +576,7 @@ class Pap
      * Set the value of territory
      *
      * @return  self
-     */ 
+     */
     public function setTerritory(?Location $territory): static
     {
         $this->territory = $territory;
@@ -586,7 +586,7 @@ class Pap
 
     /**
      * Get the value of village
-     */ 
+     */
     public function getVillage(): Location|null
     {
         return $this->village;
@@ -596,7 +596,7 @@ class Pap
      * Set the value of village
      *
      * @return  self
-     */ 
+     */
     public function setVillage(?Location $village): static
     {
         $this->village = $village;
@@ -606,7 +606,7 @@ class Pap
 
     /**
      * Get the value of longitude
-     */ 
+     */
     public function getLongitude(): float|null
     {
         return $this->longitude;
@@ -616,7 +616,7 @@ class Pap
      * Set the value of longitude
      *
      * @return  self
-     */ 
+     */
     public function setLongitude($longitude)
     {
         $this->longitude = $longitude;
@@ -626,7 +626,7 @@ class Pap
 
     /**
      * Get the value of latitude
-     */ 
+     */
     public function getLatitude(): float|null
     {
         return $this->latitude;
@@ -636,7 +636,7 @@ class Pap
      * Set the value of latitude
      *
      * @return  self
-     */ 
+     */
     public function setLatitude($latitude): static
     {
         $this->latitude = $latitude;
@@ -646,7 +646,7 @@ class Pap
 
     /**
      * Get the value of province
-     */ 
+     */
     public function getProvince(): Location|null
     {
         return $this->province;
@@ -656,7 +656,7 @@ class Pap
      * Set the value of province
      *
      * @return  self
-     */ 
+     */
     public function setProvince(?Location $province): static
     {
         $this->province = $province;
@@ -666,7 +666,7 @@ class Pap
 
     /**
      * Get the value of category
-     */ 
+     */
     public function getCategory(): string|null
     {
         return $this->category;
@@ -676,7 +676,7 @@ class Pap
      * Set the value of category
      *
      * @return  self
-     */ 
+     */
     public function setCategory($category): static
     {
         $this->category = $category;
@@ -686,7 +686,7 @@ class Pap
 
     /**
      * Get the value of propertyType
-     */ 
+     */
     public function getPropertyType(): string|null
     {
         return $this->propertyType;
@@ -696,7 +696,7 @@ class Pap
      * Set the value of propertyType
      *
      * @return  self
-     */ 
+     */
     public function setPropertyType($propertyType)
     {
         $this->propertyType = $propertyType;

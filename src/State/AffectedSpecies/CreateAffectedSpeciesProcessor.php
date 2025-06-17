@@ -12,7 +12,6 @@ readonly class CreateAffectedSpeciesProcessor implements ProcessorInterface
 {
     public function __construct(private ComplaintManager $manager)
     {
-
     }
 
     /** @var ComplaintCreateDTO $data */

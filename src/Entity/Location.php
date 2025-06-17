@@ -60,11 +60,11 @@ class Location
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list', 'pap:get'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list', 'location:patch'])]
+    #[Groups(['location:get', 'location:list', 'road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list', 'location:patch', 'pap:get'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne]
