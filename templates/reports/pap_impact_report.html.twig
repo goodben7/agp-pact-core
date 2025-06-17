@@ -1,0 +1,142 @@
+{# templates/reports/pap_impact_report.html.twig #}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport d'Impact des PAP - AGP-PACT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20mm;
+            font-size: 10pt;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .footer {
+            font-size: 8pt;
+            text-align: center;
+            margin-top: 50px;
+            color: #777;
+        }
+
+        .pap-section {
+            margin-bottom: 30px;
+            border: 1px solid #eee;
+            padding: 15px;
+            background-color: #fdfdfd;
+        }
+
+        .pap-section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+
+        .detail-table th, .detail-table td {
+            font-size: 9pt;
+            padding: 5px;
+        }
+
+        .summary-box {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #e6f7ff;
+        }
+
+        .summary-box p {
+            margin: 0 0 5px 0;
+        }
+    </style>
+</head>
+<body>
+<h1>Rapport d'Impact des Personnes Affectées au Projet (PAP)</h1>
+<h2>Généré par AGP-PACT</h2>
+
+<div class="summary-box">
+    <h3>Résumé des Impacts</h3>
+    <p><strong>Total des PAPs affectés :</strong> {{ reportData.summary.totalPAPs|default('N/A') }}</p>
+    <p><strong>Total des compensations (estimé)
+            :</strong> {{ reportData.summary.totalCompensation|number_format(2, ',', ' ')|default('N/A') }} USD</p>
+    <p><strong>PAPs par vulnérabilité :</strong>
+        {% for vul in reportData.summary.papsByVulnerability %}
+            {{ vul.degree }}: {{ vul.count }} {% if not loop.last %}| {% endif %}
+        {% else %}
+            N/A
+        {% endfor %}
+    </p>
+</div>
+
+{% if reportData.results is not empty %}
+    {% for pap in reportData.results %}
+        <div class="pap-section">
+            <h3>PAP : {{ pap.name }} ({{ pap.personTypeName }})</h3>
+            <p><strong>Contact :</strong> {{ pap.contactPersonName }} ({{ pap.contactPersonPhone }}
+                , {{ pap.contactPersonEmail }})</p>
+            <p><strong>Localisation :</strong> {{ pap.affectedLocationName }}</p>
+            <p><strong>Degré de Vulnérabilité :</strong> {{ pap.vulnerabilityDegreeName|default('Non renseigné') }}</p>
+
+            <h4>Détails des Affectations Liées aux Plaintes :</h4>
+            {% if pap.affectationDetails is not empty %}
+                {% for detail in pap.affectationDetails %}
+                    <h4>Plainte n° {{ detail.complaintId|slice(0, 8) }}...</h4>
+                    <table class="detail-table">
+                        <thead>
+                        <tr>
+                            <th>Type Propriété</th>
+                            <th>Surface (m²)</th>
+                            <th>Activité Comm.</th>
+                            <th>Perte Revenu Locatif</th>
+                            <th>Assistance Déménagement</th>
+                            <th>Equivalent Dollar</th>
+                            <th>Accord Lib. Lieu</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>{{ detail.propertyTypeName|default('N/A') }}</td>
+                            <td>{{ detail.affectedSurface|default('N/A') }}</td>
+                            <td>{{ detail.commercialActivityAffected|default('N/A') }}</td>
+                            <td>{{ detail.rentalIncomeLoss|default('N/A') }}</td>
+                            <td>{{ detail.relocationAssistance|default('N/A') }}</td>
+                            <td>{{ detail.totalDollarEquivalent|default('N/A') }}</td>
+                            <td>{{ detail.siteReleaseAgreement ? 'Oui' : 'Non' }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    {% if detail.attachedFiles is not empty %}
+                        <p><strong>Photos d'affectation :</strong> {{ detail.attachedFiles|length }}</p>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <p>Aucun détail d'affectation enregistré pour ce PAP.</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Aucun PAP trouvé pour les critères spécifiés.</p>
+{% endif %}
+
+<div class="footer">
+    Généré le {{ reportData.generatedAt|date('d/m/Y H:i') }} par {{ reportData.generatedBy|default('Système') }}.
+</div>
+</body>
+</html>

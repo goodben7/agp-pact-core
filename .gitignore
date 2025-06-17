@@ -13,6 +13,9 @@
 ###> phpunit/phpunit ###
 /phpunit.xml
 /.phpunit.cache/
+/.DS_Store
+/.idea
+/public/.DS_Store
 ###< phpunit/phpunit ###
 
 ###> symfony/asset-mapper ###
