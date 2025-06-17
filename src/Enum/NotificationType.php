@@ -34,6 +34,7 @@ class NotificationType
 
     // === SYSTÈME / ADMIN ===
     public const USER_ACCOUNT_CREATED = 'usr_new';
+    public const RESET_PASSWORD = 'res_pwd';
     public const ROLE_ASSIGNED = 'usr_rol';
     public const SYSTEM_UPDATE = 'sys_upd';
 

@@ -4,7 +4,6 @@ namespace App\Messenger\Middleware;
 
 use App\Entity\Complaint;
 use App\Entity\Notification;
-use App\Entity\NotificationTemplate;
 use App\Message\SendNotificationMessage;
 use App\Factory\NotificationFactory;
 use App\Repository\NotificationTemplateRepository;
