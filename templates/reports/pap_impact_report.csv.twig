@@ -1,0 +1,11 @@
+{# templates/reports/pap_impact_report.csv.twig #}
+"ID PAP","Nom PAP","Type Personne","Téléphone Contact","Email Contact","Degré Vulnérabilité","Localisation Affectée","ID Plainte Liée","Type Propriété","Surface Affectée (m²)","Activité Commerciale","Nombre Jours Affectés","Perte Revenu Locatif","Assistance Déménagement","Assistance Vulnérable","Total Dollar","Accord Lib. Lieu"
+{% for pap in reportData.results %}
+    {% if pap.affectationDetails is not empty %}
+        {% for detail in pap.affectationDetails %}
+"{{ pap.id }}","{{ pap.name|replace('"', '""') }}","{{ pap.personTypeName|replace('"', '""') }}","{{ pap.contactPersonPhone|replace('"', '""') }}","{{ pap.contactPersonEmail|replace('"', '""') }}","{{ pap.vulnerabilityDegreeName|replace('"', '""') }}","{{ pap.affectedLocationName|replace('"', '""') }}","{{ detail.complaintId }}","{{ detail.propertyTypeName|replace('"', '""') }}","{{ detail.affectedSurface }}","{{ detail.commercialActivityAffected|replace('"', '""') }}","{{ detail.numberOfDaysAffected }}","{{ detail.rentalIncomeLoss }}","{{ detail.relocationAssistance }}","{{ detail.vulnerablePersonAssistance }}","{{ detail.totalDollarEquivalent }}","{{ detail.siteReleaseAgreement ? 'Oui' : 'Non' }}"
+        {% endfor %}
+    {% else %}
+"{{ pap.id }}","{{ pap.name|replace('"', '""') }}","{{ pap.personTypeName|replace('"', '""') }}","{{ pap.contactPersonPhone|replace('"', '""') }}","{{ pap.contactPersonEmail|replace('"', '""') }}","{{ pap.vulnerabilityDegreeName|replace('"', '""') }}","{{ pap.affectedLocationName|replace('"', '""') }}","","","","","","","","","",""
+    {% endif %}
+{% endfor %}

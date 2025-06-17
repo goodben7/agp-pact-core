@@ -1,0 +1,4 @@
+"ID Plainte","Date Décl.","Plaignant","Type","Statut","Cause Incident","Localisation","Description"
+{% for complaint in reportData.results %}
+"{{ complaint.id }}","{{ complaint.declarationDate|date('Y-m-d') }}","{{ complaint.complainantFullName|replace('"', '""') }}","{{ complaint.complaintTypeName|replace('"', '""') }}","{{ complaint.currentWorkflowStepName|replace('"', '""') }}","{{ complaint.incidentCauseName|replace('"', '""') }}","{{ complaint.locationName|replace('"', '""') }}","{{ complaint.description|replace('"', '""') }}"
+{% endfor %}
