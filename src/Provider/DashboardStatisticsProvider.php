@@ -32,6 +32,7 @@ final class DashboardStatisticsProvider implements ProviderInterface
 
         $filters = $context['filters'] ?? [];
         $locationId = $filters['locationId'] ?? null;
+        $roadAxisId = $filters['roadAxisId'] ?? null;
         $complaintTypeId = $filters['complaintTypeId'] ?? null;
         $startDate = $filters['declarationDate']['after'] ?? null;
         $endDate = $filters['declarationDate']['before'] ?? null;
@@ -156,9 +157,14 @@ final class DashboardStatisticsProvider implements ProviderInterface
         return $data;
     }
 
-    public function getClosure(mixed $locationId, mixed $complaintTypeId, mixed $startDate, mixed $endDate): \Closure
+    public function getClosure(mixed $roadAxisId, mixed $locationId, mixed $complaintTypeId, mixed $startDate, mixed $endDate): \Closure
     {
-        return function (QueryBuilder $qb, string $alias) use ($locationId, $complaintTypeId, $startDate, $endDate) {
+        return function (QueryBuilder $qb, string $alias) use ($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate) {
+            if ($roadAxisId) {
+                $qb
+                    ->andWhere(sprintf('%s.roadAxis = :roadAxisId', $alias))
+                    ->setParameter('roadAxisId', $roadAxisId);
+            }
             if ($locationId) {
                 $qb
                     ->andWhere(sprintf('%s.location = :locationId', $alias))

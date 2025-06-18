@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use App\Doctrine\IdGenerator;
 use ApiPlatform\Metadata\Post;
@@ -34,6 +35,9 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
             security: "is_granted('ROLE_LOCATION_UPDATE')",
             processor: PersistProcessor::class,
         ),
+        new Delete(
+            security: "is_granted('ROLE_LOCATION_DELETE')"
+        )
     ],
     normalizationContext: ['groups' => ['location:get']],
 )]

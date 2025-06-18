@@ -77,6 +77,7 @@ return static function (): iterable {
     yield Permission::new('ROLE_LOCATION_DETAILS', 'Consulter les détails d\'une localisation');
     yield Permission::new('ROLE_LOCATION_CREATE', 'Créer une localisation');
     yield Permission::new('ROLE_LOCATION_UPDATE', 'Modifier une localisation');
+    yield Permission::new('ROLE_LOCATION_DELETE', 'Supprimer une localisation');
 
     yield Permission::new('ROLE_SPECIES_PRICE_LIST', 'Consulter la liste des prix des espèces');
     yield Permission::new('ROLE_SPECIES_PRICE_DETAILS', 'Consulter les détails d\'un prix d\'espèce');
