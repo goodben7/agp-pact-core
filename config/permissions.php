@@ -145,4 +145,9 @@ return static function (): iterable {
     yield Permission::new('ROLE_PAP_CREATE', "Créer une Personne Affectée au Projet (PAP)");
     yield Permission::new('ROLE_PAP_UPDATE', "Modifier une Personne Affectée au Projet (PAP)");
 
+    yield Permission::new('ROLE_PREJUDICE_DETAILS', "Consulter les détails d'un préjudice");
+    yield Permission::new('ROLE_PREJUDICE_LIST', "Consulter la liste des préjudices");
+    yield Permission::new('ROLE_PREJUDICE_CREATE', "Créer un préjudice");
+    yield Permission::new('ROLE_PREJUDICE_UPDATE', "Modifier un préjudice");
+
 };
