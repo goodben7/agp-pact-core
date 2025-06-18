@@ -16,7 +16,11 @@ class WorkflowStepCreateDTO
 
     public ?bool $active = true;
 
+    public ?int $duration = null;
+
     public ?int $expectedDuration = null;
+
+    public ?int $emergencyDuration = null;
 
     public ?string $durationUnitId = null;
 

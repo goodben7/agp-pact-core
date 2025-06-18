@@ -27,6 +27,8 @@ readonly class WorkflowStepManager
             ->setIsInitial($data->isInitial)
             ->setIsFinal($data->isFinal)
             ->setActive($data->active)
+            ->setDuration($data->duration)
+            ->setEmergencyDuration($data->emergencyDuration)
             ->setExpectedDuration($data->expectedDuration);
 
         if ($data->durationUnitId) {

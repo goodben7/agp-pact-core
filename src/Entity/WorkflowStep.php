@@ -96,6 +96,14 @@ class WorkflowStep
     #[Groups(['workflow_step:get', 'workflow_step:list', 'complaint:get', 'complaint:list'])]
     private ?WorkflowStepUIConfiguration $uiConfiguration = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    private ?int $emergencyDuration = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    private ?int $duration = null;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -210,6 +218,30 @@ class WorkflowStep
         }
 
         $this->uiConfiguration = $uiConfiguration;
+
+        return $this;
+    }
+
+    public function getEmergencyDuration(): ?int
+    {
+        return $this->emergencyDuration;
+    }
+
+    public function setEmergencyDuration(?int $emergencyDuration): static
+    {
+        $this->emergencyDuration = $emergencyDuration;
+
+        return $this;
+    }
+
+    public function getDuration(): ?int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(?int $duration): static
+    {
+        $this->duration = $duration;
 
         return $this;
     }

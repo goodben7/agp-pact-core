@@ -1,5 +1,5 @@
 api_platform:
-    title: AGP-PACT CORE API 
+    title: AGP-PACT CORE API
     version: 1.0.0
     formats:
         jsonld: ['application/ld+json']
@@ -25,4 +25,5 @@ api_platform:
         extra_properties:
             standard_put: true
             rfc_7807_compliant_errors: true
+        pagination_enabled: false
     use_symfony_listeners: true
