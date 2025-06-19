@@ -43,7 +43,7 @@ readonly class RoadAxisManager
 
     public function updateFrom(UpdateRoadAxisModel $model, string $roadAxisId): RoadAxis
     {
-        $r = $this->findDelivery($roadAxisId);
+        $r = $this->findRoadAxis($roadAxisId);
 
         $r->setName($model->name);
         $r->setDescription($model->description);
@@ -51,17 +51,39 @@ readonly class RoadAxisManager
         $r->setEndLocation($model->endLocation);
         $r->setActive($model->active);
 
-        foreach ($model->traversedLocationIds as $traversedLocationId) {
-            $traversedLocation = $this->em->getRepository(Location::class)->find($traversedLocationId);
-            if ($traversedLocation)
-                $r->addTraversedLocation($traversedLocation);
+        // --- Début de la logique pour gérer l'ajout et la suppression ---
+
+        // 1. Obtenir les IDs des localisations traversées actuellement associées à RoadAxis
+        $currentTraversedLocationIds = $r->getTraversedLocations()->map(fn(Location $loc) => $loc->getId())->toArray();
+
+        // 2. Identifier les localisations à supprimer
+        // Ce sont celles qui sont dans $currentTraversedLocationIds mais pas dans $model->traversedLocationIds
+        $locationsToRemoveIds = array_diff($currentTraversedLocationIds, $model->traversedLocationIds);
+
+        foreach ($r->getTraversedLocations() as $traversedLocation) {
+            if (in_array($traversedLocation->getId(), $locationsToRemoveIds)) {
+                $r->removeTraversedLocation($traversedLocation);
+            }
         }
+
+        // 3. Identifier les localisations à ajouter
+        // Ce sont celles qui sont dans $model->traversedLocationIds mais pas dans $currentTraversedLocationIds
+        $locationsToAddIds = array_diff($model->traversedLocationIds, $currentTraversedLocationIds);
+
+        foreach ($locationsToAddIds as $traversedLocationId) {
+            $traversedLocation = $this->em->getRepository(Location::class)->find($traversedLocationId);
+            if ($traversedLocation) {
+                $r->addTraversedLocation($traversedLocation);
+            }
+        }
+
+        // --- Fin de la logique pour gérer l'ajout et la suppression ---
 
         $this->em->flush();
         return $r;
     }
 
-    private function findDelivery(string $roadAxisId): RoadAxis 
+    private function findRoadAxis(string $roadAxisId): RoadAxis 
     {
         $roadAxis = $this->em->find(RoadAxis::class, $roadAxisId);
 
