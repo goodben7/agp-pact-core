@@ -38,7 +38,7 @@ final class DashboardStatisticsProvider implements ProviderInterface
         $endDate = $filters['declarationDate']['before'] ?? null;
 
         try {
-            $applyCommonFilters = $this->getClosure($locationId, $complaintTypeId, $startDate, $endDate);
+            $applyCommonFilters = $this->getClosure($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
 
 
             $qb1 = $this->entityManager->createQueryBuilder()
@@ -74,7 +74,7 @@ final class DashboardStatisticsProvider implements ProviderInterface
             $applyCommonFilters($qb4, 'c');
             $stats->openComplaints = (int)$qb4->getQuery()->getSingleScalarResult();
 
-            $stats->averageResolutionTimeDays = $this->calculateAverageResolutionTime($locationId, $complaintTypeId, $startDate, $endDate);
+            $stats->averageResolutionTimeDays = $this->calculateAverageResolutionTime($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
 
 
             $stats->complaintsDeclaredMonthly = $this->getComplaintsDeclaredMonthly($locationId, $complaintTypeId);
@@ -87,14 +87,14 @@ final class DashboardStatisticsProvider implements ProviderInterface
         return $stats;
     }
 
-    private function calculateAverageResolutionTime(?string $locationId, ?string $complaintTypeId, ?string $startDate, ?string $endDate): ?float
+    private function calculateAverageResolutionTime(?string $roadAxisId, ?string $locationId, ?string $complaintTypeId, ?string $startDate, ?string $endDate): ?float
     {
         $qb = $this->entityManager->createQueryBuilder()
             ->select('c.declarationDate, c.closureDate')
             ->from(Complaint::class, 'c')
             ->where('c.closureDate IS NOT NULL');
 
-        $applyCommonFiltersForAverage = $this->getClosure($locationId, $complaintTypeId, $startDate, $endDate);
+        $applyCommonFiltersForAverage = $this->getClosure($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
         $applyCommonFiltersForAverage($qb, 'c');
 
         $closedComplaintsData = $qb->getQuery()->getResult();
