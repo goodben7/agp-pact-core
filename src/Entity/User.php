@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\Post;
 use App\Dto\ChangePasswordDto;
 use App\Dto\SetUserProfileDto;
 use ApiPlatform\Metadata\Patch;
+use App\Dto\NewRegisterUserDto;
 use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use App\Model\UserProxyInterface;
@@ -19,6 +20,7 @@ use App\State\DeleteUserProcessor;
 use App\State\SetProfileProcessor;
 use ApiPlatform\Metadata\ApiFilter;
 use App\Provider\UserAboutProvider;
+use App\State\RegisterUserProcessor;
 use ApiPlatform\Metadata\ApiResource;
 use App\State\ToggleLockUserProcessor;
 use ApiPlatform\Metadata\GetCollection;
@@ -88,6 +90,11 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         new Delete(
             security: 'is_granted("ROLE_USER_DELETE")',
             processor: DeleteUserProcessor::class
+        ),
+        new Post(
+            uriTemplate: "users/registers",
+            input: NewRegisterUserDto::class,
+            processor: RegisterUserProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => 'user:get']
@@ -406,6 +413,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             "ROLE_WORLD_BANK" => UserProxyInterface::PERSON_WORLD_BANK,
             "ROLE_ADMIN" => UserProxyInterface::PERSON_ADMIN,
             "ROLE_COMPLAINANT" => UserProxyInterface::PERSON_COMPLAINANT,
+            "ROLE_LAMBDA" => UserProxyInterface::PERSON_LAMBDA,
         ]);
     }
 
@@ -420,6 +428,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             UserProxyInterface::PERSON_WORLD_BANK,
             UserProxyInterface::PERSON_ADMIN,
             UserProxyInterface::PERSON_COMPLAINANT,
+            UserProxyInterface::PERSON_LAMBDA,
         ];
     }
 
@@ -433,7 +442,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             "Cellule d'infrastructure" => UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
             "Banque mondiale" => UserProxyInterface::PERSON_WORLD_BANK,
             "Administrateur" => UserProxyInterface::PERSON_ADMIN,
-            "Plaignant" => UserProxyInterface::PERSON_COMPLAINANT
+            "Plaignant" => UserProxyInterface::PERSON_COMPLAINANT,
+            "Lambda" => UserProxyInterface::PERSON_LAMBDA,
         ];
     }
 

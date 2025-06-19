@@ -5,6 +5,9 @@ namespace App\Manager;
 use App\Entity\User;
 use App\Entity\Profile;
 use App\Model\NewUserModel;
+use App\Model\UserProxyInterface;
+use App\Model\NewRegisterUserModel;
+use App\Repository\ProfileRepository;
 use App\Service\ActivityLogDispatcher;
 use App\Exception\UserCreationException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,6 +22,7 @@ class UserManager
         private EntityManagerInterface $em, 
         private UserPasswordHasherInterface $hasher,
         private ActivityLogDispatcher  $dispatcher,
+        private ProfileRepository $profileRepository
     )
     {
     }
@@ -49,6 +53,43 @@ class UserManager
         } catch (\Exception $e) {
             throw new UserCreationException($e->getMessage());
         }
+    }
+
+    /**
+     * @param NewRegisterUserModel $model
+     * @return User
+     * @throws UserCreationException
+     */
+    public function register(NewRegisterUserModel $model): User
+    {
+        try {
+
+            $profile = $this->profileRepository->findOneBy(['personType' => UserProxyInterface::PERSON_LAMBDA]);
+
+            if (null === $profile) {
+                throw new UnavailableDataException('cannot find profile');
+            }
+
+            $user = new User();
+
+            $user->setEmail($model->email);
+            $user->setCreatedAt(new \DateTimeImmutable('now'));
+            $user->setPassword($this->hasher->hashPassword($user, $model->plainPassword));
+            $user->setPhone($model->phone);
+            $user->setDisplayName($model->displayName);
+            $user->setProfile($profile);
+            $user->setPersonType($profile->getPersonType());
+
+            $this->em->persist($user);
+            $this->em->flush();
+
+            $this->dispatcher->dispatch('create', $user);
+
+            return $user;
+        } catch (\Exception $e) {
+            throw new UserCreationException($e->getMessage());
+        }
+        
     }
 
     public function changePassword(string $userId, string $actualPassword, string $newPassword): User 

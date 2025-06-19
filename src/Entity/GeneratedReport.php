@@ -28,11 +28,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
             processor: RequestReportProcessor::class
         )
     ],
-    security: "is_granted('ROLE_VIEW_GENERATED_REPORTS')",
 )]
 class GeneratedReport
 {
-    const ID_PREFIX = "GR";
+    public const ID_PREFIX = "GR";
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
