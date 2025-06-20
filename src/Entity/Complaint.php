@@ -110,7 +110,7 @@ class Complaint
     #[Groups(['complaint:get', 'complaint:list'])]
     private ?RoadAxis $roadAxis = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $locationDetail = null;
 
@@ -184,7 +184,7 @@ class Complaint
     private ?\DateTimeImmutable $closureDate = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['complaint:get', 'complaint:list'])]
     private ?Complainant $complainant = null;
 
@@ -322,7 +322,7 @@ class Complaint
         return $this->locationDetail;
     }
 
-    public function setLocationDetail(string $locationDetail): static
+    public function setLocationDetail(?string $locationDetail): static
     {
         $this->locationDetail = $locationDetail;
 
