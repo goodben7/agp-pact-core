@@ -93,7 +93,7 @@ class Complainant
     #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
     private ?string $displayName = null;
 
-    #[ORM\Column(length: 14)]
+    #[ORM\Column(length: 14, nullable: true)]
     #[Groups(['complainant:list', 'complainant:get', 'complaint:get', 'complaint:list'])]
     private ?string $contactPhone = null;
 
@@ -205,7 +205,7 @@ class Complainant
         return $this->contactPhone;
     }
 
-    public function setContactPhone(string $contactPhone): static
+    public function setContactPhone(?string $contactPhone): static
     {
         $this->contactPhone = $contactPhone;
 
