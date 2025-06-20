@@ -34,7 +34,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
             processor: WorkflowStepCreateProcessor::class
         ),
         new Patch(
-            security: "is_granted('ROLE_WORKFLOW_STEP_UPDATE')",
+            denormalizationContext: ['groups' => ['workflow_step:patch']],
+            security: "is_granted('ROLE_WORKFLOW_STEP_UPDATE')"
         )
     ],
     normalizationContext: ['groups' => ['workflow_step:get']]
@@ -57,51 +58,51 @@ class WorkflowStep
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['workflow_step:get', 'complaint:get', 'complaint:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:patch', 'complaint:get', 'complaint:list'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:patch', 'workflow_step:list'])]
     private ?int $position = null;
 
     #[ORM\Column]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:patch', 'workflow_step:list'])]
     private ?bool $isInitial = null;
 
     #[ORM\Column]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:patch', 'workflow_step:list'])]
     private ?bool $isFinal = null;
 
     #[ORM\Column]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:patch', 'workflow_step:list'])]
     private ?bool $active = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:patch', 'workflow_step:list'])]
     private ?int $expectedDuration = null;
 
     #[ORM\ManyToOne]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:patch', 'workflow_step:list'])]
     private ?GeneralParameter $durationUnit = null;
 
     #[ORM\OneToOne(mappedBy: 'workflowStep', cascade: ['persist', 'remove'])]
-    #[Groups(['workflow_step:get', 'workflow_step:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:patch', 'workflow_step:list', 'complaint:get', 'complaint:list'])]
     private ?WorkflowStepUIConfiguration $uiConfiguration = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:patch', 'workflow_step:list'])]
     private ?int $emergencyDuration = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:patch', 'workflow_step:list'])]
     private ?int $duration = null;
 
     public function getId(): ?string
