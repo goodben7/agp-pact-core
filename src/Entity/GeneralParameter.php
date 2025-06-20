@@ -53,7 +53,7 @@ use App\State\GeneralParameter\GeneralParameterCreateProcessor;
 )]
 class GeneralParameter
 {
-    const ID_PREFIX = "GP";
+    public const ID_PREFIX = "GP";
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]

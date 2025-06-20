@@ -44,4 +44,5 @@ class ComplaintCreateDTO
 
     /** @var ComplaintConsequenceCreateDTO[] $complaintConsequences */
     public ?array $complaintConsequences = null;
+    public ?bool $isAnonymous = false;
 }

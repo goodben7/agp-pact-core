@@ -31,45 +31,49 @@ readonly class ComplaintManager
     {
         // Handle Complainant creation or retrieval
         $complainant = null;
-        if ($data->newComplainant) {
-            $complainantRepository = $this->em->getRepository(Complainant::class);
 
-            // Check if a complainant with the same contactPhone or contactEmail already exists
-            if ($data->newComplainant->contactPhone) {
-                $existingComplainant = $complainantRepository->findOneBy(['contactPhone' => $data->newComplainant->contactPhone]);
-                if ($existingComplainant) {
-                    $complainant = $existingComplainant;
+        // Only handle complainant creation/retrieval if the complaint is NOT anonymous
+        if (!$data->isAnonymous) {
+            if ($data->newComplainant) {
+                $complainantRepository = $this->em->getRepository(Complainant::class);
+
+                // Check if a complainant with the same contactPhone or contactEmail already exists
+                if ($data->newComplainant->contactPhone) {
+                    $existingComplainant = $complainantRepository->findOneBy(['contactPhone' => $data->newComplainant->contactPhone]);
+                    if ($existingComplainant) {
+                        $complainant = $existingComplainant;
+                    }
                 }
-            }
 
-            if (!$complainant && $data->newComplainant->contactEmail) {
-                $existingComplainant = $complainantRepository->findOneBy(['contactEmail' => $data->newComplainant->contactEmail]);
-                if ($existingComplainant) {
-                    $complainant = $existingComplainant;
+                if (!$complainant && $data->newComplainant->contactEmail) {
+                    $existingComplainant = $complainantRepository->findOneBy(['contactEmail' => $data->newComplainant->contactEmail]);
+                    if ($existingComplainant) {
+                        $complainant = $existingComplainant;
+                    }
                 }
-            }
 
-            // If no existing complainant found, create a new one
-            if (!$complainant) {
-                $complainant = (new Complainant())
-                    ->setFirstName($data->newComplainant->firstName)
-                    ->setLastName($data->newComplainant->lastName)
-                    ->setMiddleName($data->newComplainant->middleName)
-                    ->setContactPhone($data->newComplainant->contactPhone)
-                    ->setContactEmail($data->newComplainant->contactEmail)
-                    ->setPersonType($data->newComplainant->personType)
-                    ->setOrganizationStatus($data->newComplainant->organizationStatus)
-                    ->setLegalPersonality($data->newComplainant->legalPersonality)
-                    ->setAddress($data->newComplainant->address)
-                    ->setProvince($data->newComplainant->province)
-                    ->setTerritory($data->newComplainant->territory)
-                    ->setCommune($data->newComplainant->commune)
-                    ->setQuartier($data->newComplainant->quartier)
-                    ->setCity($data->newComplainant->city)
-                    ->setVillage($data->newComplainant->village)
-                    ->setSecteur($data->newComplainant->secteur);
+                // If no existing complainant found, create a new one
+                if (!$complainant) {
+                    $complainant = (new Complainant())
+                        ->setFirstName($data->newComplainant->firstName)
+                        ->setLastName($data->newComplainant->lastName)
+                        ->setMiddleName($data->newComplainant->middleName)
+                        ->setContactPhone($data->newComplainant->contactPhone)
+                        ->setContactEmail($data->newComplainant->contactEmail)
+                        ->setPersonType($data->newComplainant->personType)
+                        ->setOrganizationStatus($data->newComplainant->organizationStatus)
+                        ->setLegalPersonality($data->newComplainant->legalPersonality)
+                        ->setAddress($data->newComplainant->address)
+                        ->setProvince($data->newComplainant->province)
+                        ->setTerritory($data->newComplainant->territory)
+                        ->setCommune($data->newComplainant->commune)
+                        ->setQuartier($data->newComplainant->quartier)
+                        ->setCity($data->newComplainant->city)
+                        ->setVillage($data->newComplainant->village)
+                        ->setSecteur($data->newComplainant->secteur);
 
-                $this->em->persist($complainant);
+                    $this->em->persist($complainant);
+                }
             }
         }
 
@@ -145,14 +149,15 @@ readonly class ComplaintManager
         $this->em->persist($complaint);
         $this->em->flush();
 
-        $this->bus->dispatch(
-            new ComplaintRegisteredMessage(
-                complaintId: $complaint->getId(),
-                complaintEmail: $complainant->getContactEmail(),
-                complaintPhone: $complainant->getContactPhone(),
-            )
-        );
-
+        if (!$data->isAnonymous) {
+            $this->bus->dispatch(
+                new ComplaintRegisteredMessage(
+                    complaintId: $complaint->getId(),
+                    complaintEmail: $complainant->getContactEmail(),
+                    complaintPhone: $complainant->getContactPhone(),
+                )
+            );
+        }
         return $complaint;
     }
 }
