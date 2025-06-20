@@ -22,28 +22,28 @@ class WorkflowStepUIConfiguration
     private ?WorkflowStep $workflowStep = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch'])]
     private ?string $mainComponentKey = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['workflow_step:get', 'workflow_step:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch', 'complaint:get', 'complaint:list'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch'])]
     /** @var DisplayFields[] $displayFields */
     private ?array $displayFields = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch'])]
     private ?array $inputFields = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['workflow_step:get', 'workflow_step:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch'])]
     private ?array $customWidgets = null;
 
     public function getId(): ?int

@@ -6,10 +6,10 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Dto\Complaint\ApplyActionRequest;
 use App\Entity\Complaint;
+use App\Entity\WorkflowAction;
 use App\Exception\UnavailableDataException;
 use App\Manager\ComplaintWorkflowManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Proxies\__CG__\App\Entity\WorkflowAction;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 readonly class ComplaintApplyActionProcessor implements ProcessorInterface
