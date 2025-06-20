@@ -65,41 +65,41 @@ class ComplaintConsequence
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['complaint_consequence:get'] )]
+    #[Groups(['complaint_consequence:get', 'complaint:get', 'complaint:list'])]
     private ?string $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'consequences')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['complaint_consequence:get', 'complaint_consequence:post'] )]
+    #[Groups(['complaint_consequence:get', 'complaint_consequence:post'])]
     private ?Complaint $complaint = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch'] )]
+    #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch', 'complaint:get', 'complaint:list'])]
     private ?GeneralParameter $consequenceType = null;
 
     #[ORM\ManyToOne]
-    #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch'] )]
+    #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch', 'complaint:get', 'complaint:list'])]
     private ?GeneralParameter $severity = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch'] )]
+    #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch', 'complaint:get', 'complaint:list'])]
     private ?float $estimatedCost = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch'] )]
+    #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch', 'complaint:get', 'complaint:list'])]
     private ?string $impactDescription = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch'] )]
+    #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch', 'complaint:get', 'complaint:list'])]
     private ?float $affectedQuantity = null;
 
     #[ORM\ManyToOne]
-    #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch'] )]
+    #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch', 'complaint:get', 'complaint:list'])]
     private ?GeneralParameter $affectedUnit = null;
 
     #[ORM\ManyToOne]
-    #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch'] )]
+    #[Groups(['complaint_consequence:get', 'complaint_consequence:post', 'complaint_consequence:patch', 'complaint:get', 'complaint:list'])]
     private ?GeneralParameter $affectedAssetType = null;
 
     public function getId(): ?string
