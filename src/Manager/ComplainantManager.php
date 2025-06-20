@@ -3,12 +3,9 @@
 namespace App\Manager;
 
 use App\Entity\Complainant;
-use App\Model\UserProxyInterface;
 use App\Model\NewComplainantModel;
 use App\Repository\ProfileRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Message\Command\CreateUserCommand;
-use App\Exception\UnavailableDataException;
 use App\Message\Command\CommandBusInterface;
 use Psr\Log\LoggerInterface;
 use App\Exception\ComplainantCreationException;
@@ -51,35 +48,10 @@ readonly class ComplainantManager
         ;
 
         try {
-
-            $profile = $this->profileRepository->findOneBy(['personType' => UserProxyInterface::PERSON_COMPLAINANT]);
-
-            if (null === $profile) {
-                throw new UnavailableDataException('cannot find profile');
-            }
-
-
             $this->em->persist($complainant);
             $this->em->flush();
-
-            $user = $this->bus->dispatch(
-                new CreateUserCommand(
-                    $model->plainPassword,
-                    $profile,
-                    $complainant->getContactEmail(),
-                    $complainant->getContactPhone(),
-                    $complainant->getFirstName(),
-                )
-            );
-
-            $this->logger->info('User created successfully');
-
-            $complainant->setUserId($user->getId());
 
             $this->logger->info('Complainant created successfully');
-
-            $this->em->persist($complainant);
-            $this->em->flush();
 
             return $complainant;
         } catch (\Exception $e) {

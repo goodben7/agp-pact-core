@@ -3,18 +3,17 @@
 namespace App\Manager;
 
 
-use App\Dto\Complaint\ComplaintCreateDTO;
-use App\Entity\AffectedSpecies;
-use App\Entity\Complainant;
-use App\Entity\Complaint;
-use App\Entity\ComplaintConsequence;
-use App\Entity\User;
 use App\Entity\Victim;
+use App\Entity\Complaint;
+use App\Entity\Complainant;
 use App\Entity\WorkflowStep;
+use App\Entity\AffectedSpecies;
 use App\Entity\WorkflowTransition;
+use App\Entity\ComplaintConsequence;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Dto\Complaint\ComplaintCreateDTO;
 use App\Exception\UnavailableDataException;
 use App\Message\ComplaintRegisteredMessage;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -30,14 +29,48 @@ readonly class ComplaintManager
 
     public function create(ComplaintCreateDTO $data): Complaint
     {
-        /** @var User $user */
-        $user = $this->security->getUser();
+        // Handle Complainant creation or retrieval
+        $complainant = null;
+        if ($data->newComplainant) {
+            $complainantRepository = $this->em->getRepository(Complainant::class);
 
-        $complainant = $data->complainant;
-        if (is_null($complainant)) {
-            $complainant = $this->em->getRepository(Complainant::class)->findOneBy(['userId' => $user->getId()]);
-            if (!$complainant)
-                throw new UnavailableDataException('No complainant found for user');
+            // Check if a complainant with the same contactPhone or contactEmail already exists
+            if ($data->newComplainant->contactPhone) {
+                $existingComplainant = $complainantRepository->findOneBy(['contactPhone' => $data->newComplainant->contactPhone]);
+                if ($existingComplainant) {
+                    $complainant = $existingComplainant;
+                }
+            }
+
+            if (!$complainant && $data->newComplainant->contactEmail) {
+                $existingComplainant = $complainantRepository->findOneBy(['contactEmail' => $data->newComplainant->contactEmail]);
+                if ($existingComplainant) {
+                    $complainant = $existingComplainant;
+                }
+            }
+
+            // If no existing complainant found, create a new one
+            if (!$complainant) {
+                $complainant = (new Complainant())
+                    ->setFirstName($data->newComplainant->firstName)
+                    ->setLastName($data->newComplainant->lastName)
+                    ->setMiddleName($data->newComplainant->middleName)
+                    ->setContactPhone($data->newComplainant->contactPhone)
+                    ->setContactEmail($data->newComplainant->contactEmail)
+                    ->setPersonType($data->newComplainant->personType)
+                    ->setOrganizationStatus($data->newComplainant->organizationStatus)
+                    ->setLegalPersonality($data->newComplainant->legalPersonality)
+                    ->setAddress($data->newComplainant->address)
+                    ->setProvince($data->newComplainant->province)
+                    ->setTerritory($data->newComplainant->territory)
+                    ->setCommune($data->newComplainant->commune)
+                    ->setQuartier($data->newComplainant->quartier)
+                    ->setCity($data->newComplainant->city)
+                    ->setVillage($data->newComplainant->village)
+                    ->setSecteur($data->newComplainant->secteur);
+
+                $this->em->persist($complainant);
+            }
         }
 
         $complaint = (new Complaint())

@@ -74,7 +74,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 class Complaint
 {
-    const ID_PREFIX = "CP";
+    public const ID_PREFIX = "CP";
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]

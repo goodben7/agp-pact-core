@@ -2,13 +2,13 @@
 
 namespace App\Dto\Complaint;
 
-use App\Dto\Victim\VictimCreateDTO;
+use App\Entity\User;
 use App\Entity\Company;
-use App\Entity\Complainant;
-use App\Entity\GeneralParameter;
 use App\Entity\Location;
 use App\Entity\RoadAxis;
-use App\Entity\User;
+use App\Entity\GeneralParameter;
+use App\Dto\Victim\VictimCreateDTO;
+use App\Dto\Complainant\ComplainantCreateDTO;
 
 class ComplaintCreateDTO
 {
@@ -30,7 +30,7 @@ class ComplaintCreateDTO
 
     public ?float $longitude = null;
 
-    public ?Complainant $complainant = null;
+    public ?ComplainantCreateDTO $newComplainant = null;
 
     public ?User $assignedTo = null;
 

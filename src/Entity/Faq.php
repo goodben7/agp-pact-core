@@ -23,11 +23,9 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
     normalizationContext: ['groups' => 'faq:get'],
     operations:[
         new Get(
-            security: 'is_granted("ROLE_FAQ_DETAILS")',
             provider: ItemProvider::class
         ),
         new GetCollection(
-            security: 'is_granted("ROLE_FAQ_LIST")',
             provider: CollectionProvider::class
         ),
         new Post(

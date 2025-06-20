@@ -13,7 +13,6 @@ class ComplainantCreateDTO
         public ?string $firstName = null,
         public ?string $contactPhone = null,
         public ?string $contactEmail = null,
-        public ?string $plainPassword = null, 
 
         public ?GeneralParameter $personType = null, 
         public ?GeneralParameter $organizationStatus = null, 

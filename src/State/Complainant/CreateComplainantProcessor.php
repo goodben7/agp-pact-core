@@ -24,7 +24,6 @@ readonly class CreateComplainantProcessor implements ProcessorInterface
             $data->middleName,
             $data->contactPhone,
             $data->contactEmail,
-            $data->plainPassword,
             $data->personType,
             $data->address,
             $data->province,
