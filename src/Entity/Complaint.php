@@ -2,26 +2,27 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\Get;
+use App\Doctrine\IdGenerator;
+use ApiPlatform\Metadata\Post;
+use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\Patch;
+use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use App\Doctrine\IdGenerator;
+use App\Repository\ComplaintRepository;
 use App\Dto\Complaint\ApplyActionRequest;
 use App\Dto\Complaint\ComplaintCreateDTO;
-use App\Repository\ComplaintRepository;
-use App\State\Complaint\ComplaintApplyActionProcessor;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use App\State\Complaint\CreateComplaintProcessor;
 use App\State\Complaint\UpdateComplaintProcessor;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use App\State\Complaint\ComplaintApplyActionProcessor;
 
 #[ORM\Entity(repositoryClass: ComplaintRepository::class)]
 #[ApiResource(
@@ -72,6 +73,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'incidentDate',
     ]
 )]
+#[ApiFilter(OrderFilter::class, properties: ['declarationDate', 'closureDate', 'incidentDate'])]
 class Complaint
 {
     public const ID_PREFIX = "CP";
