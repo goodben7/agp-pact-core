@@ -26,7 +26,6 @@ use App\Entity\Complainant;
 
 readonly class ComplaintWorkflowManager
 {
-
     public function __construct(
         private EntityManagerInterface $em,
         private MessageBusInterface    $bus,
@@ -356,7 +355,9 @@ readonly class ComplaintWorkflowManager
             $fieldConstraints = [];
 
             if ($fieldRequired && $fieldType !== 'file') {
-                $fieldConstraints[] = new Assert\NotBlank(null, sprintf('%s is required.', $fieldLabel));
+                $fieldConstraints[] = new Assert\NotBlank([
+                    'message' => sprintf('%s is required.', $fieldLabel)
+                ]);
             }
 
             foreach ($validationRules as $rule) {
@@ -364,14 +365,21 @@ readonly class ComplaintWorkflowManager
                     switch ($rule) {
                         case 'not_blank':
                             if (!$fieldRequired) {
-                                $fieldConstraints[] = new Assert\NotBlank(null, sprintf('%s cannot be blank.', $fieldLabel));
+                                $fieldConstraints[] = new Assert\NotBlank([
+                                    'message' => sprintf('%s cannot be blank.', $fieldLabel)
+                                ]);
                             }
                             break;
                         case 'email':
-                            $fieldConstraints[] = new Assert\Email(null, sprintf('%s must be a valid email address.', $fieldLabel));
+                            $fieldConstraints[] = new Assert\Email([
+                                'message' => sprintf('%s must be a valid email address.', $fieldLabel)
+                            ]);
                             break;
                         case 'numeric':
-                            $fieldConstraints[] = new Assert\Type(['type' => 'numeric'], sprintf('%s must be numeric.', $fieldLabel));
+                            $fieldConstraints[] = new Assert\Type([
+                                'type' => 'numeric',
+                                'message' => sprintf('%s must be numeric.', $fieldLabel)
+                            ]);
                             break;
                     }
                 }
@@ -381,39 +389,95 @@ readonly class ComplaintWorkflowManager
                 case 'select':
                     $fieldConstraints[] = new Assert\Callback([
                         'callback' => function ($iri, $context) use ($fieldConfig, $fieldLabel, $fieldRequired) {
-                            // ... your existing Callback logic ...
+                            if ($fieldRequired && empty($iri)) {
+                                $context->buildViolation(sprintf('%s is required.', $fieldLabel))
+                                    ->addViolation();
+                                return;
+                            }
+
+                            if (!empty($iri) && is_string($iri)) {
+                                $id = $this->extractIdFromIri($iri);
+                                if ($id === null) {
+                                    $context->buildViolation(sprintf('%s has an invalid format.', $fieldLabel))
+                                        ->addViolation();
+                                    return;
+                                }
+
+                                $entityExists = false;
+                                if (isset($fieldConfig['optionsCategory'])) {
+                                    $category = $fieldConfig['optionsCategory'];
+                                    $entity = $this->em->getRepository(GeneralParameter::class)->findOneBy(['id' => $id, 'category' => $category]);
+                                    $entityExists = $entity !== null;
+                                } elseif (isset($fieldConfig['optionsResource'])) {
+                                    $resource = $fieldConfig['optionsResource'];
+                                    switch ($resource) {
+                                        case 'api/companies':
+                                            $entity = $this->em->getRepository(Company::class)->find($id);
+                                            break;
+                                        case 'api/users':
+                                            $entity = $this->em->getRepository(User::class)->find($id);
+                                            break;
+                                        case 'api/road_axes':
+                                            $entity = $this->em->getRepository(RoadAxis::class)->find($id);
+                                            break;
+                                        case 'api/locations':
+                                            $entity = $this->em->getRepository(Location::class)->find($id);
+                                            break;
+                                        case 'api/complainants':
+                                            $entity = $this->em->getRepository(Complainant::class)->find($id);
+                                            break;
+                                        default:
+                                            $entity = null;
+                                    }
+                                    $entityExists = $entity !== null;
+                                }
+
+                                if (!$entityExists) {
+                                    $context->buildViolation(sprintf('%s refers to a non-existent entity.', $fieldLabel))
+                                        ->addViolation();
+                                }
+                            }
                         }
                     ]);
                     break;
 
                 case 'file':
-                    $fileConstraints = [
-                        new Assert\File([
-                            'maxSize' => '10M',
-                            'mimeTypes' => ['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
-                            'mimeTypesMessage' => 'Please upload a valid image, PDF, or document.',
-                        ])
-                    ];
                     if ($fieldRequired) {
-                        $fileConstraints[] = new Assert\NotNull(null, sprintf('%s is required.', $fieldLabel));
+                        $fieldConstraints[] = new Assert\NotNull([
+                            'message' => sprintf('%s is required.', $fieldLabel)
+                        ]);
                     }
-                    $fieldConstraints = array_merge($fieldConstraints, $fileConstraints); // Merge with other general constraints if any
+                    $fieldConstraints[] = new Assert\File([
+                        'maxSize' => '10M',
+                        'mimeTypes' => [
+                            'image/*',
+                            'application/pdf',
+                            'application/msword',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid image, PDF, or document.',
+                    ]);
                     break;
 
                 case 'date':
-                    $fieldConstraints[] = new Assert\Type(['type' => \DateTimeImmutable::class], sprintf('%s must be a valid date.', $fieldLabel));
+                    $fieldConstraints[] = new Assert\DateTime([
+                        'message' => sprintf('%s must be a valid date.', $fieldLabel)
+                    ]);
                     break;
 
                 case 'boolean':
                 case 'checkbox':
-                    $fieldConstraints[] = new Assert\Type(['type' => 'bool'], sprintf('%s must be a boolean.', $fieldLabel));
+                    $fieldConstraints[] = new Assert\Type([
+                        'type' => 'bool',
+                        'message' => sprintf('%s must be a boolean.', $fieldLabel)
+                    ]);
                     break;
             }
 
             if (count($fieldConstraints) === 1) {
                 $constraintsCollection->fields[$fieldName] = $fieldConstraints[0];
             } elseif (count($fieldConstraints) > 1) {
-                $constraintsCollection->fields[$fieldName] = new Assert\All($fieldConstraints);
+                $constraintsCollection->fields[$fieldName] = $fieldConstraints;
             }
         }
 
