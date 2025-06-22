@@ -757,11 +757,17 @@ class Complaint
      */
     public function getAvailableActions(): Collection
     {
+        if (!isset($this->availableActions)) {
+            $this->availableActions = new ArrayCollection();
+        }
         return $this->availableActions;
     }
 
     public function addAvailableAction(WorkflowAction $workflowAction): static
     {
+        if (!isset($this->availableActions)) {
+            $this->availableActions = new ArrayCollection();
+        }
         if (!$this->availableActions->contains($workflowAction)) {
             $this->availableActions->add($workflowAction);
         }
@@ -771,6 +777,9 @@ class Complaint
 
     public function removeAvailableAction(WorkflowAction $workflowAction): static
     {
+        if (!isset($this->availableActions)) {
+            $this->availableActions = new ArrayCollection();
+        }
         $this->availableActions->removeElement($workflowAction);
 
         return $this;
