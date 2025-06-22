@@ -364,7 +364,8 @@ readonly class ComplaintWorkflowManager
                 if (is_string($rule)) {
                     switch ($rule) {
                         case 'not_blank':
-                            if (!$fieldRequired) {
+                            // This check is already covered by $fieldRequired, but ensuring no double-adding
+                            if (!$fieldRequired) { // Only add if not already marked as required
                                 $fieldConstraints[] = new Assert\NotBlank([
                                     'message' => sprintf('%s cannot be blank.', $fieldLabel)
                                 ]);
@@ -474,9 +475,8 @@ readonly class ComplaintWorkflowManager
                     break;
             }
 
-            if (count($fieldConstraints) === 1) {
-                $constraintsCollection->fields[$fieldName] = $fieldConstraints[0];
-            } elseif (count($fieldConstraints) > 1) {
+            // Always assign an array of constraints to the field, even if it's a single constraint.
+            if (!empty($fieldConstraints)) {
                 $constraintsCollection->fields[$fieldName] = $fieldConstraints;
             }
         }
