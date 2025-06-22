@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PapRepository;
+use App\State\DeletePapProcessor;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
@@ -15,8 +16,9 @@ use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
-use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Doctrine\Common\State\PersistProcessor;
+use App\Dto\DeletePapDto;
 
 #[ORM\Entity(repositoryClass: PapRepository::class)]
 #[ApiResource(
@@ -39,6 +41,13 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: 'is_granted("ROLE_PAP_UPDATE")',
             processor: PersistProcessor::class,
         ),
+        new Post(
+            uriTemplate: 'paps/{id}/deletions',
+            input: DeletePapDto::class,
+            security: 'is_granted("ROLE_PAP_DELETE")',
+            processor: DeletePapProcessor::class,
+            status: 204
+        )
     ],
     normalizationContext: ['groups' => 'pap:get']
 )]
@@ -71,6 +80,9 @@ class Pap
 
     public const PROPERTY_TYPE_PROPRIETAIRE = "P";
     public const PROPERTY_TYPE_REPRESENTANT = "R";
+
+    public const REASON_DELETION_ERRONEE = "ERRONEOUS_DATA";
+    public const REASON_DELETION_ERREUR_CREATION = "DATA_CREATED_BY_MISTAKE";
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -226,6 +238,14 @@ class Pap
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['pap:get', 'pap:post', 'pap:patch'])]
     private ?string $category = null; // Catégorie PAP
+
+    #[ORM\Column]
+    #[Groups(['pap:get'])]
+    private ?bool $deleted = false;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['pap:get'])]
+    private ?string $reasonDeletion = null; 
 
     public function getId(): ?string
     {
@@ -700,6 +720,46 @@ class Pap
     public function setPropertyType($propertyType)
     {
         $this->propertyType = $propertyType;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of deleted
+     */ 
+    public function getDeleted(): bool|null
+    {
+        return $this->deleted;
+    }
+
+    /**
+     * Set the value of deleted
+     *
+     * @return  self
+     */ 
+    public function setDeleted(bool $deleted): static
+    {
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of reasonDeletion
+     */ 
+    public function getReasonDeletion(): string|null
+    {
+        return $this->reasonDeletion;
+    }
+
+    /**
+     * Set the value of reasonDeletion
+     *
+     * @return  self
+     */ 
+    public function setReasonDeletion(?string $reasonDeletion): static
+    {
+        $this->reasonDeletion = $reasonDeletion;
 
         return $this;
     }
