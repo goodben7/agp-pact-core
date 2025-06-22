@@ -56,13 +56,19 @@ readonly class ComplaintWorkflowManager
             ));
         }
 
-        if (!in_array($currentUser->getRoles(), $transition->getRoleRequired())) {
-            throw new \LogicException(sprintf(
-                'User "%s" is not allowed to perform action "%s". Missing required roles. %s',
-                $currentUser->getDisplayName(),
-                $action->getName(),
-                json_encode($transition->getRoleRequired())
-            ));
+        $requiredRoles = $transition->getRoleRequired();
+
+        if (!empty($requiredRoles)) {
+            $userRoles = $currentUser->getRoles();
+            if (empty(array_intersect($userRoles, $requiredRoles))) {
+                throw new \LogicException(sprintf(
+                    'User "%s" is not allowed to perform action "%s". Missing required roles. User roles: %s, Required roles: %s',
+                    $currentUser->getDisplayName(),
+                    $action->getName(),
+                    json_encode($userRoles),
+                    json_encode($requiredRoles)
+                ));
+            }
         }
 
         $uiConfig = $complaint->getCurrentWorkflowStep()->getUiConfiguration();
