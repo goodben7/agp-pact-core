@@ -339,11 +339,7 @@ readonly class ComplaintWorkflowManager
 
     private function validateDynamicFields(array $data, array $inputFieldsConfig): void
     {
-        $constraintsCollection = new Assert\Collection([
-            'fields' => [],
-            'allowExtraFields' => true,
-            'allowMissingFields' => true,
-        ]);
+        $constraintsForCollection = [];
 
         foreach ($inputFieldsConfig as $fieldConfig) {
             $fieldName = $fieldConfig['name'];
@@ -354,19 +350,31 @@ readonly class ComplaintWorkflowManager
 
             $fieldConstraints = [];
 
-            if ($fieldRequired && $fieldType !== 'file') {
-                $fieldConstraints[] = new Assert\NotBlank([
-                    'message' => sprintf('%s is required.', $fieldLabel)
-                ]);
+            if ($fieldRequired) { // Apply NotBlank for all required fields, including files now checked by NotNull
+                if ($fieldType === 'file') {
+                    $fieldConstraints[] = new Assert\NotNull([
+                        'message' => sprintf('%s is required.', $fieldLabel)
+                    ]);
+                } else {
+                    $fieldConstraints[] = new Assert\NotBlank([
+                        'message' => sprintf('%s is required.', $fieldLabel)
+                    ]);
+                }
             }
 
             foreach ($validationRules as $rule) {
                 if (is_string($rule)) {
                     switch ($rule) {
                         case 'not_blank':
-                            // This check is already covered by $fieldRequired, but ensuring no double-adding
-                            if (!$fieldRequired) { // Only add if not already marked as required
+                            // Only add if not already marked as required by $fieldRequired
+                            if (!$fieldRequired && $fieldType !== 'file') {
                                 $fieldConstraints[] = new Assert\NotBlank([
+                                    'message' => sprintf('%s cannot be blank.', $fieldLabel)
+                                ]);
+                            }
+                            // If it's a file type and not required by $fieldRequired, but has 'not_blank', use NotNull
+                            if (!$fieldRequired && $fieldType === 'file') {
+                                $fieldConstraints[] = new Assert\NotNull([
                                     'message' => sprintf('%s cannot be blank.', $fieldLabel)
                                 ]);
                             }
@@ -382,10 +390,12 @@ readonly class ComplaintWorkflowManager
                                 'message' => sprintf('%s must be numeric.', $fieldLabel)
                             ]);
                             break;
+                        // Add more dynamic rules as needed
                     }
                 }
             }
 
+            // Type-specific constraints
             switch ($fieldType) {
                 case 'select':
                     $fieldConstraints[] = new Assert\Callback([
@@ -443,26 +453,24 @@ readonly class ComplaintWorkflowManager
                     break;
 
                 case 'file':
-                    if ($fieldRequired) {
-                        $fieldConstraints[] = new Assert\NotNull([
-                            'message' => sprintf('%s is required.', $fieldLabel)
-                        ]);
-                    }
                     $fieldConstraints[] = new Assert\File([
                         'maxSize' => '10M',
                         'mimeTypes' => [
                             'image/*',
                             'application/pdf',
                             'application/msword',
-                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'application/vnd.ms-excel',
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            // Add other common file types if necessary
                         ],
-                        'mimeTypesMessage' => 'Please upload a valid image, PDF, or document.',
+                        'mimeTypesMessage' => 'Please upload a valid image, PDF, or document (Word/Excel).',
                     ]);
                     break;
 
                 case 'date':
                     $fieldConstraints[] = new Assert\DateTime([
-                        'message' => sprintf('%s must be a valid date.', $fieldLabel)
+                        'message' => sprintf('%s must be a valid date/time format.', $fieldLabel)
                     ]);
                     break;
 
@@ -470,16 +478,25 @@ readonly class ComplaintWorkflowManager
                 case 'checkbox':
                     $fieldConstraints[] = new Assert\Type([
                         'type' => 'bool',
-                        'message' => sprintf('%s must be a boolean.', $fieldLabel)
+                        'message' => sprintf('%s must be a boolean value.', $fieldLabel)
                     ]);
                     break;
+                // No additional specific constraints needed for 'text', 'textarea', 'number' here
             }
 
-            // Always assign an array of constraints to the field, even if it's a single constraint.
+            // Crucial: Assign the array of constraints to the field name within the collection.
+            // If fieldConstraints is empty, no constraint will be added for this field.
             if (!empty($fieldConstraints)) {
-                $constraintsCollection->fields[$fieldName] = $fieldConstraints;
+                $constraintsForCollection[$fieldName] = $fieldConstraints;
             }
         }
+
+        // Initialize the Collection constraint with the prepared fields.
+        $constraintsCollection = new Assert\Collection([
+            'fields' => $constraintsForCollection,
+            'allowExtraFields' => true,
+            'allowMissingFields' => true,
+        ]);
 
         $violations = $this->validator->validate($data, $constraintsCollection);
 
