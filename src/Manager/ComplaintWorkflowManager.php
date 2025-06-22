@@ -56,11 +56,12 @@ readonly class ComplaintWorkflowManager
             ));
         }
 
-        if (!array_intersect($currentUser->getRoles(), $transition->getRoleRequired())) {
+        if (!in_array($currentUser->getRoles(), $transition->getRoleRequired())) {
             throw new \LogicException(sprintf(
-                'User "%s" is not allowed to perform action "%s". Missing required roles.',
+                'User "%s" is not allowed to perform action "%s". Missing required roles. %s',
                 $currentUser->getDisplayName(),
-                $action->getName()
+                $action->getName(),
+                json_encode($transition->getRoleRequired())
             ));
         }
 
