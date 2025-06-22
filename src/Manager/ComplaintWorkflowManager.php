@@ -376,23 +376,7 @@ readonly class ComplaintWorkflowManager
                     }
                 } elseif (is_array($rule)) {
                     foreach ($rule as $ruleName => $ruleValue) {
-                        switch ($ruleName) {
-                            case 'min_length':
-                                // Fix: Cast $ruleValue to int
-                                $fieldConstraints[] = new Assert\Length(['min' => (int)$ruleValue], sprintf('%s must contain at least %s characters.', $fieldLabel, $ruleValue));
-                                break;
-                            case 'max_length':
-                                // Fix: Cast $ruleValue to int
-                                $fieldConstraints[] = new Assert\Length(['max' => (int)$ruleValue], sprintf('%s must contain at most %s characters.', $fieldLabel, $ruleValue));
-                                break;
-                            case 'min':
-                                $fieldConstraints[] = new Assert\GreaterThanOrEqual(['value' => $ruleValue], sprintf('%s must be greater than or equal to %s.', $fieldLabel, $ruleValue));
-                                break;
-                            case 'max':
-                                $fieldConstraints[] = new Assert\LessThanOrEqual(['value' => $ruleValue], sprintf('%s must be less than or equal to %s.', $fieldLabel, $ruleValue));
-                                break;
-                            case 'required_if':
-                                break;
+                        if ($ruleName == 'required_if') {
                         }
                     }
                 }

@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\Get;
 use App\Doctrine\IdGenerator;
 use ApiPlatform\Metadata\Post;
+use App\Provider\Complaint\ComplaintProvider;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
 use Doctrine\ORM\Mapping as ORM;
@@ -32,7 +33,8 @@ use App\State\Complaint\ComplaintApplyActionProcessor;
             security: "is_granted('ROLE_COMPLAINT_LIST')"
         ),
         new Get(
-            security: "is_granted('ROLE_COMPLAINT_DETAILS')"
+            security: "is_granted('ROLE_COMPLAINT_DETAILS')",
+            provider: ComplaintProvider::class
         ),
         new Post(
             security: "is_granted('ROLE_COMPLAINT_CREATE')",
@@ -240,12 +242,16 @@ class Complaint
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $proposedResolutionDescription = null;
 
+    #[Groups(['complaint:get', 'complaint:list'])]
+    private Collection $availableActions;
+
     public function __construct()
     {
         $this->victims = new ArrayCollection();
         $this->consequences = new ArrayCollection();
         $this->attachedFiles = new ArrayCollection();
         $this->affectedSpecies = new ArrayCollection();
+        $this->availableActions = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -741,6 +747,23 @@ class Complaint
     public function setProposedResolutionDescription(?string $proposedResolutionDescription): static
     {
         $this->proposedResolutionDescription = $proposedResolutionDescription;
+
+        return $this;
+    }
+
+
+    /**
+     * @return Collection<int, WorkflowAction>
+     */
+    public function getAvailableActions(): Collection
+    {
+        return $this->availableActions;
+    }
+
+    public function addAvailableAction(WorkflowAction $workflowAction): static
+    {
+        if (!$this->availableActions->contains($workflowAction))
+            $this->availableActions->add($workflowAction);
 
         return $this;
     }
