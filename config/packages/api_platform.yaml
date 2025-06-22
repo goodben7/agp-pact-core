@@ -18,7 +18,7 @@ api_platform:
         App\Exception\UnavailableDataException: 404
         App\Exception\UserCreationException: 400
         App\Exception\ComplainantCreationException: 400
-        pp\Exception\UnauthorizedActionException: 403
+        App\Exception\UnauthorizedActionException: 403
     defaults:
         stateless: true
         cache_headers:
