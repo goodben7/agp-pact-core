@@ -22,13 +22,19 @@ class MultipartDecoder implements DecoderInterface
             return null;
         }
 
-        $parsedRequestData = array_map(static function ($element) {
-            if (is_string($element)) {
-                $decoded = json_decode($element, true);
-                return \is_array($decoded) ? $decoded : $element;
+        $parsedRequestData = [];
+        foreach ($request->request->all() as $key => $value) {
+            if (is_string($value) && (str_starts_with($value, '{') || str_starts_with($value, '['))) {
+                $decoded = json_decode($value, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $parsedRequestData[$key] = $decoded;
+                } else {
+                    $parsedRequestData[$key] = $value;
+                }
+            } else {
+                $parsedRequestData[$key] = $value;
             }
-            return $element;
-        }, $request->request->all());
+        }
 
         $parsedFiles = array_map(static function ($file) {
             if (\is_array($file)) {
