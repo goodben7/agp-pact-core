@@ -469,8 +469,8 @@ readonly class ComplaintWorkflowManager
                     break;
 
                 case 'date':
-                    $fieldConstraints[] = new Assert\DateTime([
-                        'message' => sprintf('%s must be a valid date/time format.', $fieldLabel)
+                    $fieldConstraints[] = new Assert\Date([
+                        'message' => sprintf('%s must be a valid date format.', $fieldLabel)
                     ]);
                     break;
 
@@ -481,11 +481,8 @@ readonly class ComplaintWorkflowManager
                         'message' => sprintf('%s must be a boolean value.', $fieldLabel)
                     ]);
                     break;
-                // No additional specific constraints needed for 'text', 'textarea', 'number' here
             }
 
-            // Crucial: Assign the array of constraints to the field name within the collection.
-            // If fieldConstraints is empty, no constraint will be added for this field.
             if (!empty($fieldConstraints)) {
                 $constraintsForCollection[$fieldName] = $fieldConstraints;
             }
