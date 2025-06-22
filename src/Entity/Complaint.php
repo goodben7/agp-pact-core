@@ -232,6 +232,12 @@ class Complaint
     #[Groups(['complaint:get', 'complaint:list'])]
     private ?\DateTimeImmutable $incidentDate = null;
 
+    #[ORM\ManyToOne(inversedBy: 'complaints')]
+    private ?Company $involvedCompany = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $proposedResolutionDescription = null;
+
     public function __construct()
     {
         $this->victims = new ArrayCollection();
@@ -709,6 +715,30 @@ class Complaint
     public function setIncidentDate(?\DateTimeImmutable $incidentDate): static
     {
         $this->incidentDate = $incidentDate;
+
+        return $this;
+    }
+
+    public function getInvolvedCompany(): ?Company
+    {
+        return $this->involvedCompany;
+    }
+
+    public function setInvolvedCompany(?Company $involvedCompany): static
+    {
+        $this->involvedCompany = $involvedCompany;
+
+        return $this;
+    }
+
+    public function getProposedResolutionDescription(): ?string
+    {
+        return $this->proposedResolutionDescription;
+    }
+
+    public function setProposedResolutionDescription(?string $proposedResolutionDescription): static
+    {
+        $this->proposedResolutionDescription = $proposedResolutionDescription;
 
         return $this;
     }
