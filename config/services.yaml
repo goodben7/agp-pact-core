@@ -17,11 +17,11 @@ services:
         resource: '../src/'
 
     App\Encoder\MultipartDecoder:
-        tags:
-            - { name: serializer.encoder, format: multipart }
         arguments:
             $requestStack: '@request_stack'
             $logger: '@logger'
+        tags:
+            - { name: serializer.encoder, format: multipart, priority: 200 }
 
     App\Serializer\UploadedFileDenormalizer:
         tags: [ 'serializer.normalizer' ]
