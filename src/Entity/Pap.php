@@ -69,7 +69,8 @@ use App\Dto\DeletePapDto;
     'village.category' => 'exact',
     'province.code' => 'exact',
     'province.category' => 'exact',
-    'category' => 'ipartial'
+    'category' => 'ipartial',
+    'deleted' => 'exact',
 ])]
 class Pap
 {
