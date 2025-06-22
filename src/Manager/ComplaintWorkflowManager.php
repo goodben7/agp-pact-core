@@ -378,9 +378,11 @@ readonly class ComplaintWorkflowManager
                     foreach ($rule as $ruleName => $ruleValue) {
                         switch ($ruleName) {
                             case 'min_length':
+                                // Fix: Cast $ruleValue to int
                                 $fieldConstraints[] = new Assert\Length(['min' => (int)$ruleValue], sprintf('%s must contain at least %s characters.', $fieldLabel, $ruleValue));
                                 break;
                             case 'max_length':
+                                // Fix: Cast $ruleValue to int
                                 $fieldConstraints[] = new Assert\Length(['max' => (int)$ruleValue], sprintf('%s must contain at most %s characters.', $fieldLabel, $ruleValue));
                                 break;
                             case 'min':
