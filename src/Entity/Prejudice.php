@@ -6,11 +6,13 @@ use ApiPlatform\Metadata\Get;
 use App\Doctrine\IdGenerator;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use App\Repository\PrejudiceRepository;
+use App\State\DeletePrejudiceProcessor;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -39,6 +41,10 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
             denormalizationContext: ['groups' => 'prejudice:patch',],
             processor: PersistProcessor::class,
         ),
+        new Delete(
+            security: "is_granted('ROLE_PREJUDICE_DELETE')",
+            processor: DeletePrejudiceProcessor::class,
+        ),
     ]
 )]
 #[ApiFilter(SearchFilter::class, properties: [
@@ -48,7 +54,8 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
     'category.category' => 'exact',
     'complaintType.code' => 'exact',
     'complaintType.category' => 'exact',
-    'active' => 'exact'
+    'active' => 'exact',
+    'deleted' => 'exact',
 ])]
 class Prejudice
 {
@@ -82,6 +89,10 @@ class Prejudice
     #[ORM\Column]
     #[Groups(['prejudice:get', 'prejudice:post', 'prejudice:patch'])]  
     private ?bool $active = null;
+
+    #[ORM\Column]
+    #[Groups(['prejudice:get'])]
+    private ?bool $deleted = false;
 
     public function getId(): ?string
     {
@@ -144,6 +155,26 @@ class Prejudice
     public function setActive(bool $active): static
     {
         $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of deleted
+     */ 
+    public function isDeleted(): bool|null
+    {
+        return $this->deleted;
+    }
+
+    /**
+     * Set the value of deleted
+     *
+     * @return  self
+     */ 
+    public function setDeleted(bool $deleted)
+    {
+        $this->deleted = $deleted;
 
         return $this;
     }
