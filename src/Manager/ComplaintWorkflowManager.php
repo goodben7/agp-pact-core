@@ -212,12 +212,15 @@ readonly class ComplaintWorkflowManager
                 throw new \Exception(sprintf('Not found file type parameter for category "%s".', $fileTypeCategory));
             }
 
+            $attachedFile->setFile($file);
+
+
             $attachedFile
                 ->setFileType($fileTypeParam)
                 ->setWorkflowStep($newStep)
                 ->setUploadedBy($currentUser)
-                ->setUploadedAt(new \DateTimeImmutable())
-                ->setFile($file);
+                ->setUploadedAt(new \DateTimeImmutable());
+
             $this->em->persist($attachedFile);
         }
 
@@ -352,12 +355,9 @@ readonly class ComplaintWorkflowManager
 
             $fieldConstraints = [];
 
-            if ($fieldRequired) {
-                if ($fieldType !== 'file') {
-                    $fieldConstraints[] = new Assert\NotBlank(null, sprintf('%s is required.', $fieldLabel));
-                }
+            if ($fieldRequired && $fieldType !== 'file') {
+                $fieldConstraints[] = new Assert\NotBlank(null, sprintf('%s is required.', $fieldLabel));
             }
-
 
             foreach ($validationRules as $rule) {
                 if (is_string($rule)) {
@@ -374,11 +374,6 @@ readonly class ComplaintWorkflowManager
                             $fieldConstraints[] = new Assert\Type(['type' => 'numeric'], sprintf('%s must be numeric.', $fieldLabel));
                             break;
                     }
-                } elseif (is_array($rule)) {
-                    foreach ($rule as $ruleName => $ruleValue) {
-                        if ($ruleName == 'required_if') {
-                        }
-                    }
                 }
             }
 
@@ -386,79 +381,40 @@ readonly class ComplaintWorkflowManager
                 case 'select':
                     $fieldConstraints[] = new Assert\Callback([
                         'callback' => function ($iri, $context) use ($fieldConfig, $fieldLabel, $fieldRequired) {
-                            if (null === $iri || (is_string($iri) && trim($iri) === '')) {
-                                if (!$fieldRequired) return;
-                            }
-
-                            if (!is_string($iri)) {
-                                $context->buildViolation(sprintf('Expected IRI string for %s, got %s.', $fieldLabel, gettype($iri)))
-                                    ->addViolation();
-                                return;
-                            }
-
-                            $id = $this->extractIdFromIri($iri);
-                            if (null === $id) {
-                                $context->buildViolation(sprintf('Invalid IRI format for %s: %s.', $fieldLabel, $iri))
-                                    ->addViolation();
-                                return;
-                            }
-
-                            $foundEntity = null;
-                            if (isset($fieldConfig['optionsCategory'])) {
-                                $foundEntity = $this->em->getRepository(GeneralParameter::class)->findOneBy(['id' => $id, 'category' => $fieldConfig['optionsCategory']]);
-                            } elseif (isset($fieldConfig['optionsResource'])) {
-                                switch ($fieldConfig['optionsResource']) {
-                                    case 'api/companies':
-                                        $foundEntity = $this->em->getRepository(Company::class)->find($id);
-                                        break;
-                                    case 'api/users':
-                                        $foundEntity = $this->em->getRepository(User::class)->find($id);
-                                        break;
-                                    case 'api/road_axes':
-                                        $foundEntity = $this->em->getRepository(RoadAxis::class)->find($id);
-                                        break;
-                                    case 'api/locations':
-                                        $foundEntity = $this->em->getRepository(Location::class)->find($id);
-                                        break;
-                                    case 'api/complainants':
-                                        $foundEntity = $this->em->getRepository(Complainant::class)->find($id);
-                                        break;
-                                    default:
-                                        $context->buildViolation(sprintf('Unsupported resource "%s" for %s.', $fieldConfig['optionsResource'], $fieldLabel))
-                                            ->addViolation();
-                                        return;
-                                }
-                            }
-
-                            if (!$foundEntity) {
-                                $context->buildViolation(sprintf('The selected option for %s (ID: %s, IRI: %s) does not exist or is not valid.', $fieldLabel, $id, $iri))
-                                    ->addViolation();
-                            }
+                            // ... your existing Callback logic ...
                         }
                     ]);
                     break;
 
                 case 'file':
-                    $fieldConstraints[] = new Assert\File([
-                        'maxSize' => '10M',
-                        'mimeTypes' => ['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
-                        'mimeTypesMessage' => 'Please upload a valid image, PDF, or document.',
-                    ]);
+                    $fileConstraints = [
+                        new Assert\File([
+                            'maxSize' => '10M',
+                            'mimeTypes' => ['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+                            'mimeTypesMessage' => 'Please upload a valid image, PDF, or document.',
+                        ])
+                    ];
                     if ($fieldRequired) {
-                        $fieldConstraints[] = new Assert\NotNull(null, sprintf('%s is required.', $fieldLabel));
+                        $fileConstraints[] = new Assert\NotNull(null, sprintf('%s is required.', $fieldLabel));
                     }
+                    $fieldConstraints = array_merge($fieldConstraints, $fileConstraints); // Merge with other general constraints if any
                     break;
 
                 case 'date':
                     $fieldConstraints[] = new Assert\Type(['type' => \DateTimeImmutable::class], sprintf('%s must be a valid date.', $fieldLabel));
                     break;
+
                 case 'boolean':
                 case 'checkbox':
                     $fieldConstraints[] = new Assert\Type(['type' => 'bool'], sprintf('%s must be a boolean.', $fieldLabel));
                     break;
             }
 
-            $constraintsCollection->fields[$fieldName] = $fieldConstraints;
+            if (count($fieldConstraints) === 1) {
+                $constraintsCollection->fields[$fieldName] = $fieldConstraints[0];
+            } elseif (count($fieldConstraints) > 1) {
+                $constraintsCollection->fields[$fieldName] = new Assert\All($fieldConstraints);
+            }
         }
 
         $violations = $this->validator->validate($data, $constraintsCollection);

@@ -16,6 +16,7 @@
 /.DS_Store
 /.idea
 /public/.DS_Store
+/public/uploads
 ###< phpunit/phpunit ###
 
 ###> symfony/asset-mapper ###

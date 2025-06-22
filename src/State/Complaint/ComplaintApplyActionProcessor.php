@@ -10,13 +10,15 @@ use App\Entity\WorkflowAction;
 use App\Exception\UnavailableDataException;
 use App\Manager\ComplaintWorkflowManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 readonly class ComplaintApplyActionProcessor implements ProcessorInterface
 {
     public function __construct(
         private ComplaintWorkflowManager $manager,
-        private EntityManagerInterface   $em
+        private EntityManagerInterface   $em,
+        private RequestStack             $requestStack
     )
     {
 
@@ -30,6 +32,13 @@ readonly class ComplaintApplyActionProcessor implements ProcessorInterface
     {
         if (!$data instanceof ApplyActionRequest)
             throw new BadRequestHttpException('Invalid request data.');
+
+        $request = $this->requestStack->getCurrentRequest();
+        if (!$request) {
+            throw new \RuntimeException('No current request found.');
+        }
+
+        $data->setFromArray($request->request->all() + $request->files->all());
 
         $complaint = $this->em->getRepository(Complaint::class)->findOneBy(['id' => $uriVariables['id']]);
         if (!$complaint)
