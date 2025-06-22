@@ -16,6 +16,9 @@ services:
     App\:
         resource: '../src/'
 
+    App\Serializer\UploadedFileDenormalizer:
+        tags: [ 'serializer.normalizer' ]
+
     App\Service\NotificationService:
         arguments:
             $em: '@doctrine.orm.entity_manager'
