@@ -468,12 +468,6 @@ readonly class ComplaintWorkflowManager
                     ]);
                     break;
 
-                case 'date':
-                    $fieldConstraints[] = new Assert\Date([
-                        'message' => sprintf('%s must be a valid date format.', $fieldLabel)
-                    ]);
-                    break;
-
                 case 'boolean':
                 case 'checkbox':
                     $fieldConstraints[] = new Assert\Type([
@@ -488,7 +482,6 @@ readonly class ComplaintWorkflowManager
             }
         }
 
-        // Initialize the Collection constraint with the prepared fields.
         $constraintsCollection = new Assert\Collection([
             'fields' => $constraintsForCollection,
             'allowExtraFields' => true,
