@@ -45,12 +45,9 @@ use App\State\Complaint\ComplaintApplyActionProcessor;
             security: "is_granted('ROLE_COMPLAINT_UPDATE')",
             processor: UpdateComplaintProcessor::class
         ),
-        new Patch(
+        new Post(
             uriTemplate: '/complaints/{id}/apply-action',
-            inputFormats: [
-                'json' => ['application/json', 'application/merge-patch+json'],
-                'multipart' => ['multipart/form-data'],
-            ],
+            inputFormats: ['multipart' => ['multipart/form-data'],],
             security: "is_granted('ROLE_COMPLAINT_APPLY_ACTION')",
             input: ApplyActionRequest::class,
             processor: ComplaintApplyActionProcessor::class

@@ -3,6 +3,8 @@
 namespace App\Manager;
 
 
+use App\Dto\Complaint\AttachedFileDto;
+use App\Entity\AttachedFile;
 use App\Entity\Victim;
 use App\Entity\Complaint;
 use App\Entity\Complainant;
@@ -21,7 +23,7 @@ readonly class ComplaintManager
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private Security $security,
+        private Security               $security,
         private MessageBusInterface    $bus
     )
     {
@@ -158,6 +160,26 @@ readonly class ComplaintManager
                 )
             );
         }
+        return $complaint;
+    }
+
+    public function uploadFiles(Complaint $complaint, AttachedFileDto $dto): Complaint
+    {
+        $attachedFile = (new AttachedFile())
+            ->setComplaint($complaint)
+            ->setFiletype($dto->fileType)
+            ->setWorkflowStep($dto->workflowStep);
+
+        $attachedFile->setFile($dto->file);
+
+        if ($dto->fileName)
+            $attachedFile->setFileName($dto->fileName);
+
+        $attachedFile->setUploadedBy($this->security->getUser());
+
+        $this->em->persist($attachedFile);
+        $this->em->flush();
+
         return $complaint;
     }
 }

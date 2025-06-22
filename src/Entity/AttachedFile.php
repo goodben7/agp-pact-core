@@ -3,15 +3,29 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
+use App\Dto\Complaint\AttachedFileDto;
 use App\Repository\AttachedFileRepository;
+use App\State\Complaint\UploadAttachedFileProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: AttachedFileRepository::class)]
 #[Vich\Uploadable]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Post(
+            inputFormats: [
+                'json' => ['application/json', 'application/merge-patch+json'],
+                'multipart' => ['multipart/form-data'],
+            ],
+            input: AttachedFileDto::class,
+            processor: UploadAttachedFileProcessor::class
+        )
+    ]
+)]
 class AttachedFile
 {
     const ID_PREFIX = "AF";
@@ -32,7 +46,7 @@ class AttachedFile
     #[ORM\Column(length: 255)]
     private ?string $filePath = null;
 
-    #[Vich\UploadableField(mapping: 'attached_files', fileNameProperty: 'filePath')]
+    #[Vich\UploadableField(mapping: 'attached_files', fileNameProperty: 'filePath', size: 'fileSize', mimeType: 'mimeType', originalName: 'fileName')]
     private ?File $file = null;
 
     #[ORM\ManyToOne]
