@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Attribute\Groups;
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use App\Dto\GeneralParameter\GeneralParameterCreateDTO;
+use App\State\GeneralParameter\DeleteGeneralParameterProcessor;
 use App\State\GeneralParameter\GeneralParameterCreateProcessor;
 
 #[ORM\Entity(repositoryClass: GeneralParameterRepository::class)]
@@ -38,6 +39,7 @@ use App\State\GeneralParameter\GeneralParameterCreateProcessor;
         ),
         new Delete(
             security: "is_granted('ROLE_GENERAL_PARAMETER_DELETE')",
+            processor: DeleteGeneralParameterProcessor::class,
         ),
     ]
 )]
@@ -85,6 +87,10 @@ class GeneralParameter
     #[ORM\Column(nullable: true)]
     #[Groups(['general_parameter:get', 'general_parameter:list','general_parameter:patch'])]
     private ?int $displayOrder = null;
+
+    #[ORM\Column]
+    #[Groups(['general_parameter:get'])]
+    private ?bool $deleted = false;
 
     public function getId(): ?string
     {
@@ -159,6 +165,26 @@ class GeneralParameter
     public function setDisplayOrder(?int $displayOrder): static
     {
         $this->displayOrder = $displayOrder;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of deleted
+     */ 
+    public function isDeleted(): bool|null
+    {
+        return $this->deleted;
+    }
+
+    /**
+     * Set the value of deleted
+     *
+     * @return  self
+     */ 
+    public function setDeleted(bool $deleted): static
+    {
+        $this->deleted = $deleted;
 
         return $this;
     }
