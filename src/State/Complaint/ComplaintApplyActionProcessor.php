@@ -28,16 +28,28 @@ readonly class ComplaintApplyActionProcessor implements ProcessorInterface
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Complaint
     {
-        if (!$data instanceof ApplyActionRequest)
-            throw new BadRequestHttpException('Invalid request data.');
+        if (is_array($data)) {
+            $requestDto = new ApplyActionRequest();
+            $requestDto->setFromArray($data);
+        } elseif ($data instanceof ApplyActionRequest) {
+            $requestDto = $data;
+        } else {
+            throw new BadRequestHttpException('Invalid request data type: ' . gettype($data));
+        }
 
-        $complaint = $this->em->getRepository(Complaint::class)->findOneBy(['id' => $uriVariables['id']]);
-        if (!$complaint)
+        if (!$requestDto->actionId) {
+            throw new BadRequestHttpException('actionId is required.');
+        }
+
+        $complaint = $this->em->getRepository(Complaint::class)->find($uriVariables['id']);
+        if (!$complaint) {
             throw new UnavailableDataException('Complaint not found.');
+        }
 
-        $action = $this->em->getRepository(WorkflowAction::class)->findOneBy(['id' => $data->actionId]);
-        if (!$action)
-            throw new UnavailableDataException(sprintf('Action with code "%s" not found.', $data->actionId));
+        $action = $this->em->getRepository(WorkflowAction::class)->find($requestDto->actionId);
+        if (!$action) {
+            throw new UnavailableDataException(sprintf('Action with ID "%s" not found.', $requestDto->actionId));
+        }
 
         return $this->manager->applyAction($complaint, $action, $data->toArray());
     }

@@ -16,6 +16,16 @@ services:
     App\:
         resource: '../src/'
 
+    App\Encoder\MultipartDecoder:
+        tags:
+            - { name: serializer.encoder, format: multipart }
+        arguments:
+            $requestStack: '@request_stack'
+            $logger: '@logger'
+
+    App\Serializer\UploadedFileDenormalizer:
+        tags: [ 'serializer.normalizer' ]
+
     App\Service\NotificationService:
         arguments:
             $em: '@doctrine.orm.entity_manager'
