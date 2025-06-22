@@ -242,7 +242,8 @@ class Complaint
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $proposedResolutionDescription = null;
 
-    #[Groups(['complaint:get', 'complaint:list'])]
+
+    #[Groups(['complaint:get'])]
     private Collection $availableActions;
 
     public function __construct()
@@ -751,7 +752,6 @@ class Complaint
         return $this;
     }
 
-
     /**
      * @return Collection<int, WorkflowAction>
      */
@@ -762,8 +762,16 @@ class Complaint
 
     public function addAvailableAction(WorkflowAction $workflowAction): static
     {
-        if (!$this->availableActions->contains($workflowAction))
+        if (!$this->availableActions->contains($workflowAction)) {
             $this->availableActions->add($workflowAction);
+        }
+
+        return $this;
+    }
+
+    public function removeAvailableAction(WorkflowAction $workflowAction): static
+    {
+        $this->availableActions->removeElement($workflowAction);
 
         return $this;
     }
