@@ -37,7 +37,7 @@ use App\State\Complaint\ComplaintApplyActionProcessor;
             provider: ComplaintProvider::class
         ),
         new Post(
-            security: "is_granted('ROLE_COMPLAINT_CREATE')",
+            //security: "is_granted('ROLE_COMPLAINT_CREATE')",
             input: ComplaintCreateDTO::class,
             processor: CreateComplaintProcessor::class
         ),
