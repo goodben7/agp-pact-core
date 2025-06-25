@@ -94,6 +94,16 @@ class Prejudice
     #[Groups(['prejudice:get'])]
     private ?bool $deleted = false;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['prejudice:get', 'prejudice:post', 'prejudice:patch'])]  
+    private ?GeneralParameter $incidentCause = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['prejudice:get', 'prejudice:post', 'prejudice:patch'])]  
+    private ?GeneralParameter $consequenceType = null;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -175,6 +185,46 @@ class Prejudice
     public function setDeleted(bool $deleted)
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of incidentCause
+     */ 
+    public function getIncidentCause(): GeneralParameter|null
+    {
+        return $this->incidentCause;
+    }
+
+    /**
+     * Set the value of incidentCause
+     *
+     * @return  self
+     */ 
+    public function setIncidentCause(?GeneralParameter $incidentCause): static
+    {
+        $this->incidentCause = $incidentCause;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of consequenceType
+     */ 
+    public function getConsequenceType(): GeneralParameter|null
+    {
+        return $this->consequenceType;
+    }
+
+    /**
+     * Set the value of consequenceType
+     *
+     * @return  self
+     */ 
+    public function setConsequenceType(?GeneralParameter $consequenceType): static
+    {
+        $this->consequenceType = $consequenceType;
 
         return $this;
     }
