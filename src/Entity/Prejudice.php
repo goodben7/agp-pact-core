@@ -6,18 +6,23 @@ use ApiPlatform\Metadata\Get;
 use App\Doctrine\IdGenerator;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
+use App\Dto\PrejudiceCreateDTO;
+use App\Dto\PrejudiceUpdateDTO;
 use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use App\Repository\PrejudiceRepository;
+use App\State\CreatePrejudiceProcessor;
 use App\State\DeletePrejudiceProcessor;
+use App\State\UpdatePrejudiceProcessor;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
+use Doctrine\Common\Collections\ArrayCollection;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
-use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 
 #[ORM\Entity(repositoryClass: PrejudiceRepository::class)]
 #[ApiResource(
@@ -33,13 +38,13 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
         ),
         new Post(
             security: 'is_granted("ROLE_PREJUDICE_CREATE")',
-            denormalizationContext: ['groups' => 'prejudice:post',],
-            processor: PersistProcessor::class,
+            input: PrejudiceCreateDTO::class,
+            processor: CreatePrejudiceProcessor::class,
         ),
         new Patch(
             security: 'is_granted("ROLE_PREJUDICE_UPDATE")',
-            denormalizationContext: ['groups' => 'prejudice:patch',],
-            processor: PersistProcessor::class,
+            input: PrejudiceUpdateDTO::class,
+            processor: UpdatePrejudiceProcessor::class,
         ),
         new Delete(
             security: "is_granted('ROLE_PREJUDICE_DELETE')",
@@ -69,25 +74,25 @@ class Prejudice
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['prejudice:get', 'prejudice:post', 'prejudice:patch'])]  
+    #[Groups(['prejudice:get'])]  
     private ?string $label = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['prejudice:get', 'prejudice:post', 'prejudice:patch'])]  
+    #[Groups(['prejudice:get'])]  
     private ?GeneralParameter $category = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['prejudice:get', 'prejudice:post', 'prejudice:patch'])]  
+    #[Groups(['prejudice:get'])]  
     private ?GeneralParameter $complaintType = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['prejudice:get', 'prejudice:post', 'prejudice:patch'])]  
+    #[Groups(['prejudice:get'])]  
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['prejudice:get', 'prejudice:post', 'prejudice:patch'])]  
+    #[Groups(['prejudice:get'])]  
     private ?bool $active = null;
 
     #[ORM\Column]
@@ -96,13 +101,20 @@ class Prejudice
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['prejudice:get', 'prejudice:post', 'prejudice:patch'])]  
+    #[Groups(['prejudice:get'])]  
     private ?GeneralParameter $incidentCause = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['prejudice:get', 'prejudice:post', 'prejudice:patch'])]  
-    private ?GeneralParameter $consequenceType = null;
+    /**
+     * @var Collection<int, PrejudiceConsequence>
+     */
+    #[ORM\OneToMany(targetEntity: PrejudiceConsequence::class, mappedBy: 'prejudice', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups(['prejudice:get'])]
+    private Collection $consequences;
+
+    public function __construct()
+    {
+        $this->consequences = new ArrayCollection();
+    }
 
     public function getId(): ?string
     {
@@ -210,21 +222,31 @@ class Prejudice
     }
 
     /**
-     * Get the value of consequenceType
-     */ 
-    public function getConsequenceType(): GeneralParameter|null
+     * @return Collection<int, PrejudiceConsequence>
+     */
+    public function getConsequences(): Collection
     {
-        return $this->consequenceType;
+        return $this->consequences;
     }
 
-    /**
-     * Set the value of consequenceType
-     *
-     * @return  self
-     */ 
-    public function setConsequenceType(?GeneralParameter $consequenceType): static
+    public function addConsequence(PrejudiceConsequence $consequence): static
     {
-        $this->consequenceType = $consequenceType;
+        if (!$this->consequences->contains($consequence)) {
+            $this->consequences->add($consequence);
+            $consequence->setPrejudice($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConsequence(PrejudiceConsequence $consequence): static
+    {
+        if ($this->consequences->removeElement($consequence)) {
+            // set the owning side to null (unless already changed)
+            if ($consequence->getPrejudice() === $this) {
+                $consequence->setPrejudice(null);
+            }
+        }
 
         return $this;
     }
