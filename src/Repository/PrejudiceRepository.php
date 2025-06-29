@@ -16,6 +16,23 @@ class PrejudiceRepository extends ServiceEntityRepository
         parent::__construct($registry, Prejudice::class);
     }
 
+    /**
+     * Find prejudices by complaint type code
+     * 
+     * @param string $complaintTypeCode
+     * @return Prejudice[] Returns an array of Prejudice objects
+     */
+    public function findByComplaintTypeCode(string $complaintTypeCode): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.complaintType', 'ct')
+            ->andWhere('ct.code = :code')
+            ->setParameter('code', $complaintTypeCode)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     //    /**
     //     * @return Prejudice[] Returns an array of Prejudice objects
     //     */

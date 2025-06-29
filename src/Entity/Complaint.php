@@ -250,6 +250,10 @@ class Complaint
     #[Groups(['complaint:get'])]
     private Collection $availableActions;
 
+    #[ORM\Column]
+    #[Groups(['complaint:get', 'complaint:list'])]
+    private ?bool $isSensitive = false;
+
     public function __construct()
     {
         $this->victims = new ArrayCollection();
@@ -785,6 +789,26 @@ class Complaint
             $this->availableActions = new ArrayCollection();
         }
         $this->availableActions->removeElement($workflowAction);
+
+        return $this;
+    }
+
+    /**
+     * Get the value of isSensitive
+     */ 
+    public function getIsSensitive(): bool|null
+    {
+        return $this->isSensitive;
+    }
+
+    /**
+     * Set the value of isSensitive
+     *
+     * @return  self
+     */ 
+    public function setIsSensitive(bool $isSensitive): static
+    {
+        $this->isSensitive = $isSensitive;
 
         return $this;
     }

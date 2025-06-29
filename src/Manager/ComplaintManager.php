@@ -3,20 +3,23 @@
 namespace App\Manager;
 
 
-use App\Dto\Complaint\AttachedFileDto;
-use App\Entity\AttachedFile;
 use App\Entity\Victim;
 use App\Entity\Complaint;
+use App\Entity\Prejudice;
 use App\Entity\Complainant;
+use App\Entity\AttachedFile;
 use App\Entity\WorkflowStep;
 use App\Entity\AffectedSpecies;
 use App\Entity\WorkflowTransition;
 use App\Entity\ComplaintConsequence;
+use App\Entity\PrejudiceConsequence;
+use App\Dto\Complaint\AttachedFileDto;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Dto\Complaint\ComplaintCreateDTO;
 use App\Exception\UnavailableDataException;
 use App\Message\ComplaintRegisteredMessage;
 use Symfony\Bundle\SecurityBundle\Security;
+use App\Constant\GeneralParameterComplaintType;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class ComplaintManager
@@ -79,6 +82,53 @@ readonly class ComplaintManager
             }
         }
 
+        // Check if the incident cause is associated with a sensitive prejudice
+        $isSensitive = false;
+        if ($data->incidentCause) {
+            $prejudiceRepository = $this->em->getRepository(Prejudice::class);
+
+            $matchingPrejudices = $prejudiceRepository->findBy(['incidentCause' => $data->incidentCause]);
+            
+            foreach ($matchingPrejudices as $prejudice) {
+                $complaintType = $prejudice->getComplaintType();
+                if ($complaintType && $complaintType->getCode() === GeneralParameterComplaintType::SENSITIVE_COMPLAINT_CODE) {
+                    $isSensitive = true;
+                    break;
+                }
+            }
+        }
+        
+        if (!$isSensitive && $data->complaintConsequences) {
+            $prejudiceRepository = $this->em->getRepository(Prejudice::class);
+        
+            // Récupère tous les préjudices sensibles en une requête
+            $sensitivePrejudices = $prejudiceRepository->findByComplaintTypeCode(GeneralParameterComplaintType::SENSITIVE_COMPLAINT_CODE);
+        
+            if ($sensitivePrejudices) {
+                // Collecte tous les IDs des consequenceTypes sensibles dans un tableau
+                $sensitiveConsequenceTypeIds = [];
+        
+                foreach ($sensitivePrejudices as $prejudice) {
+                    foreach ($prejudice->getConsequences() as $prejudiceConsequence) {
+                        $type = $prejudiceConsequence->getConsequenceType();
+                        if ($type) {
+                            $sensitiveConsequenceTypeIds[$type->getId()] = true;
+                        }
+                    }
+                }
+        
+                // Vérifie si l'un des consequenceTypes de la plainte correspond à un sensible
+                foreach ($data->complaintConsequences as $consequenceDto) {
+                    $type = $consequenceDto->consequenceType;
+                    if ($type && isset($sensitiveConsequenceTypeIds[$type->getId()])) {
+                        $isSensitive = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        
         $complaint = (new Complaint())
             ->setComplaintType($data->complaintType)
             ->setIncidentDate($data->incidentDate)
@@ -91,6 +141,7 @@ readonly class ComplaintManager
             ->setLongitude($data->longitude)
             ->setComplainant($complainant)
             ->setAssignedTo($data->assignedTo)
+            ->setIsSensitive($isSensitive)
             ->setDeclarationDate(new \DateTimeImmutable());
 
         $initialStep = $this->em->getRepository(WorkflowStep::class)->findOneBy(['isInitial' => true]);
