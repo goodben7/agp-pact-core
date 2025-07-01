@@ -36,6 +36,9 @@ final class DashboardStatistics
     public ?array $complaintsByType = null;
 
     #[Groups(["dashboard_stats:read"])]
+    public ?array $complaintsBySensitivity = null;
+
+    #[Groups(["dashboard_stats:read"])]
     public ?int $totalComplaints = null;
 
     #[Groups(["dashboard_stats:read"])]

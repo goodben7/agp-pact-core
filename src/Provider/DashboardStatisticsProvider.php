@@ -74,8 +74,18 @@ final class DashboardStatisticsProvider implements ProviderInterface
             $applyCommonFilters($qb4, 'c');
             $stats->openComplaints = (int)$qb4->getQuery()->getSingleScalarResult();
 
-            $stats->averageResolutionTimeDays = $this->calculateAverageResolutionTime($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
 
+            $applyCommonFilters($qb4, 'c');
+            $stats->openComplaints = (int)$qb4->getQuery()->getSingleScalarResult();
+
+            $qb5 = $this->entityManager->createQueryBuilder()
+                ->select('c.isSensitive, COUNT(c.id) AS count')
+                ->from(Complaint::class, 'c');
+            $applyCommonFilters($qb5, 'c');
+            $qb5->groupBy('c.isSensitive');
+            $stats->complaintsBySensitivity = $qb5->getQuery()->getResult();
+
+            $stats->averageResolutionTimeDays = $this->calculateAverageResolutionTime($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
 
             $stats->complaintsDeclaredMonthly = $this->getComplaintsDeclaredMonthly($locationId, $complaintTypeId);
 
