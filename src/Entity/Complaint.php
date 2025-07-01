@@ -68,7 +68,8 @@ use App\State\Complaint\ComplaintApplyActionProcessor;
         'roadAxis.id' => 'exact',
         'location.id' => 'exact',
         'complainant.id' => 'exact',
-        'currentWorkflowAction.id' => 'exact'
+        'currentWorkflowAction.id' => 'exact',
+        'isSensitive' => 'exact',
     ]
 )]
 #[ApiFilter(
