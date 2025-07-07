@@ -24,9 +24,8 @@ final class DashboardStatisticsProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        if ($operation->getName() !== 'get_dashboard_statistics') {
+        if ($operation->getName() !== 'get_dashboard_statistics')
             return null;
-        }
 
         $stats = new DashboardStatistics();
 
@@ -39,13 +38,12 @@ final class DashboardStatisticsProvider implements ProviderInterface
 
         try {
             $applyCommonFilters = $this->getClosure($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
-
+            $finalClosedStepNames = [WorkflowStepName::CLOSED, WorkflowStepName::ESCALATED_JUSTICE, WorkflowStepName::NON_RECEIVABLE];
 
             $qb1 = $this->entityManager->createQueryBuilder()
                 ->select('ws.name AS status, COUNT(c.id) AS count')
                 ->from(Complaint::class, 'c')
                 ->join('c.currentWorkflowStep', 'ws');
-
             $applyCommonFilters($qb1, 'c');
             $qb1->groupBy('ws.name');
             $stats->complaintsByStatus = $qb1->getQuery()->getResult();
@@ -58,26 +56,6 @@ final class DashboardStatisticsProvider implements ProviderInterface
             $qb2->groupBy('gt.value');
             $stats->complaintsByType = $qb2->getQuery()->getResult();
 
-            $qb3 = $this->entityManager->createQueryBuilder()
-                ->select('COUNT(c.id)')
-                ->from(Complaint::class, 'c');
-            $applyCommonFilters($qb3, 'c');
-            $stats->totalComplaints = (int)$qb3->getQuery()->getSingleScalarResult();
-
-            $finalClosedStepNames = [WorkflowStepName::CLOSED, WorkflowStepName::ESCALATED_JUSTICE, WorkflowStepName::NON_RECEIVABLE];
-            $qb4 = $this->entityManager->createQueryBuilder()
-                ->select('COUNT(c.id)')
-                ->from(Complaint::class, 'c')
-                ->join('c.currentWorkflowStep', 'ws')
-                ->where('ws.name NOT IN (:finalClosedNames)')
-                ->setParameter('finalClosedNames', $finalClosedStepNames);
-            $applyCommonFilters($qb4, 'c');
-            $stats->openComplaints = (int)$qb4->getQuery()->getSingleScalarResult();
-
-
-            $applyCommonFilters($qb4, 'c');
-            $stats->openComplaints = (int)$qb4->getQuery()->getSingleScalarResult();
-
             $qb5 = $this->entityManager->createQueryBuilder()
                 ->select('c.isSensitive, COUNT(c.id) AS count')
                 ->from(Complaint::class, 'c');
@@ -85,8 +63,36 @@ final class DashboardStatisticsProvider implements ProviderInterface
             $qb5->groupBy('c.isSensitive');
             $stats->complaintsBySensitivity = $qb5->getQuery()->getResult();
 
-            $stats->averageResolutionTimeDays = $this->calculateAverageResolutionTime($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
+            $statsQb = $this->entityManager->createQueryBuilder()
+                ->select(
+                    'c.isSensitive',
+                    'CASE WHEN ws.name IN (:finalClosedNames) THEN \'closed\' ELSE \'open\' END AS status',
+                    'COUNT(c.id) AS count'
+                )
+                ->from(Complaint::class, 'c')
+                ->join('c.currentWorkflowStep', 'ws')
+                ->setParameter('finalClosedNames', $finalClosedStepNames);
 
+            $applyCommonFilters($statsQb, 'c');
+            $statsQb->groupBy('c.isSensitive', 'status');
+            $results = $statsQb->getQuery()->getResult();
+
+            $stats->complaintStats = [
+                'general' => ['total' => 0, 'open' => 0, 'closed' => 0],
+                'sensitive' => ['total' => 0, 'open' => 0, 'closed' => 0],
+            ];
+
+            foreach ($results as $row) {
+                $category = $row['isSensitive'] ? 'sensitive' : 'general';
+                $status = $row['status'];
+                $count = (int)$row['count'];
+
+                $stats->complaintStats[$category][$status] = $count;
+                $stats->complaintStats[$category]['total'] += $count;
+            }
+
+
+            $stats->averageResolutionTimeDays = $this->calculateAverageResolutionTime($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
             $stats->complaintsDeclaredMonthly = $this->getComplaintsDeclaredMonthly($locationId, $complaintTypeId);
 
         } catch (\Exception $e) {

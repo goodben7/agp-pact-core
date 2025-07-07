@@ -38,11 +38,20 @@ final class DashboardStatistics
     #[Groups(["dashboard_stats:read"])]
     public ?array $complaintsBySensitivity = null;
 
+    /**
+     * @var array{
+     *     general: array{total: int, open: int, closed: int},
+     *     sensitive: array{total: int, open: int, closed: int}
+     * }
+     */
     #[Groups(["dashboard_stats:read"])]
-    public ?int $totalComplaints = null;
+    public array $complaintStats = [];
 
-    #[Groups(["dashboard_stats:read"])]
+    public ?int $totalComplaints = null;
     public ?int $openComplaints = null;
+    public int $totalSensitiveComplaints = 0;
+    public int $openSensitiveComplaints = 0;
+    public int $closedSensitiveComplaints = 0;
 
     #[Groups(["dashboard_stats:read"])]
     public ?float $averageResolutionTimeDays = null;
@@ -52,7 +61,6 @@ final class DashboardStatistics
 
     #[Groups(["dashboard_stats:read"])]
     public ?array $complaintsDeclaredMonthly = null;
-
 
     #[ApiFilter(SearchFilter::class, strategy: "exact", properties: ["location.id" => "exact"])]
     public ?string $locationId = null;
