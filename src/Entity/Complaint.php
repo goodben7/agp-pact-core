@@ -256,7 +256,7 @@ class Complaint
     private ?bool $isSensitive = false;
 
     #[ORM\Column]
-    private ?bool $closed = null;
+    private ?bool $closed = false;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $satisfactionComments = null;
@@ -817,7 +817,7 @@ class Complaint
 
     /**
      * Get the value of isSensitive
-     */ 
+     */
     public function getIsSensitive(): bool|null
     {
         return $this->isSensitive;
@@ -827,7 +827,7 @@ class Complaint
      * Set the value of isSensitive
      *
      * @return  self
-     */ 
+     */
     public function setIsSensitive(bool $isSensitive): static
     {
         $this->isSensitive = $isSensitive;
