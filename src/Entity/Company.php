@@ -95,9 +95,17 @@ class Company
     #[ORM\OneToMany(targetEntity: Complaint::class, mappedBy: 'involvedCompany')]
     private Collection $complaints;
 
+    /**
+     * @var Collection<int, Member>
+     */
+    #[ORM\OneToMany(targetEntity: Member::class, mappedBy: 'company')]
+    #[Groups(['company:get'])]
+    private Collection $members;
+
     public function __construct()
     {
         $this->complaints = new ArrayCollection();
+        $this->members = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -189,6 +197,36 @@ class Company
             // set the owning side to null (unless already changed)
             if ($complaint->getInvolvedCompany() === $this) {
                 $complaint->setInvolvedCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Member>
+     */
+    public function getMembers(): Collection
+    {
+        return $this->members;
+    }
+
+    public function addMember(Member $member): static
+    {
+        if (!$this->members->contains($member)) {
+            $this->members->add($member);
+            $member->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMember(Member $member): static
+    {
+        if ($this->members->removeElement($member)) {
+            // set the owning side to null (unless already changed)
+            if ($member->getCompany() === $this) {
+                $member->setCompany(null);
             }
         }
 
