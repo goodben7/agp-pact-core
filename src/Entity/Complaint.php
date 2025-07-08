@@ -261,7 +261,7 @@ class Complaint
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $satisfactionComments = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $closureComments = null;
 
     #[ORM\Column(nullable: true)]
@@ -864,7 +864,7 @@ class Complaint
         return $this->closureComments;
     }
 
-    public function setClosureComments(string $closureComments): static
+    public function setClosureComments(?string $closureComments): static
     {
         $this->closureComments = $closureComments;
 
