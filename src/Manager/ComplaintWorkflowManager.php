@@ -154,40 +154,51 @@ readonly class ComplaintWorkflowManager
         }
 
         if (isset($extractedFields['complaintType'])) {
-            $complaint->setComplaintType($extractedFields['complaintType']);
+            $complaintType = $this->em->getRepository(GeneralParameter::class)->find($this->extractIdFromIri($extractedFields['complaintType']));
+            $complaint->setComplaintType($complaintType);
         }
         if (isset($extractedFields['incidentCause'])) {
-            $complaint->setIncidentCause($extractedFields['incidentCause']);
+            $incidentCause = $this->em->getRepository(GeneralParameter::class)->find($this->extractIdFromIri($extractedFields['incidentCause']));
+            $complaint->setIncidentCause($$incidentCause);
         }
         if (isset($extractedFields['roadAxis'])) {
-            $complaint->setRoadAxis($extractedFields['roadAxis']);
+            $roadAxis = $this->em->getRepository(RoadAxis::class)->find($this->extractIdFromIri($extractedFields['roadAxis']));
+            $complaint->setRoadAxis($roadAxis);
         }
         if (isset($extractedFields['location'])) {
-            $complaint->setLocation($extractedFields['location']);
+            $location = $this->em->getRepository(Location::class)->find($this->extractIdFromIri($extractedFields['location']));
+            $complaint->setLocation($location);
         }
         if (isset($extractedFields['internalResolutionDecision'])) {
-            $complaint->setInternalResolutionDecision($extractedFields['internalResolutionDecision']);
+            $internalResolutionDecision = $this->em->getRepository(GeneralParameter::class)->find($this->extractIdFromIri($extractedFields['internalResolutionDecision']));
+            $complaint->setInternalResolutionDecision($internalResolutionDecision);
         }
         if (isset($extractedFields['complainantDecision'])) {
-            $complaint->setComplainantDecision($extractedFields['complainantDecision']);
+            $complainantDecision = $this->em->getRepository(GeneralParameter::class)->find($this->extractIdFromIri($extractedFields['complainantDecision']));
+            $complaint->setComplainantDecision($complainantDecision);
         }
         if (isset($extractedFields['satisfactionFollowUpResult'])) {
-            $complaint->setSatisfactionFollowUpResult($extractedFields['satisfactionFollowUpResult']);
+            $satisfactionFollowUpResult = $this->em->getRepository(GeneralParameter::class)->find($this->extractIdFromIri($extractedFields['satisfactionFollowUpResult']));
+            $complaint->setSatisfactionFollowUpResult($satisfactionFollowUpResult);
         }
         if (isset($extractedFields['escalationLevel'])) {
-            $complaint->setEscalationLevel($extractedFields['escalationLevel']);
+            $escalationLevel = $this->em->getRepository(GeneralParameter::class)->find($this->extractIdFromIri($extractedFields['escalationLevel']));
+            $complaint->setEscalationLevel($escalationLevel);
         }
         if (isset($extractedFields['complainant'])) {
-            $complaint->setComplainant($extractedFields['complainant']);
+            $complainant = $this->em->getRepository(Complainant::class)->find($this->extractIdFromIri($extractedFields['complainant']));
+            $complaint->setComplainant($complainant);
         }
         if (isset($extractedFields['assignedTo'])) {
-            $complaint->setAssignedTo($extractedFields['assignedTo']);
+            $user = $this->em->getRepository(User::class)->find($this->extractIdFromIri($extractedFields['assignedTo']));
+            $complaint->setAssignedTo($user);
         }
         if (isset($extractedFields['currentAssignee'])) {
             $complaint->setCurrentAssignee($extractedFields['currentAssignee']);
         }
         if (isset($extractedFields['involvedCompany'])) {
-            $complaint->setInvolvedCompany($extractedFields['involvedCompany']);
+            $company = $this->em->getRepository(Company::class)->find($this->extractIdFromIri($extractedFields['involvedCompany']));
+            $complaint->setInvolvedCompany($company);
         }
 
         if ($file instanceof UploadedFile) {
@@ -207,9 +218,8 @@ readonly class ComplaintWorkflowManager
             }
 
             $fileTypeParam = $this->em->getRepository(GeneralParameter::class)->findOneBy(['category' => GeneralParameterCategory::FILE_TYPE, 'value' => $fileTypeCategory]);
-            if (!$fileTypeParam) {
+            if (!$fileTypeParam)
                 throw new \Exception(sprintf('Not found file type parameter for category "%s".', $fileTypeCategory));
-            }
 
             $attachedFile->setFile($file);
 

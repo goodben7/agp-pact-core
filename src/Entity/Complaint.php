@@ -255,6 +255,27 @@ class Complaint
     #[Groups(['complaint:get', 'complaint:list'])]
     private ?bool $isSensitive = false;
 
+    #[ORM\Column]
+    private ?bool $closed = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $satisfactionComments = null;
+
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $closureComments = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $executionDate = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $estimatedCost = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $proposedResolutionEndDate = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $proposedResolutionStartDate = null;
+
     public function __construct()
     {
         $this->victims = new ArrayCollection();
@@ -810,6 +831,90 @@ class Complaint
     public function setIsSensitive(bool $isSensitive): static
     {
         $this->isSensitive = $isSensitive;
+
+        return $this;
+    }
+
+    public function isClosed(): ?bool
+    {
+        return $this->closed;
+    }
+
+    public function setClosed(bool $closed): static
+    {
+        $this->closed = $closed;
+
+        return $this;
+    }
+
+    public function getSatisfactionComments(): ?string
+    {
+        return $this->satisfactionComments;
+    }
+
+    public function setSatisfactionComments(?string $satisfactionComments): static
+    {
+        $this->satisfactionComments = $satisfactionComments;
+
+        return $this;
+    }
+
+    public function getClosureComments(): ?string
+    {
+        return $this->closureComments;
+    }
+
+    public function setClosureComments(string $closureComments): static
+    {
+        $this->closureComments = $closureComments;
+
+        return $this;
+    }
+
+    public function getExecutionDate(): ?\DateTimeImmutable
+    {
+        return $this->executionDate;
+    }
+
+    public function setExecutionDate(?\DateTimeImmutable $executionDate): static
+    {
+        $this->executionDate = $executionDate;
+
+        return $this;
+    }
+
+    public function getEstimatedCost(): ?string
+    {
+        return $this->estimatedCost;
+    }
+
+    public function setEstimatedCost(?string $estimatedCost): static
+    {
+        $this->estimatedCost = $estimatedCost;
+
+        return $this;
+    }
+
+    public function getProposedResolutionEndDate(): ?\DateTimeImmutable
+    {
+        return $this->proposedResolutionEndDate;
+    }
+
+    public function setProposedResolutionEndDate(?\DateTimeImmutable $proposedResolutionEndDate): static
+    {
+        $this->proposedResolutionEndDate = $proposedResolutionEndDate;
+
+        return $this;
+    }
+
+    public function getProposedResolutionStartDate(): ?\DateTimeImmutable
+    {
+        return $this->proposedResolutionStartDate;
+    }
+
+    public function setProposedResolutionStartDate(?\DateTimeImmutable $proposedResolutionStartDate): static
+    {
+        $this->proposedResolutionStartDate = $proposedResolutionStartDate;
 
         return $this;
     }
