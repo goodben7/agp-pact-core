@@ -153,4 +153,10 @@ return static function (): iterable {
     yield Permission::new('ROLE_PREJUDICE_UPDATE', "Modifier un préjudice");
     yield Permission::new( 'ROLE_PREJUDICE_DELETE', "Supprimer un préjudice"); 
 
+    yield Permission::new('ROLE_MEMBER_DETAILS', "Consulter les détails d'un membre");
+    yield Permission::new('ROLE_MEMBER_LIST', "Consulter la liste des membres");
+    yield Permission::new('ROLE_MEMBER_CREATE', "Créer un membre");
+    yield Permission::new('ROLE_MEMBER_UPDATE', "Modifier un membre");
+    yield Permission::new('ROLE_USER_SET_ACCESS', "Modifier les accès d'un utilisateur");
+
 };
