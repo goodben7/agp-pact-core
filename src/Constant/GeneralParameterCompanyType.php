@@ -22,6 +22,9 @@ class GeneralParameterCompanyType
     public const CLRGP_CODE = 'CLRGP'; // Cellule de Lutte contre le Racket et les Incivilités Routières et Portuaires
     public const CLRGP_VALUE = 'CLRGP (Cellule de Lutte contre le Racket et les Incivilités)';
 
+    public const LOCAL_COMMITTEE_CODE = 'LOCAL_COMMITTEE';
+    public const LOCAL_COMMITTEE_VALUE = 'Comité Locaux';
+
     public const INTERNAL_COMMITTEE_CODE = 'INTERNAL_COMMITTEE'; // Comité Interne de l'organisation
     public const INTERNAL_COMMITTEE_VALUE = 'Comité Interne';
 
