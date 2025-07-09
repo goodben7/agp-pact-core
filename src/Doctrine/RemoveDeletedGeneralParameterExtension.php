@@ -17,8 +17,9 @@ class RemoveDeletedGeneralParameterExtension implements QueryCollectionExtension
 
     private function restrict(QueryBuilder $queryBuilder, string $resourceClass): void
     {
-        if (GeneralParameter::class !== $resourceClass)
+        if (GeneralParameter::class !== $resourceClass) {
             return;
+        }
 
         $rootAlias = $queryBuilder->getRootAliases()[0];
         $queryBuilder->andWhere(sprintf('%s.deleted != :isDeleted', $rootAlias));
