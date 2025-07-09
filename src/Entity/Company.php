@@ -50,7 +50,8 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
     'type.id' => 'exact',
     'type.category' => 'exact',
     'type.code' => 'exact',
-    'active' => 'exact'
+    'active' => 'exact',
+    'roadAxes' => 'exact',
 ])]
 class Company
 {
@@ -106,6 +107,7 @@ class Company
      * @var Collection<int, RoadAxis>
      */
     #[ORM\ManyToMany(targetEntity: RoadAxis::class)]
+    #[Groups(['company:get', 'company:post', 'company:patch'])]
     private Collection $roadAxes;
 
     /**

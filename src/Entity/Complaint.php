@@ -42,7 +42,6 @@ use App\State\Complaint\ComplaintApplyActionProcessor;
             provider: ComplaintProvider::class
         ),
         new Post(
-        //security: "is_granted('ROLE_COMPLAINT_CREATE')",
             input: ComplaintCreateDTO::class,
             processor: CreateComplaintProcessor::class
         ),
@@ -963,7 +962,7 @@ class Complaint
         return $this;
     }
 
-    public function removeComplaintStepAssignment(ComplaintStepAssignment $complaintStepAssignment): static
+    public function removeComplaintStepAssignment(ComplaintStepAssignment $complaintStepAssignment): void
     {
         if ($this->complaintStepAssignments->removeElement($complaintStepAssignment)) {
             // set the owning side to null (unless already changed)
@@ -983,7 +982,7 @@ class Complaint
      * Set the value of createdBy
      *
      * @return  self
-     */ 
+     */
     public function setCreatedBy(?string $createdBy): static
     {
         $this->createdBy = $createdBy;

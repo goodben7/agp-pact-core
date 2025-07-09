@@ -159,7 +159,7 @@ readonly class ComplaintWorkflowManager
         }
         if (isset($extractedFields['incidentCause'])) {
             $incidentCause = $this->em->getRepository(GeneralParameter::class)->find($this->extractIdFromIri($extractedFields['incidentCause']));
-            $complaint->setIncidentCause($$incidentCause);
+            $complaint->setIncidentCause($incidentCause);
         }
         if (isset($extractedFields['roadAxis'])) {
             $roadAxis = $this->em->getRepository(RoadAxis::class)->find($this->extractIdFromIri($extractedFields['roadAxis']));
