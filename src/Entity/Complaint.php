@@ -2,20 +2,25 @@
 
 namespace App\Entity;
 
+use App\Entity\Victim;
+use App\Entity\AttachedFile;
 use ApiPlatform\Metadata\Get;
 use App\Doctrine\IdGenerator;
 use ApiPlatform\Metadata\Post;
-use App\Provider\Complaint\ComplaintProvider;
+use App\Entity\WorkflowAction;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
+use App\Entity\AffectedSpecies;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
+use App\Entity\ComplaintConsequence;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use App\Repository\ComplaintRepository;
 use App\Dto\Complaint\ApplyActionRequest;
 use App\Dto\Complaint\ComplaintCreateDTO;
 use Doctrine\Common\Collections\Collection;
+use App\Provider\Complaint\ComplaintProvider;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -275,6 +280,10 @@ class Complaint
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $proposedResolutionStartDate = null;
+
+    #[ORM\Column(length: 16, nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
+    private ?string $createdBy = null;
 
     public function __construct()
     {
@@ -915,6 +924,26 @@ class Complaint
     public function setProposedResolutionStartDate(?\DateTimeImmutable $proposedResolutionStartDate): static
     {
         $this->proposedResolutionStartDate = $proposedResolutionStartDate;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of createdBy
+     */ 
+    public function getCreatedBy(): string|null
+    {
+        return $this->createdBy;
+    }
+
+    /**
+     * Set the value of createdBy
+     *
+     * @return  self
+     */ 
+    public function setCreatedBy(?string $createdBy): static
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }

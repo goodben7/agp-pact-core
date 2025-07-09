@@ -20,6 +20,7 @@ use App\Exception\UnavailableDataException;
 use App\Message\ComplaintRegisteredMessage;
 use Symfony\Bundle\SecurityBundle\Security;
 use App\Constant\GeneralParameterComplaintType;
+use App\Entity\User;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class ComplaintManager
@@ -127,8 +128,18 @@ readonly class ComplaintManager
                 }
             }
         }
-        
-        
+        $userId = null;
+
+        if (!$data->isAnonymous) {
+
+            /**
+             * @var User $user
+             */
+            $user = $this->security->getUser();
+           
+            $userId = $user->getId();
+        }
+
         $complaint = (new Complaint())
             ->setComplaintType($data->complaintType)
             ->setIncidentDate($data->incidentDate)
@@ -142,7 +153,9 @@ readonly class ComplaintManager
             ->setComplainant($complainant)
             ->setAssignedTo($data->assignedTo)
             ->setIsSensitive($isSensitive)
-            ->setDeclarationDate(new \DateTimeImmutable());
+            ->setDeclarationDate(new \DateTimeImmutable())
+            ->setCreatedBy($userId);
+        
 
         $initialStep = $this->em->getRepository(WorkflowStep::class)->findOneBy(['isInitial' => true]);
         if (!$initialStep)
