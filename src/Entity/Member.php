@@ -27,8 +27,7 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 #[ORM\Table(name: '`member`')]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
-    normalizationContext: ['groups' => 'member:get'],
-    operations:[
+    operations: [
         new Get(
             security: 'is_granted("ROLE_MEMBER_DETAILS")',
             provider: ItemProvider::class
@@ -38,8 +37,8 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
             provider: CollectionProvider::class
         ),
         new Post(
-            security: 'is_granted("ROLE_MEMBER_CREATE")',
             denormalizationContext: ['groups' => 'member:post',],
+            security: 'is_granted("ROLE_MEMBER_CREATE")',
             processor: PersistProcessor::class,
         ),
         new Post(
@@ -50,11 +49,12 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
             processor: RequireAccessProcessor::class,
         ),
         new Patch(
-            security: 'is_granted("ROLE_MEMBER_UPDATE")',
             denormalizationContext: ['groups' => 'member:patch',],
+            security: 'is_granted("ROLE_MEMBER_UPDATE")',
             processor: PersistProcessor::class,
         ),
-    ]
+    ],
+    normalizationContext: ['groups' => 'member:get']
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'id' => 'exact',
@@ -151,7 +151,7 @@ class Member
 
     /**
      * Get the value of createdAt
-     */ 
+     */
     public function getCreatedAt(): \DateTimeImmutable|null
     {
         return $this->createdAt;
@@ -161,7 +161,7 @@ class Member
      * Set the value of createdAt
      *
      * @return  self
-     */ 
+     */
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
@@ -177,7 +177,7 @@ class Member
 
     /**
      * Get the value of active
-     */ 
+     */
     public function isActive(): bool|null
     {
         return $this->active;
@@ -187,7 +187,7 @@ class Member
      * Set the value of active
      *
      * @return  self
-     */ 
+     */
     public function setActive(bool $active): static
     {
         $this->active = $active;
@@ -197,7 +197,7 @@ class Member
 
     /**
      * Get the value of userId
-     */ 
+     */
     public function getUserId(): string|null
     {
         return $this->userId;
@@ -207,7 +207,7 @@ class Member
      * Set the value of userId
      *
      * @return  self
-     */ 
+     */
     public function setUserId(?string $userId): static
     {
         $this->userId = $userId;
@@ -217,7 +217,7 @@ class Member
 
     /**
      * Get the value of email
-     */ 
+     */
     public function getEmail(): string|null
     {
         return $this->email;
@@ -227,7 +227,7 @@ class Member
      * Set the value of email
      *
      * @return  self
-     */ 
+     */
     public function setEmail(?string $email): static
     {
         $this->email = $email;
@@ -237,7 +237,7 @@ class Member
 
     /**
      * Get the value of phone
-     */ 
+     */
     public function getPhone(): string|null
     {
         return $this->phone;
@@ -247,7 +247,7 @@ class Member
      * Set the value of phone
      *
      * @return  self
-     */ 
+     */
     public function setPhone(?string $phone): static
     {
         $this->phone = $phone;
