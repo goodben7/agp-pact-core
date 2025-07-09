@@ -37,7 +37,7 @@ use App\State\Complaint\ComplaintApplyActionProcessor;
             provider: ComplaintProvider::class
         ),
         new Post(
-            //security: "is_granted('ROLE_COMPLAINT_CREATE')",
+        //security: "is_granted('ROLE_COMPLAINT_CREATE')",
             input: ComplaintCreateDTO::class,
             processor: CreateComplaintProcessor::class
         ),
@@ -245,6 +245,7 @@ class Complaint
     private ?Company $involvedCompany = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['complaint:get'])]
     private ?string $proposedResolutionDescription = null;
 
 
@@ -256,25 +257,39 @@ class Complaint
     private ?bool $isSensitive = false;
 
     #[ORM\Column]
+    #[Groups(['complaint:get'])]
     private ?bool $closed = false;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complaint:get'])]
     private ?string $satisfactionComments = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complaint:get'])]
     private ?string $closureComments = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['complaint:get'])]
     private ?\DateTimeImmutable $executionDate = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    #[Groups(['complaint:get'])]
     private ?string $estimatedCost = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['complaint:get'])]
     private ?\DateTimeImmutable $proposedResolutionEndDate = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['complaint:get'])]
     private ?\DateTimeImmutable $proposedResolutionStartDate = null;
+
+    /**
+     * @var Collection<int, ComplaintStepAssignment>
+     */
+    #[ORM\OneToMany(targetEntity: ComplaintStepAssignment::class, mappedBy: 'complaint', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups(['complaint:get'])]
+    private Collection $complaintStepAssignments;
 
     public function __construct()
     {
@@ -283,6 +298,7 @@ class Complaint
         $this->attachedFiles = new ArrayCollection();
         $this->affectedSpecies = new ArrayCollection();
         $this->availableActions = new ArrayCollection();
+        $this->complaintStepAssignments = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -915,6 +931,36 @@ class Complaint
     public function setProposedResolutionStartDate(?\DateTimeImmutable $proposedResolutionStartDate): static
     {
         $this->proposedResolutionStartDate = $proposedResolutionStartDate;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ComplaintStepAssignment>
+     */
+    public function getComplaintStepAssignments(): Collection
+    {
+        return $this->complaintStepAssignments;
+    }
+
+    public function addComplaintStepAssignment(ComplaintStepAssignment $complaintStepAssignment): static
+    {
+        if (!$this->complaintStepAssignments->contains($complaintStepAssignment)) {
+            $this->complaintStepAssignments->add($complaintStepAssignment);
+            $complaintStepAssignment->setComplaint($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComplaintStepAssignment(ComplaintStepAssignment $complaintStepAssignment): static
+    {
+        if ($this->complaintStepAssignments->removeElement($complaintStepAssignment)) {
+            // set the owning side to null (unless already changed)
+            if ($complaintStepAssignment->getComplaint() === $this) {
+                $complaintStepAssignment->setComplaint(null);
+            }
+        }
 
         return $this;
     }
