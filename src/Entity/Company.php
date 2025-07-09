@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Metadata\Get;
 use App\Doctrine\IdGenerator;
 use ApiPlatform\Metadata\Post;
@@ -53,6 +54,7 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
     'active' => 'exact',
     'roadAxes' => 'exact',
 ])]
+#[ApiFilter(BooleanFilter::class, properties: ['canProcessSensitiveComplaint'])]
 class Company
 {
     public const ID_PREFIX = "CN";
@@ -115,6 +117,10 @@ class Company
      */
     #[ORM\OneToMany(targetEntity: ComplaintStepAssignment::class, mappedBy: 'assignedCompany', orphanRemoval: true)]
     private Collection $complaintStepAssignments;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['company:get', 'company:post', 'company:patch'])]
+    private ?bool $canProcessSensitiveComplaint = null;
 
     public function __construct()
     {
@@ -299,6 +305,18 @@ class Company
                 $complaintStepAssignment->setAssignedCompany(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isCanProcessSensitiveComplaint(): ?bool
+    {
+        return $this->canProcessSensitiveComplaint;
+    }
+
+    public function setCanProcessSensitiveComplaint(?bool $canProcessSensitiveComplaint): static
+    {
+        $this->canProcessSensitiveComplaint = $canProcessSensitiveComplaint;
 
         return $this;
     }
