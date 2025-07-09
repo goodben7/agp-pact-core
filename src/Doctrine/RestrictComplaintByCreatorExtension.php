@@ -24,19 +24,17 @@ class RestrictComplaintByCreatorExtension implements QueryCollectionExtensionInt
 
     private function restrict(QueryBuilder $queryBuilder, string $resourceClass): void
     {
-        if (Complaint::class !== $resourceClass) {
+        if (Complaint::class !== $resourceClass)
             return;
-        }
 
         /**
          * @var User $user
          */
         $user = $this->security->getUser();
-        if (!$user) {
+        if (!$user)
             return;
-        }
 
-        if (UserProxyInterface::PERSON_LAMBDA === $user->getPersonType()) {
+        if (UserProxyInterface::PERSON_LAMBDA === $user->getPersonType() || UserProxyInterface::PERSON_COMPLAINANT === $user->getPersonType()) {
             $rootAlias = $queryBuilder->getRootAliases()[0];
             $queryBuilder->andWhere(sprintf('%s.createdBy = :currentUser', $rootAlias));
             $queryBuilder->setParameter('currentUser', $user->getId());
