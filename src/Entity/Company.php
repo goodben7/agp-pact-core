@@ -102,10 +102,24 @@ class Company
     #[Groups(['company:get'])]
     private Collection $members;
 
+    /**
+     * @var Collection<int, RoadAxis>
+     */
+    #[ORM\ManyToMany(targetEntity: RoadAxis::class)]
+    private Collection $roadAxes;
+
+    /**
+     * @var Collection<int, ComplaintStepAssignment>
+     */
+    #[ORM\OneToMany(targetEntity: ComplaintStepAssignment::class, mappedBy: 'assignedCompany', orphanRemoval: true)]
+    private Collection $complaintStepAssignments;
+
     public function __construct()
     {
         $this->complaints = new ArrayCollection();
         $this->members = new ArrayCollection();
+        $this->roadAxes = new ArrayCollection();
+        $this->complaintStepAssignments = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -227,6 +241,60 @@ class Company
             // set the owning side to null (unless already changed)
             if ($member->getCompany() === $this) {
                 $member->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RoadAxis>
+     */
+    public function getRoadAxes(): Collection
+    {
+        return $this->roadAxes;
+    }
+
+    public function addRoadAxe(RoadAxis $roadAxe): static
+    {
+        if (!$this->roadAxes->contains($roadAxe)) {
+            $this->roadAxes->add($roadAxe);
+        }
+
+        return $this;
+    }
+
+    public function removeRoadAxe(RoadAxis $roadAxe): static
+    {
+        $this->roadAxes->removeElement($roadAxe);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ComplaintStepAssignment>
+     */
+    public function getComplaintStepAssignments(): Collection
+    {
+        return $this->complaintStepAssignments;
+    }
+
+    public function addComplaintStepAssignment(ComplaintStepAssignment $complaintStepAssignment): static
+    {
+        if (!$this->complaintStepAssignments->contains($complaintStepAssignment)) {
+            $this->complaintStepAssignments->add($complaintStepAssignment);
+            $complaintStepAssignment->setAssignedCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComplaintStepAssignment(ComplaintStepAssignment $complaintStepAssignment): static
+    {
+        if ($this->complaintStepAssignments->removeElement($complaintStepAssignment)) {
+            // set the owning side to null (unless already changed)
+            if ($complaintStepAssignment->getAssignedCompany() === $this) {
+                $complaintStepAssignment->setAssignedCompany(null);
             }
         }
 
