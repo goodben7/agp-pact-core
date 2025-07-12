@@ -48,7 +48,8 @@ final class DashboardStatisticsProvider implements ProviderInterface
                 ->join('c.currentWorkflowStep', 'ws')
                 ->leftJoin('ws.uiConfiguration', 'wsuic');
             $applyCommonFilters($qb1, 'c');
-            $qb1->groupBy('status');
+            // --- FIX 1: Group by the expression, not the alias ---
+            $qb1->groupBy('COALESCE(wsuic.title, ws.name)');
             $stats->complaintsByStatus = $qb1->getQuery()->getResult();
 
             $qb2 = $this->entityManager->createQueryBuilder()
@@ -66,10 +67,11 @@ final class DashboardStatisticsProvider implements ProviderInterface
             $qb5->groupBy('c.isSensitive');
             $stats->complaintsBySensitivity = $qb5->getQuery()->getResult();
 
+            $caseStatement = 'CASE WHEN ws.name IN (:finalClosedNames) THEN \'closed\' ELSE \'open\' END';
             $statsQb = $this->entityManager->createQueryBuilder()
                 ->select(
                     'c.isSensitive',
-                    'CASE WHEN ws.name IN (:finalClosedNames) THEN \'closed\' ELSE \'open\' END AS status',
+                    "$caseStatement AS status",
                     'COUNT(c.id) AS count'
                 )
                 ->from(Complaint::class, 'c')
@@ -77,7 +79,8 @@ final class DashboardStatisticsProvider implements ProviderInterface
                 ->setParameter('finalClosedNames', $finalClosedStepNames);
 
             $applyCommonFilters($statsQb, 'c');
-            $statsQb->groupBy('c.isSensitive', 'status');
+            // --- FIX 2: Group by the expression, not the alias ---
+            $statsQb->groupBy('c.isSensitive', $caseStatement);
             $results = $statsQb->getQuery()->getResult();
 
             $stats->complaintStats = [
