@@ -47,10 +47,15 @@ final class DashboardStatistics
     #[Groups(["dashboard_stats:read"])]
     public array $complaintStats = [];
 
+    #[Groups(["dashboard_stats:read"])]
     public ?int $totalComplaints = null;
+    #[Groups(["dashboard_stats:read"])]
     public ?int $openComplaints = null;
+    #[Groups(["dashboard_stats:read"])]
     public int $totalSensitiveComplaints = 0;
+    #[Groups(["dashboard_stats:read"])]
     public int $openSensitiveComplaints = 0;
+    #[Groups(["dashboard_stats:read"])]
     public int $closedSensitiveComplaints = 0;
 
     #[Groups(["dashboard_stats:read"])]
