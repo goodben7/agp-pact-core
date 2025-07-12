@@ -8,7 +8,6 @@ use App\ApiResource\DashboardStatistics;
 use App\Constant\WorkflowStepName;
 use App\Entity\Complaint;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
 
@@ -25,9 +24,8 @@ final class DashboardStatisticsProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        if ($operation->getName() !== 'get_dashboard_statistics') {
+        if ($operation->getName() !== 'get_dashboard_statistics')
             return null;
-        }
 
         $stats = new DashboardStatistics();
 
@@ -140,50 +138,41 @@ final class DashboardStatisticsProvider implements ProviderInterface
         return $count > 0 ? (float)($totalDays / $count) : null;
     }
 
-    /**
-     * Refactored for performance: executes 1 query instead of 12.
-     */
+
     private function getComplaintsDeclaredMonthly(?string $locationId, ?string $complaintTypeId): array
     {
-        $now = new \DateTimeImmutable();
-        $twelveMonthsAgo = $now->modify('-11 months')->modify('first day of this month')->setTime(0, 0, 0);
-
-        // This uses a database-specific function, assuming MySQL/PostgreSQL.
-        // For full portability, you might need platform-specific logic.
-        $monthExpression = new Func('SUBSTRING', 'c.declarationDate', 1, 7);
-
-        $qb = $this->entityManager->createQueryBuilder()
-            ->select($monthExpression . " as month_key", "COUNT(c.id) as count")
-            ->from(Complaint::class, 'c')
-            ->where('c.declarationDate >= :startDate')
-            ->setParameter('startDate', $twelveMonthsAgo)
-            ->groupBy('month_key')
-            ->orderBy('month_key', 'ASC');
-
-        if ($locationId) {
-            $qb
-                ->andWhere('c.location = :locationIdFiltered')
-                ->setParameter('locationIdFiltered', $locationId);
-        }
-        if ($complaintTypeId) {
-            $qb
-                ->andWhere('c.complaintType = :complaintTypeIdFiltered')
-                ->setParameter('complaintTypeIdFiltered', $complaintTypeId);
-        }
-
-        $results = $qb->getQuery()->getResult();
-        $resultsByMonth = array_column($results, 'count', 'month_key');
-
         $data = [];
-        $dateCursor = $twelveMonthsAgo;
+        $now = new \DateTimeImmutable();
 
-        while ($dateCursor <= $now) {
-            $monthKey = $dateCursor->format('Y-m');
+        for ($i = 11; $i >= 0; $i--) {
+            $month = $now->modify("-{$i} months");
+            $startOfMonth = $month->modify('first day of this month')->setTime(0, 0, 0);
+            $endOfMonth = $month->modify('last day of this month')->setTime(23, 59, 59);
+
+            $qb = $this->entityManager->createQueryBuilder()
+                ->select('COUNT(c.id)')
+                ->from(Complaint::class, 'c')
+                ->where('c.declarationDate BETWEEN :start AND :end')
+                ->setParameter('start', $startOfMonth)
+                ->setParameter('end', $endOfMonth);
+
+            if ($locationId) {
+                $qb
+                    ->andWhere('c.location = :locationIdFiltered')
+                    ->setParameter('locationIdFiltered', $locationId);
+            }
+            if ($complaintTypeId) {
+                $qb
+                    ->andWhere('c.complaintType = :complaintTypeIdFiltered')
+                    ->setParameter('complaintTypeIdFiltered', $complaintTypeId);
+            }
+
+            $count = $qb->getQuery()->getSingleScalarResult();
+
             $data[] = [
-                'month' => $monthKey,
-                'count' => (int)($resultsByMonth[$monthKey] ?? 0)
+                'month' => $month->format('Y-m'),
+                'count' => (int)$count
             ];
-            $dateCursor = $dateCursor->modify('+1 month');
         }
 
         return $data;
