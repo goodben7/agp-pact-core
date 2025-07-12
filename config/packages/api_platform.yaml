@@ -28,3 +28,5 @@ api_platform:
             rfc_7807_compliant_errors: true
         pagination_enabled: false
     use_symfony_listeners: true
+    eager_loading:
+        max_joins: 100
