@@ -41,11 +41,12 @@ final class DashboardStatisticsProvider implements ProviderInterface
             $finalClosedStepNames = [WorkflowStepName::CLOSED, WorkflowStepName::ESCALATED_JUSTICE, WorkflowStepName::NON_RECEIVABLE];
 
             $qb1 = $this->entityManager->createQueryBuilder()
-                ->select('ws.name AS status, COUNT(c.id) AS count')
+                ->select('wsuic.title AS status, COUNT(c.id) AS count')
                 ->from(Complaint::class, 'c')
-                ->join('c.currentWorkflowStep', 'ws');
+                ->join('c.currentWorkflowStep', 'ws')
+                ->join('ws.uiConfiguration', 'wsuic');
             $applyCommonFilters($qb1, 'c');
-            $qb1->groupBy('ws.name');
+            $qb1->groupBy('wsuic.name');
             $stats->complaintsByStatus = $qb1->getQuery()->getResult();
 
             $qb2 = $this->entityManager->createQueryBuilder()
