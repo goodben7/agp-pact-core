@@ -12,6 +12,7 @@ use App\Doctrine\IdGenerator;
 use App\Repository\ComplaintHistoryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ComplaintHistoryRepository::class)]
 #[ApiResource(
@@ -51,31 +52,39 @@ class ComplaintHistory
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
+    #[Groups(['complaint_history:get', 'complaint_history:list'])]
     private ?string $id = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complaint_history:get', 'complaint_history:list'])]
     private ?Complaint $complaint = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['complaint_history:get', 'complaint_history:list'])]
     private ?WorkflowStep $oldWorkflowStep = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complaint_history:get', 'complaint_history:list'])]
     private ?WorkflowStep $newWorkflowStep = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complaint_history:get', 'complaint_history:list'])]
     private ?WorkflowAction $action = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complaint_history:get', 'complaint_history:list'])]
     private ?string $comments = null;
 
     #[ORM\Column]
+    #[Groups(['complaint_history:get', 'complaint_history:list'])]
     private ?\DateTimeImmutable $actionDate = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['complaint_history:get', 'complaint_history:list'])]
     private ?User $actor = null;
 
     public function getId(): ?string
