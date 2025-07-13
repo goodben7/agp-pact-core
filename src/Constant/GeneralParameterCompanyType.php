@@ -28,6 +28,9 @@ class GeneralParameterCompanyType
     public const INTERNAL_COMMITTEE_CODE = 'INTERNAL_COMMITTEE'; // Comité Interne de l'organisation
     public const INTERNAL_COMMITTEE_VALUE = 'Comité Interne';
 
+    public const WORLD_BANK_CODE = 'WORLD_BANK';
+    public const WORLD_BANK_VALUE = 'Banque Mondiale';
+
     public const OTHER_CODE = 'OTHER';
     public const OTHER_VALUE = 'Autre';
 }

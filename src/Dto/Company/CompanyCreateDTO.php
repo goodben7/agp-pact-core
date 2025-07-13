@@ -8,5 +8,7 @@ class CompanyCreateDTO
     public ?string $type = null;
     public ?string $contactEmail = null;
     public ?string $contactPhone = null;
-    public ?bool $isActive = true;
+    public ?bool $active = true;
+    public ?array $roadAxes = [];
+    public ?bool $canProcessSensitiveComplaint = null;
 }

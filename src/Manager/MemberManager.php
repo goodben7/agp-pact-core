@@ -55,6 +55,7 @@ readonly class MemberManager
                 GeneralParameterCompanyType::GOVERNMENT_AGENCY_CODE => UserProxyInterface::PERSON_CONTROL_MISSION,
                 GeneralParameterCompanyType::INTERNAL_COMMITTEE_CODE => UserProxyInterface::PERSON_COMMITTEE,
                 GeneralParameterCompanyType::LOCAL_COMMITTEE_CODE => UserProxyInterface::PERSON_COMMITTEE,
+                GeneralParameterCompanyType::WORLD_BANK_CODE => UserProxyInterface::PERSON_WORLD_BANK,
                 default => UserProxyInterface::PERSON_LAMBDA,
             };
             
