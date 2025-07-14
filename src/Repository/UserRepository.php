@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Member;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -57,4 +58,25 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * 
+     * @param string $userId
+     * @return string|null 
+     */
+    public function findCompanyIdByUserId(string $userId): ?string
+    {
+        $entityManager = $this->getEntityManager();
+        
+        $memberRepository = $entityManager->getRepository(Member::class);
+        $member = $memberRepository->findOneBy(['userId' => $userId]);
+        
+        if (!$member) {
+            return null;
+        }
+        
+        $company = $member->getCompany();
+        
+        return $company?->getId();
+    }
 }
