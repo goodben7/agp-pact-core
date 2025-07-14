@@ -2,24 +2,27 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Metadata\Get;
 use App\Doctrine\IdGenerator;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use App\Dto\Company\CompanyCreateDTO;
 use App\Repository\CompanyRepository;
 use ApiPlatform\Metadata\GetCollection;
+use Doctrine\Common\Collections\Collection;
+use App\State\Company\CompanyCreateProcessor;
+use App\State\Company\CompanyUpdateProcessor;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
+use Doctrine\Common\Collections\ArrayCollection;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Doctrine\Common\State\PersistProcessor;
+use App\Dto\Company\CompanyUpdateDTO;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 #[ApiResource(
@@ -33,14 +36,14 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
             provider: ItemProvider::class
         ),
         new Post(
-            denormalizationContext: ['groups' => 'company:post',],
             security: 'is_granted("ROLE_COMPANY_CREATE")',
-            processor: PersistProcessor::class,
+            input: CompanyCreateDTO::class,
+            processor: CompanyCreateProcessor::class,
         ),
         new Patch(
-            denormalizationContext: ['groups' => 'company:patch',],
             security: 'is_granted("ROLE_COMPANY_UPDATE")',
-            processor: PersistProcessor::class,
+            input: CompanyUpdateDTO::class,
+            processor: CompanyUpdateProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => 'company:get']
