@@ -38,7 +38,9 @@ readonly class ComplaintApplyActionProcessor implements ProcessorInterface
             throw new \RuntimeException('No current request found.');
         }
 
-        $data->setFromArray($request->request->all() + $request->files->all());
+        $payload = json_decode($request->getContent(), true) ?? [];
+
+        $data->setFromArray($request->request->all() + $request->files->all() + $payload);
 
         $complaint = $this->em->getRepository(Complaint::class)->findOneBy(['id' => $uriVariables['id']]);
         if (!$complaint)

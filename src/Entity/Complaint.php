@@ -246,6 +246,7 @@ class Complaint
     private ?\DateTimeImmutable $incidentDate = null;
 
     #[ORM\ManyToOne(inversedBy: 'complaints')]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?Company $involvedCompany = null;
 
     #[ORM\Column(length: 255, nullable: true)]

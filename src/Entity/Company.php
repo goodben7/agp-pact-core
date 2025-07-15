@@ -66,13 +66,13 @@ class Company
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['company:get'])]
+    #[Groups(['company:get', 'complaint:get', 'complaint:list'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
-    #[Groups(['company:get', 'company:post', 'company:patch'])]
+    #[Groups(['company:get', 'company:post', 'company:patch', 'complaint:get', 'complaint:list'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne]
