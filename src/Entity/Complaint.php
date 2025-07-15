@@ -188,9 +188,9 @@ class Complaint
     #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $escalationComments = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\ManyToOne]
     #[Groups(['complaint:get', 'complaint:list'])]
-    private ?string $closureReason = null;
+    private ?GeneralParameter $closureReason = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['complaint:get', 'complaint:list'])]
@@ -580,12 +580,12 @@ class Complaint
         return $this;
     }
 
-    public function getClosureReason(): ?string
+    public function getClosureReason(): ?GeneralParameter
     {
         return $this->closureReason;
     }
 
-    public function setClosureReason(?string $closureReason): static
+    public function setClosureReason(?GeneralParameter $closureReason): static
     {
         $this->closureReason = $closureReason;
 

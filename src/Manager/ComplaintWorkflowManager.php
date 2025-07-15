@@ -127,6 +127,7 @@ readonly class ComplaintWorkflowManager
             'assignedTo' => 'setAssignedTo',
             'currentAssignee' => 'setCurrentAssignee',
             'involvedCompany' => 'setInvolvedCompany',
+            'closed' => 'setClosed',
         ];
 
         foreach ($fieldSetterMap as $fieldName => $setterMethod) {

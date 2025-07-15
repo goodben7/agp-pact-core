@@ -5,7 +5,6 @@ namespace App\Provider;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\DashboardStatistics;
-use App\Constant\WorkflowStepName;
 use App\Entity\Complaint;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
@@ -38,8 +37,8 @@ final class DashboardStatisticsProvider implements ProviderInterface
 
         try {
             $applyCommonFilters = $this->getClosure($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
-            $finalClosedStepNames = [WorkflowStepName::CLOSED, WorkflowStepName::ESCALATED_JUSTICE, WorkflowStepName::NON_RECEIVABLE];
 
+            // Cette requête reste inchangée, elle fournit le détail par statut de workflow.
             $qb1 = $this->entityManager->createQueryBuilder()
                 ->select('COUNT(c.id) AS count')
                 ->addSelect('COALESCE(wsuic.title, ws.name) AS status')
@@ -47,11 +46,8 @@ final class DashboardStatisticsProvider implements ProviderInterface
                 ->from(Complaint::class, 'c')
                 ->join('c.currentWorkflowStep', 'ws')
                 ->leftJoin('ws.uiConfiguration', 'wsuic');
-
             $applyCommonFilters($qb1, 'c');
-
             $qb1->groupBy('status_expr');
-
             $stats->complaintsByStatus = $qb1->getQuery()->getResult();
 
             $qb2 = $this->entityManager->createQueryBuilder()
@@ -69,15 +65,14 @@ final class DashboardStatisticsProvider implements ProviderInterface
             $qb5->groupBy('c.isSensitive');
             $stats->complaintsBySensitivity = $qb5->getQuery()->getResult();
 
+            // MODIFICATION : La logique ouvert/fermé se base maintenant sur `c.closed`.
             $statsQb = $this->entityManager->createQueryBuilder()
                 ->select(
                     'c.isSensitive',
-                    'CASE WHEN ws.name IN (:finalClosedNames) THEN \'closed\' ELSE \'open\' END AS status',
+                    'CASE WHEN c.closed = true THEN \'closed\' ELSE \'open\' END AS status',
                     'COUNT(c.id) AS count'
                 )
-                ->from(Complaint::class, 'c')
-                ->join('c.currentWorkflowStep', 'ws')
-                ->setParameter('finalClosedNames', $finalClosedStepNames);
+                ->from(Complaint::class, 'c');
 
             $applyCommonFilters($statsQb, 'c');
             $statsQb->groupBy('c.isSensitive', 'status');
@@ -116,10 +111,13 @@ final class DashboardStatisticsProvider implements ProviderInterface
 
     private function calculateAverageResolutionTime(?string $roadAxisId, ?string $locationId, ?string $complaintTypeId, ?string $startDate, ?string $endDate): ?float
     {
+        // MODIFICATION : On filtre aussi sur les plaintes où `closed` est `true`.
         $qb = $this->entityManager->createQueryBuilder()
             ->select('c.declarationDate, c.closureDate')
             ->from(Complaint::class, 'c')
-            ->where('c.closureDate IS NOT NULL');
+            ->where('c.closureDate IS NOT NULL')
+            ->andWhere('c.closed = :isClosed')
+            ->setParameter('isClosed', true);
 
         $applyCommonFiltersForAverage = $this->getClosure($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
         $applyCommonFiltersForAverage($qb, 'c');
