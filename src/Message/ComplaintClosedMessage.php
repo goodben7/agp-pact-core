@@ -12,4 +12,14 @@ class ComplaintClosedMessage implements EventMessageInterface
     )
     {
     }
+
+    public function getComplaintId(): string
+    {
+        return $this->complaintId;
+    }
+
+    public function getClosureReason(): string
+    {
+        return $this->closureReason;
+    }
 }
