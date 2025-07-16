@@ -2,7 +2,11 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
 use App\Dto\Complaint\AttachedFileDto;
@@ -10,12 +14,15 @@ use App\Repository\AttachedFileRepository;
 use App\State\Complaint\UploadAttachedFileProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: AttachedFileRepository::class)]
 #[Vich\Uploadable]
 #[ApiResource(
     operations: [
+        new GetCollection(),
+        new Get(),
         new Post(
             inputFormats: [
                 'json' => ['application/json', 'application/merge-patch+json'],
@@ -24,6 +31,18 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
             input: AttachedFileDto::class,
             processor: UploadAttachedFileProcessor::class
         )
+    ],
+    normalizationContext: ['groups' => 'attached_file:get']
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'id' => 'exact',
+        'complaint.id' => 'exact',
+        'fileType.code' => 'exact',
+        'fileType.category' => 'exact',
+        'workflowStep.id' => 'exact',
+        'uploadedBy.id' => 'exact',
     ]
 )]
 class AttachedFile
@@ -34,16 +53,20 @@ class AttachedFile
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
+    #[Groups(['attached_file:get'])]
     private ?string $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'attachedFiles')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['attached_file:get'])]
     private ?Complaint $complaint = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['attached_file:get'])]
     private ?string $fileName = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['attached_file:get'])]
     private ?string $filePath = null;
 
     #[Vich\UploadableField(mapping: 'attached_files', fileNameProperty: 'filePath', size: 'fileSize', mimeType: 'mimeType', originalName: 'fileName')]
@@ -51,22 +74,28 @@ class AttachedFile
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['attached_file:get'])]
     private ?GeneralParameter $fileType = null;
 
     #[ORM\Column]
+    #[Groups(['attached_file:get'])]
     private ?int $fileSize = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['attached_file:get'])]
     private ?string $mimeType = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['attached_file:get'])]
     private ?WorkflowStep $workflowStep = null;
 
     #[ORM\Column]
+    #[Groups(['attached_file:get'])]
     private ?\DateTimeImmutable $uploadedAt = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['attached_file:get'])]
     private ?User $uploadedBy = null;
 
     public function __construct()

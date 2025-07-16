@@ -93,7 +93,7 @@ class Complaint
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['complaint:get', 'complaint:list', 'complaint_history:get', 'complaint_history:list'])]
+    #[Groups(['complaint:get', 'complaint:list', 'complaint_history:get', 'complaint_history:list', 'attached_file:get'])]
     private ?string $id = null;
 
     #[ORM\ManyToOne]

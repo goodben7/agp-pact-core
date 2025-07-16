@@ -8,7 +8,7 @@
       <jdbc-url>jdbc:mysql://127.0.0.1:3306/agp</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="agp-pact@localhost" uuid="174232e9-4f43-45d2-ac92-4a11b1688ad6">
+    <data-source source="LOCAL" name="agp-pact@localhost" uuid="34959a74-e165-4b4b-a261-2e21068b06f2">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
