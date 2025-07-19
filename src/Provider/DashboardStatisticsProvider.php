@@ -38,7 +38,6 @@ final class DashboardStatisticsProvider implements ProviderInterface
         try {
             $applyCommonFilters = $this->getClosure($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
 
-            // Cette requête reste inchangée, elle fournit le détail par statut de workflow.
             $qb1 = $this->entityManager->createQueryBuilder()
                 ->select('COUNT(c.id) AS count')
                 ->addSelect('COALESCE(wsuic.title, ws.name) AS status')
@@ -65,11 +64,14 @@ final class DashboardStatisticsProvider implements ProviderInterface
             $qb5->groupBy('c.isSensitive');
             $stats->complaintsBySensitivity = $qb5->getQuery()->getResult();
 
-            // MODIFICATION : La logique ouvert/fermé se base maintenant sur `c.closed`.
             $statsQb = $this->entityManager->createQueryBuilder()
                 ->select(
                     'c.isSensitive',
-                    'CASE WHEN c.closed = true THEN \'closed\' ELSE \'open\' END AS status',
+                    "CASE
+                        WHEN c.isReceivable = false THEN 'rejected'
+                        WHEN c.closed = true THEN 'closed'
+                        ELSE 'open'
+                     END AS status",
                     'COUNT(c.id) AS count'
                 )
                 ->from(Complaint::class, 'c');
@@ -79,8 +81,8 @@ final class DashboardStatisticsProvider implements ProviderInterface
             $results = $statsQb->getQuery()->getResult();
 
             $stats->complaintStats = [
-                'general' => ['total' => 0, 'open' => 0, 'closed' => 0],
-                'sensitive' => ['total' => 0, 'open' => 0, 'closed' => 0],
+                'general' => ['total' => 0, 'open' => 0, 'closed' => 0, 'rejected' => 0],
+                'sensitive' => ['total' => 0, 'open' => 0, 'closed' => 0, 'rejected' => 0],
             ];
 
             foreach ($results as $row) {
@@ -88,12 +90,15 @@ final class DashboardStatisticsProvider implements ProviderInterface
                 $status = $row['status'];
                 $count = (int)$row['count'];
 
-                $stats->complaintStats[$category][$status] = $count;
-                $stats->complaintStats[$category]['total'] += $count;
+                if (array_key_exists($status, $stats->complaintStats[$category])) {
+                    $stats->complaintStats[$category][$status] = $count;
+                    $stats->complaintStats[$category]['total'] += $count;
+                }
             }
 
             $stats->totalComplaints = $stats->complaintStats['general']['total'] + $stats->complaintStats['sensitive']['total'];
             $stats->openComplaints = $stats->complaintStats['general']['open'] + $stats->complaintStats['sensitive']['open'];
+            $stats->totalRejectedComplaints = $stats->complaintStats['general']['rejected'] + $stats->complaintStats['sensitive']['rejected'];
             $stats->totalSensitiveComplaints = $stats->complaintStats['sensitive']['total'];
             $stats->openSensitiveComplaints = $stats->complaintStats['sensitive']['open'];
             $stats->closedSensitiveComplaints = $stats->complaintStats['sensitive']['closed'];
@@ -111,7 +116,6 @@ final class DashboardStatisticsProvider implements ProviderInterface
 
     private function calculateAverageResolutionTime(?string $roadAxisId, ?string $locationId, ?string $complaintTypeId, ?string $startDate, ?string $endDate): ?float
     {
-        // MODIFICATION : On filtre aussi sur les plaintes où `closed` est `true`.
         $qb = $this->entityManager->createQueryBuilder()
             ->select('c.declarationDate, c.closureDate')
             ->from(Complaint::class, 'c')

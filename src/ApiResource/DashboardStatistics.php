@@ -40,8 +40,8 @@ final class DashboardStatistics
 
     /**
      * @var array{
-     *     general: array{total: int, open: int, closed: int},
-     *     sensitive: array{total: int, open: int, closed: int}
+     *     general: array{total: int, open: int, closed: int, rejected: int},
+     *     sensitive: array{total: int, open: int, closed: int, rejected: int}
      * }
      */
     #[Groups(["dashboard_stats:read"])]
@@ -51,6 +51,10 @@ final class DashboardStatistics
     public ?int $totalComplaints = null;
     #[Groups(["dashboard_stats:read"])]
     public ?int $openComplaints = null;
+
+    #[Groups(["dashboard_stats:read"])]
+    public int $totalRejectedComplaints = 0;
+
     #[Groups(["dashboard_stats:read"])]
     public int $totalSensitiveComplaints = 0;
     #[Groups(["dashboard_stats:read"])]
