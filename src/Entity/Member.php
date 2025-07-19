@@ -7,6 +7,7 @@ use App\Doctrine\IdGenerator;
 use App\Dto\RequireAccessDto;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use App\Repository\MemberRepository;
@@ -60,16 +61,18 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
     'id' => 'exact',
     'displayName' => 'ipartial',
     'company' => 'exact',
-    'active' => 'exact'
+    'active' => 'exact',
+    'jobTitle' => 'ipartial',
+    'rank' => 'ipartial',
 ])]
-#[ApiFilter(OrderFilter::class, properties: ['createdAt'])]
-#[ApiFilter(DateFilter::class, properties: ['createdAt'])]
+#[ApiFilter(OrderFilter::class, properties: ['createdAt', 'contractStartDate', 'contractEndDate'])]
+#[ApiFilter(DateFilter::class, properties: ['createdAt', 'contractStartDate', 'contractEndDate'])]
 class Member
 {
     public const ID_PREFIX = "ME";
 
     #[ORM\Id]
-    #[ORM\GeneratedValue( strategy: 'CUSTOM')]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
     #[Groups(['member:get'])]
@@ -92,7 +95,7 @@ class Member
     #[Groups(['member:get', 'member:post', 'member:patch'])]
     private ?bool $active = null;
 
-    #[ORM\Column(length: 180, nullable:true)]
+    #[ORM\Column(length: 180, nullable: true)]
     #[Groups(['member:get', 'member:post'])]
     private ?string $email = null;
 
@@ -107,6 +110,26 @@ class Member
     #[ORM\Column(length: 16, nullable: true)]
     #[Groups(['member:get'])]
     private ?string $userId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['member:get', 'member:post', 'member:patch'])]
+    private ?string $profilePicture = null;
+
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    #[Groups(['member:get', 'member:post', 'member:patch'])]
+    private ?\DateTimeImmutable $contractStartDate = null;
+
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    #[Groups(['member:get', 'member:post', 'member:patch'])]
+    private ?\DateTimeImmutable $contractEndDate = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['member:get', 'member:post', 'member:patch'])]
+    private ?string $jobTitle = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    #[Groups(['member:get', 'member:post', 'member:patch'])]
+    private ?string $rank = null;
 
     public function getId(): ?string
     {
@@ -251,6 +274,66 @@ class Member
     public function setPhone(?string $phone): static
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getProfilePicture(): ?string
+    {
+        return $this->profilePicture;
+    }
+
+    public function setProfilePicture(?string $profilePicture): static
+    {
+        $this->profilePicture = $profilePicture;
+
+        return $this;
+    }
+
+    public function getContractStartDate(): ?\DateTimeImmutable
+    {
+        return $this->contractStartDate;
+    }
+
+    public function setContractStartDate(?\DateTimeImmutable $contractStartDate): static
+    {
+        $this->contractStartDate = $contractStartDate;
+
+        return $this;
+    }
+
+    public function getContractEndDate(): ?\DateTimeImmutable
+    {
+        return $this->contractEndDate;
+    }
+
+    public function setContractEndDate(?\DateTimeImmutable $contractEndDate): static
+    {
+        $this->contractEndDate = $contractEndDate;
+
+        return $this;
+    }
+
+    public function getJobTitle(): ?string
+    {
+        return $this->jobTitle;
+    }
+
+    public function setJobTitle(?string $jobTitle): static
+    {
+        $this->jobTitle = $jobTitle;
+
+        return $this;
+    }
+
+    public function getRank(): ?string
+    {
+        return $this->rank;
+    }
+
+    public function setRank(?string $rank): static
+    {
+        $this->rank = $rank;
 
         return $this;
     }

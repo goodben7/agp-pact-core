@@ -66,23 +66,35 @@ class NotificationTriggerMiddleware implements MiddlewareInterface
                 try {
                     $recipient = null;
                     $recipientType = null;
+                    $sentVia = $template->getSentVia();
 
-                    if ($complaint && $template->getSentVia() === Notification::RECIPIENT_TYPE_EMAIL && $complaint->getComplainant()->getContactEmail()) {
-                        $recipient = $complaint->getComplainant()->getContactEmail();
-                        $recipientType = 'email';
-                    } elseif ($complaint && $template->getSentVia() === Notification::SENT_VIA_SMS && $complaint->getComplainant()->getContactPhone()) {
-                        $recipient = $complaint->getComplainant()->getContactPhone();
-                        $recipientType = 'phone';
+                    if ($complaint && $complainant = $complaint->getComplainant()) {
+                        switch ($sentVia) {
+                            case Notification::SENT_VIA_EMAIL:
+                                if ($complainant->getContactEmail()) {
+                                    $recipient = $complainant->getContactEmail();
+                                    $recipientType = 'email';
+                                }
+                                break;
+
+                            case Notification::SENT_VIA_SMS:
+                            case Notification::SENT_VIA_WHATSAPP:
+                                if ($complainant->getContactPhone()) {
+                                    $recipient = $complainant->getContactPhone();
+                                    $recipientType = 'phone';
+                                }
+                                break;
+                        }
                     }
 
                     if (!$recipient || !$recipientType) {
                         $this->logger->warning(sprintf(
-                            'Could not determine recipient for template "%s" (type: %s) triggered by %s.',
+                            'Could not determine a valid recipient for template "%s" (type: %s) triggered by %s. The complainant might be anonymous or missing contact info.',
                             $template->getName(),
-                            $template->getSentVia(),
+                            $sentVia,
                             $messageFqcn
                         ));
-                        continue;
+                        continue; // Passe à l'itération suivante de la boucle
                     }
 
                     $renderedSubject = $template->getSubject()

@@ -56,6 +56,7 @@ use App\Dto\Company\CompanyUpdateDTO;
     'type.code' => 'exact',
     'active' => 'exact',
     'roadAxes' => 'exact',
+    'location.id' => 'exact',
 ])]
 #[ApiFilter(BooleanFilter::class, properties: ['canProcessSensitiveComplaint'])]
 class Company
@@ -94,6 +95,11 @@ class Company
     #[ORM\Column]
     #[Groups(['company:get', 'company:post', 'company:patch'])]
     private ?bool $active = false;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['company:get', 'company:post', 'company:patch'])]
+    private ?Location $location = null;
 
     /**
      * @var Collection<int, Complaint>
@@ -194,6 +200,18 @@ class Company
     public function setActive(bool $active): static
     {
         $this->active = $active;
+
+        return $this;
+    }
+
+    public function getLocation(): ?Location
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?Location $location): static
+    {
+        $this->location = $location;
 
         return $this;
     }

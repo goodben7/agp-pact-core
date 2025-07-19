@@ -74,6 +74,7 @@ use App\State\Complaint\ComplaintApplyActionProcessor;
         'complainant.id' => 'exact',
         'currentWorkflowAction.id' => 'exact',
         'isSensitive' => 'exact',
+        'isReceivable' => 'exact'
     ]
 )]
 #[ApiFilter(
@@ -299,6 +300,9 @@ class Complaint
     #[ORM\Column(length: 16, nullable: true)]
     #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $createdBy = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $isReceivable = null;
 
 
     public function __construct()
@@ -987,6 +991,18 @@ class Complaint
     public function setCreatedBy(?string $createdBy): static
     {
         $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    public function isReceivable(): ?bool
+    {
+        return $this->isReceivable;
+    }
+
+    public function setIsReceivable(?bool $isReceivable): static
+    {
+        $this->isReceivable = $isReceivable;
 
         return $this;
     }

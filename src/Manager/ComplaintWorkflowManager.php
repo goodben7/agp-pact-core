@@ -3,6 +3,7 @@
 namespace App\Manager;
 
 use App\Constant\GeneralParameterCategory;
+use App\Constant\WorkflowStepName;
 use App\Entity\AttachedFile;
 use App\Entity\Complaint;
 use App\Entity\ComplaintHistory;
@@ -103,6 +104,7 @@ readonly class ComplaintWorkflowManager
             'locationDetail' => 'setLocationDetail',
             'latitude' => 'setLatitude',
             'longitude' => 'setLongitude',
+            'isReceivable' => 'setIsReceivable',
             'receivabilityDecisionJustification' => 'setReceivabilityDecisionJustification',
             'meritsAnalysis' => 'setMeritsAnalysis',
             'resolutionProposal' => 'setResolutionProposal',
@@ -134,6 +136,10 @@ readonly class ComplaintWorkflowManager
             if (array_key_exists($fieldName, $extractedFields)) {
                 $complaint->$setterMethod($extractedFields[$fieldName]);
             }
+        }
+
+        if ($action->getName() === 'verify_receivability_action') {
+            $complaint->setIsReceivable($newStep->getName() === WorkflowStepName::RECEIVABLE);
         }
 
         if ($file instanceof UploadedFile) {
