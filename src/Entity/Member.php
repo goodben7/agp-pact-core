@@ -341,3 +341,4 @@ class Member
         return $this;
     }
 }
+
