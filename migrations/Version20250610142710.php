@@ -21,9 +21,6 @@ final class Version20250610142710 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            CREATE TABLE affected_species (id VARCHAR(16) NOT NULL, complaint_id VARCHAR(16) NOT NULL, species_type_id VARCHAR(16) NOT NULL, affected_unit_id VARCHAR(16) NOT NULL, asset_type_id VARCHAR(16) NOT NULL, affected_quantity DOUBLE PRECISION DEFAULT NULL, description LONGTEXT DEFAULT NULL, INDEX IDX_EF862293EDAE188E (complaint_id), INDEX IDX_EF86229367D2FDDC (species_type_id), INDEX IDX_EF862293B234A58C (affected_unit_id), INDEX IDX_EF862293A6A2CDC5 (asset_type_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
-        SQL);
-        $this->addSql(<<<'SQL'
             CREATE TABLE attached_file (id VARCHAR(16) NOT NULL, complaint_id VARCHAR(16) NOT NULL, file_type_id VARCHAR(16) NOT NULL, workflow_step_id VARCHAR(16) DEFAULT NULL, uploaded_by_id VARCHAR(16) NOT NULL, file_name VARCHAR(255) NOT NULL, file_path VARCHAR(255) NOT NULL, file_size INT NOT NULL, mime_type VARCHAR(255) NOT NULL, uploaded_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', INDEX IDX_B010289AEDAE188E (complaint_id), INDEX IDX_B010289A9E2A35A8 (file_type_id), INDEX IDX_B010289A71FE882C (workflow_step_id), INDEX IDX_B010289AA2B28FE8 (uploaded_by_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
@@ -54,9 +51,6 @@ final class Version20250610142710 extends AbstractMigration
             CREATE TABLE road_axis_location (road_axis_id VARCHAR(16) NOT NULL, location_id VARCHAR(16) NOT NULL, INDEX IDX_61A7AD527D3C2BE7 (road_axis_id), INDEX IDX_61A7AD5264D218E (location_id), PRIMARY KEY(road_axis_id, location_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE species_price (id VARCHAR(16) NOT NULL, species_type_id VARCHAR(16) NOT NULL, road_axis_id VARCHAR(16) NOT NULL, unit_id VARCHAR(16) NOT NULL, currency_id VARCHAR(16) DEFAULT NULL, price_per_unit DOUBLE PRECISION DEFAULT NULL, effective_date DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)', expiration_date DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)', INDEX IDX_732A6E4567D2FDDC (species_type_id), INDEX IDX_732A6E457D3C2BE7 (road_axis_id), INDEX IDX_732A6E45F8BD700D (unit_id), INDEX IDX_732A6E4538248176 (currency_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
-        SQL);
-        $this->addSql(<<<'SQL'
             CREATE TABLE `user` (id VARCHAR(16) NOT NULL, profile_id VARCHAR(16) DEFAULT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, phone VARCHAR(15) DEFAULT NULL, display_name VARCHAR(120) DEFAULT NULL, deleted TINYINT(1) NOT NULL, created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', updated_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)', locked TINYINT(1) NOT NULL, person_type VARCHAR(8) DEFAULT NULL, INDEX IDX_8D93D649CCFA12B8 (profile_id), UNIQUE INDEX UNIQ_IDENTIFIER_EMAIL (email), UNIQUE INDEX UNIQ_IDENTIFIER_PHONE (phone), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
@@ -73,18 +67,6 @@ final class Version20250610142710 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE messenger_messages (id BIGINT AUTO_INCREMENT NOT NULL, body LONGTEXT NOT NULL, headers LONGTEXT NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', available_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', delivered_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)', INDEX IDX_75EA56E0FB7336F0 (queue_name), INDEX IDX_75EA56E0E3BD61CE (available_at), INDEX IDX_75EA56E016BA31DB (delivered_at), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE affected_species ADD CONSTRAINT FK_EF862293EDAE188E FOREIGN KEY (complaint_id) REFERENCES complaint (id)
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE affected_species ADD CONSTRAINT FK_EF86229367D2FDDC FOREIGN KEY (species_type_id) REFERENCES general_parameter (id)
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE affected_species ADD CONSTRAINT FK_EF862293B234A58C FOREIGN KEY (affected_unit_id) REFERENCES general_parameter (id)
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE affected_species ADD CONSTRAINT FK_EF862293A6A2CDC5 FOREIGN KEY (asset_type_id) REFERENCES general_parameter (id)
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE attached_file ADD CONSTRAINT FK_B010289AEDAE188E FOREIGN KEY (complaint_id) REFERENCES complaint (id)
@@ -207,18 +189,6 @@ final class Version20250610142710 extends AbstractMigration
             ALTER TABLE road_axis_location ADD CONSTRAINT FK_61A7AD5264D218E FOREIGN KEY (location_id) REFERENCES location (id) ON DELETE CASCADE
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE species_price ADD CONSTRAINT FK_732A6E4567D2FDDC FOREIGN KEY (species_type_id) REFERENCES general_parameter (id)
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE species_price ADD CONSTRAINT FK_732A6E457D3C2BE7 FOREIGN KEY (road_axis_id) REFERENCES road_axis (id)
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE species_price ADD CONSTRAINT FK_732A6E45F8BD700D FOREIGN KEY (unit_id) REFERENCES general_parameter (id)
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE species_price ADD CONSTRAINT FK_732A6E4538248176 FOREIGN KEY (currency_id) REFERENCES general_parameter (id)
-        SQL);
-        $this->addSql(<<<'SQL'
             ALTER TABLE `user` ADD CONSTRAINT FK_8D93D649CCFA12B8 FOREIGN KEY (profile_id) REFERENCES profile (id)
         SQL);
         $this->addSql(<<<'SQL'
@@ -249,19 +219,6 @@ final class Version20250610142710 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql(<<<'SQL'
-            ALTER TABLE affected_species DROP FOREIGN KEY FK_EF862293EDAE188E
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE affected_species DROP FOREIGN KEY FK_EF86229367D2FDDC
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE affected_species DROP FOREIGN KEY FK_EF862293B234A58C
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE affected_species DROP FOREIGN KEY FK_EF862293A6A2CDC5
-        SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE attached_file DROP FOREIGN KEY FK_B010289AEDAE188E
         SQL);
@@ -383,18 +340,6 @@ final class Version20250610142710 extends AbstractMigration
             ALTER TABLE road_axis_location DROP FOREIGN KEY FK_61A7AD5264D218E
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE species_price DROP FOREIGN KEY FK_732A6E4567D2FDDC
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE species_price DROP FOREIGN KEY FK_732A6E457D3C2BE7
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE species_price DROP FOREIGN KEY FK_732A6E45F8BD700D
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE species_price DROP FOREIGN KEY FK_732A6E4538248176
-        SQL);
-        $this->addSql(<<<'SQL'
             ALTER TABLE `user` DROP FOREIGN KEY FK_8D93D649CCFA12B8
         SQL);
         $this->addSql(<<<'SQL'
@@ -420,9 +365,6 @@ final class Version20250610142710 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE workflow_transition DROP FOREIGN KEY FK_6A3A796FEF6AA4B6
-        SQL);
-        $this->addSql(<<<'SQL'
-            DROP TABLE affected_species
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE attached_file
@@ -453,9 +395,6 @@ final class Version20250610142710 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE road_axis_location
-        SQL);
-        $this->addSql(<<<'SQL'
-            DROP TABLE species_price
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE `user`
