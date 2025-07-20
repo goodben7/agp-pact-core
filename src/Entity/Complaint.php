@@ -42,7 +42,6 @@ use App\State\Complaint\ComplaintApplyActionProcessor;
             provider: ComplaintProvider::class
         ),
         new Post(
-            //security: "is_granted('ROLE_COMPLAINT_CREATE')",
             input: ComplaintCreateDTO::class,
             processor: CreateComplaintProcessor::class
         ),
@@ -75,6 +74,7 @@ use App\State\Complaint\ComplaintApplyActionProcessor;
         'complainant.id' => 'exact',
         'currentWorkflowAction.id' => 'exact',
         'isSensitive' => 'exact',
+        'isReceivable' => 'exact'
     ]
 )]
 #[ApiFilter(
@@ -94,7 +94,7 @@ class Complaint
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['complaint:get', 'complaint:list'])]
+    #[Groups(['complaint:get', 'complaint:list', 'complaint_history:get', 'complaint_history:list', 'attached_file:get'])]
     private ?string $id = null;
 
     #[ORM\ManyToOne]
@@ -189,9 +189,9 @@ class Complaint
     #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $escalationComments = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\ManyToOne]
     #[Groups(['complaint:get', 'complaint:list'])]
-    private ?string $closureReason = null;
+    private ?GeneralParameter $closureReason = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['complaint:get', 'complaint:list'])]
@@ -247,9 +247,11 @@ class Complaint
     private ?\DateTimeImmutable $incidentDate = null;
 
     #[ORM\ManyToOne(inversedBy: 'complaints')]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?Company $involvedCompany = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['complaint:get'])]
     private ?string $proposedResolutionDescription = null;
 
 
@@ -261,29 +263,47 @@ class Complaint
     private ?bool $isSensitive = false;
 
     #[ORM\Column]
+    #[Groups(['complaint:get'])]
     private ?bool $closed = false;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complaint:get'])]
     private ?string $satisfactionComments = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['complaint:get'])]
     private ?string $closureComments = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['complaint:get'])]
     private ?\DateTimeImmutable $executionDate = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    #[Groups(['complaint:get'])]
     private ?string $estimatedCost = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['complaint:get'])]
     private ?\DateTimeImmutable $proposedResolutionEndDate = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['complaint:get'])]
     private ?\DateTimeImmutable $proposedResolutionStartDate = null;
+
+    /**
+     * @var Collection<int, ComplaintStepAssignment>
+     */
+    #[ORM\OneToMany(targetEntity: ComplaintStepAssignment::class, mappedBy: 'complaint', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups(['complaint:get'])]
+    private Collection $complaintStepAssignments;
 
     #[ORM\Column(length: 16, nullable: true)]
     #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $createdBy = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $isReceivable = null;
+
 
     public function __construct()
     {
@@ -292,6 +312,7 @@ class Complaint
         $this->attachedFiles = new ArrayCollection();
         $this->affectedSpecies = new ArrayCollection();
         $this->availableActions = new ArrayCollection();
+        $this->complaintStepAssignments = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -563,12 +584,12 @@ class Complaint
         return $this;
     }
 
-    public function getClosureReason(): ?string
+    public function getClosureReason(): ?GeneralParameter
     {
         return $this->closureReason;
     }
 
-    public function setClosureReason(?string $closureReason): static
+    public function setClosureReason(?GeneralParameter $closureReason): static
     {
         $this->closureReason = $closureReason;
 
@@ -929,8 +950,34 @@ class Complaint
     }
 
     /**
-     * Get the value of createdBy
-     */ 
+     * @return Collection<int, ComplaintStepAssignment>
+     */
+    public function getComplaintStepAssignments(): Collection
+    {
+        return $this->complaintStepAssignments;
+    }
+
+    public function addComplaintStepAssignment(ComplaintStepAssignment $complaintStepAssignment): static
+    {
+        if (!$this->complaintStepAssignments->contains($complaintStepAssignment)) {
+            $this->complaintStepAssignments->add($complaintStepAssignment);
+            $complaintStepAssignment->setComplaint($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComplaintStepAssignment(ComplaintStepAssignment $complaintStepAssignment): void
+    {
+        if ($this->complaintStepAssignments->removeElement($complaintStepAssignment)) {
+            // set the owning side to null (unless already changed)
+            if ($complaintStepAssignment->getComplaint() === $this) {
+                $complaintStepAssignment->setComplaint(null);
+            }
+        }
+    }
+
+
     public function getCreatedBy(): string|null
     {
         return $this->createdBy;
@@ -940,10 +987,22 @@ class Complaint
      * Set the value of createdBy
      *
      * @return  self
-     */ 
+     */
     public function setCreatedBy(?string $createdBy): static
     {
         $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    public function isReceivable(): ?bool
+    {
+        return $this->isReceivable;
+    }
+
+    public function setIsReceivable(?bool $isReceivable): static
+    {
+        $this->isReceivable = $isReceivable;
 
         return $this;
     }

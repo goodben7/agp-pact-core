@@ -6,19 +6,23 @@ use ApiPlatform\Metadata\Get;
 use App\Doctrine\IdGenerator;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use App\Dto\Company\CompanyCreateDTO;
 use App\Repository\CompanyRepository;
 use ApiPlatform\Metadata\GetCollection;
+use Doctrine\Common\Collections\Collection;
+use App\State\Company\CompanyCreateProcessor;
+use App\State\Company\CompanyUpdateProcessor;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
+use Doctrine\Common\Collections\ArrayCollection;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Doctrine\Common\State\PersistProcessor;
+use App\Dto\Company\CompanyUpdateDTO;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 #[ApiResource(
@@ -32,14 +36,14 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
             provider: ItemProvider::class
         ),
         new Post(
-            denormalizationContext: ['groups' => 'company:post',],
             security: 'is_granted("ROLE_COMPANY_CREATE")',
-            processor: PersistProcessor::class,
+            input: CompanyCreateDTO::class,
+            processor: CompanyCreateProcessor::class,
         ),
         new Patch(
-            denormalizationContext: ['groups' => 'company:patch',],
             security: 'is_granted("ROLE_COMPANY_UPDATE")',
-            processor: PersistProcessor::class,
+            input: CompanyUpdateDTO::class,
+            processor: CompanyUpdateProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => 'company:get']
@@ -50,8 +54,11 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
     'type.id' => 'exact',
     'type.category' => 'exact',
     'type.code' => 'exact',
-    'active' => 'exact'
+    'active' => 'exact',
+    'roadAxes' => 'exact',
+    'location.id' => 'exact',
 ])]
+#[ApiFilter(BooleanFilter::class, properties: ['canProcessSensitiveComplaint'])]
 class Company
 {
     public const ID_PREFIX = "CN";
@@ -60,13 +67,13 @@ class Company
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['company:get'])]
+    #[Groups(['company:get', 'complaint:get', 'complaint:list'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
-    #[Groups(['company:get', 'company:post', 'company:patch'])]
+    #[Groups(['company:get', 'company:post', 'company:patch', 'complaint:get', 'complaint:list'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne]
@@ -89,6 +96,11 @@ class Company
     #[Groups(['company:get', 'company:post', 'company:patch'])]
     private ?bool $active = false;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['company:get', 'company:post', 'company:patch'])]
+    private ?Location $location = null;
+
     /**
      * @var Collection<int, Complaint>
      */
@@ -102,10 +114,29 @@ class Company
     #[Groups(['company:get'])]
     private Collection $members;
 
+    /**
+     * @var Collection<int, RoadAxis>
+     */
+    #[ORM\ManyToMany(targetEntity: RoadAxis::class)]
+    #[Groups(['company:get', 'company:post', 'company:patch'])]
+    private Collection $roadAxes;
+
+    /**
+     * @var Collection<int, ComplaintStepAssignment>
+     */
+    #[ORM\OneToMany(targetEntity: ComplaintStepAssignment::class, mappedBy: 'assignedCompany', orphanRemoval: true)]
+    private Collection $complaintStepAssignments;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['company:get', 'company:post', 'company:patch'])]
+    private ?bool $canProcessSensitiveComplaint = null;
+
     public function __construct()
     {
         $this->complaints = new ArrayCollection();
         $this->members = new ArrayCollection();
+        $this->roadAxes = new ArrayCollection();
+        $this->complaintStepAssignments = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -173,6 +204,18 @@ class Company
         return $this;
     }
 
+    public function getLocation(): ?Location
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?Location $location): static
+    {
+        $this->location = $location;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Complaint>
      */
@@ -229,6 +272,72 @@ class Company
                 $member->setCompany(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RoadAxis>
+     */
+    public function getRoadAxes(): Collection
+    {
+        return $this->roadAxes;
+    }
+
+    public function addRoadAxe(RoadAxis $roadAxe): static
+    {
+        if (!$this->roadAxes->contains($roadAxe)) {
+            $this->roadAxes->add($roadAxe);
+        }
+
+        return $this;
+    }
+
+    public function removeRoadAxe(RoadAxis $roadAxe): static
+    {
+        $this->roadAxes->removeElement($roadAxe);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ComplaintStepAssignment>
+     */
+    public function getComplaintStepAssignments(): Collection
+    {
+        return $this->complaintStepAssignments;
+    }
+
+    public function addComplaintStepAssignment(ComplaintStepAssignment $complaintStepAssignment): static
+    {
+        if (!$this->complaintStepAssignments->contains($complaintStepAssignment)) {
+            $this->complaintStepAssignments->add($complaintStepAssignment);
+            $complaintStepAssignment->setAssignedCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComplaintStepAssignment(ComplaintStepAssignment $complaintStepAssignment): static
+    {
+        if ($this->complaintStepAssignments->removeElement($complaintStepAssignment)) {
+            // set the owning side to null (unless already changed)
+            if ($complaintStepAssignment->getAssignedCompany() === $this) {
+                $complaintStepAssignment->setAssignedCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isCanProcessSensitiveComplaint(): ?bool
+    {
+        return $this->canProcessSensitiveComplaint;
+    }
+
+    public function setCanProcessSensitiveComplaint(?bool $canProcessSensitiveComplaint): static
+    {
+        $this->canProcessSensitiveComplaint = $canProcessSensitiveComplaint;
 
         return $this;
     }

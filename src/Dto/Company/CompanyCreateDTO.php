@@ -2,11 +2,15 @@
 
 namespace App\Dto\Company;
 
+use App\Entity\GeneralParameter;
+
 class CompanyCreateDTO
 {
     public ?string $name = null;
-    public ?string $type = null;
+    public ?GeneralParameter $type = null;
     public ?string $contactEmail = null;
     public ?string $contactPhone = null;
-    public ?bool $isActive = true;
+    public ?bool $active = true;
+    public ?array $roadAxes = [];
+    public ?bool $canProcessSensitiveComplaint = null;
 }

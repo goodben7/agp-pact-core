@@ -61,19 +61,19 @@ class GeneralParameter
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'report_template:get', 'report_template:list', 'complaint:get', 'complaint:list', 'prejudice:get'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'report_template:get', 'report_template:list', 'complaint:get', 'complaint:list', 'prejudice:get', 'attached_file:get'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch', 'report_template:get', 'report_template:list', 'complaint:get', 'complaint:list', 'prejudice:get'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch', 'report_template:get', 'report_template:list', 'complaint:get', 'complaint:list', 'prejudice:get', 'attached_file:get'])]
     private ?string $category = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch', 'report_template:get', 'report_template:list', 'complaint:get', 'complaint:list', 'prejudice:get'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch', 'report_template:get', 'report_template:list', 'complaint:get', 'complaint:list', 'prejudice:get', 'attached_file:get'])]
     private ?string $value = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch', 'attached_file:get'])]
     private ?string $code = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -171,7 +171,7 @@ class GeneralParameter
 
     /**
      * Get the value of deleted
-     */ 
+     */
     public function isDeleted(): bool|null
     {
         return $this->deleted;
@@ -181,7 +181,7 @@ class GeneralParameter
      * Set the value of deleted
      *
      * @return  self
-     */ 
+     */
     public function setDeleted(bool $deleted): static
     {
         $this->deleted = $deleted;

@@ -39,6 +39,12 @@ services:
             $keccelRouteId: '%env(KECCEL_ROUTE_ID)%'
         tags: [ 'app.notification_sender' ]
 
+    App\Service\WhatsappNotificationSender:
+        arguments:
+            $instanceId: '%env(ULTRAMSG_INSTANCE_ID)%'
+            $token: '%env(ULTRAMSG_TOKEN)%'
+        tags: [ 'app.notification_sender' ]
+
     App\Provider\Auth\MultiFieldUserProvider:
         arguments:
             $entityManager: '@doctrine.orm.entity_manager'

@@ -58,11 +58,11 @@ class WorkflowStep
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list', 'complaint_history:get', 'complaint_history:list', 'attached_file:get'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list', 'complaint_history:get', 'complaint_history:list', 'attached_file:get'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]

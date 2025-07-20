@@ -5,7 +5,6 @@ namespace App\Provider;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\DashboardStatistics;
-use App\Constant\WorkflowStepName;
 use App\Entity\Complaint;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
@@ -38,14 +37,16 @@ final class DashboardStatisticsProvider implements ProviderInterface
 
         try {
             $applyCommonFilters = $this->getClosure($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
-            $finalClosedStepNames = [WorkflowStepName::CLOSED, WorkflowStepName::ESCALATED_JUSTICE, WorkflowStepName::NON_RECEIVABLE];
 
             $qb1 = $this->entityManager->createQueryBuilder()
-                ->select('ws.name AS status, COUNT(c.id) AS count')
+                ->select('COUNT(c.id) AS count')
+                ->addSelect('COALESCE(wsuic.title, ws.name) AS status')
+                ->addSelect('COALESCE(wsuic.title, ws.name) AS HIDDEN status_expr')
                 ->from(Complaint::class, 'c')
-                ->join('c.currentWorkflowStep', 'ws');
+                ->join('c.currentWorkflowStep', 'ws')
+                ->leftJoin('ws.uiConfiguration', 'wsuic');
             $applyCommonFilters($qb1, 'c');
-            $qb1->groupBy('ws.name');
+            $qb1->groupBy('status_expr');
             $stats->complaintsByStatus = $qb1->getQuery()->getResult();
 
             $qb2 = $this->entityManager->createQueryBuilder()
@@ -66,20 +67,22 @@ final class DashboardStatisticsProvider implements ProviderInterface
             $statsQb = $this->entityManager->createQueryBuilder()
                 ->select(
                     'c.isSensitive',
-                    'CASE WHEN ws.name IN (:finalClosedNames) THEN \'closed\' ELSE \'open\' END AS status',
+                    "CASE
+                        WHEN c.isReceivable = false THEN 'rejected'
+                        WHEN c.closed = true THEN 'closed'
+                        ELSE 'open'
+                     END AS status",
                     'COUNT(c.id) AS count'
                 )
-                ->from(Complaint::class, 'c')
-                ->join('c.currentWorkflowStep', 'ws')
-                ->setParameter('finalClosedNames', $finalClosedStepNames);
+                ->from(Complaint::class, 'c');
 
             $applyCommonFilters($statsQb, 'c');
             $statsQb->groupBy('c.isSensitive', 'status');
             $results = $statsQb->getQuery()->getResult();
 
             $stats->complaintStats = [
-                'general' => ['total' => 0, 'open' => 0, 'closed' => 0],
-                'sensitive' => ['total' => 0, 'open' => 0, 'closed' => 0],
+                'general' => ['total' => 0, 'open' => 0, 'closed' => 0, 'rejected' => 0],
+                'sensitive' => ['total' => 0, 'open' => 0, 'closed' => 0, 'rejected' => 0],
             ];
 
             foreach ($results as $row) {
@@ -87,10 +90,18 @@ final class DashboardStatisticsProvider implements ProviderInterface
                 $status = $row['status'];
                 $count = (int)$row['count'];
 
-                $stats->complaintStats[$category][$status] = $count;
-                $stats->complaintStats[$category]['total'] += $count;
+                if (array_key_exists($status, $stats->complaintStats[$category])) {
+                    $stats->complaintStats[$category][$status] = $count;
+                    $stats->complaintStats[$category]['total'] += $count;
+                }
             }
 
+            $stats->totalComplaints = $stats->complaintStats['general']['total'] + $stats->complaintStats['sensitive']['total'];
+            $stats->openComplaints = $stats->complaintStats['general']['open'] + $stats->complaintStats['sensitive']['open'];
+            $stats->totalRejectedComplaints = $stats->complaintStats['general']['rejected'] + $stats->complaintStats['sensitive']['rejected'];
+            $stats->totalSensitiveComplaints = $stats->complaintStats['sensitive']['total'];
+            $stats->openSensitiveComplaints = $stats->complaintStats['sensitive']['open'];
+            $stats->closedSensitiveComplaints = $stats->complaintStats['sensitive']['closed'];
 
             $stats->averageResolutionTimeDays = $this->calculateAverageResolutionTime($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
             $stats->complaintsDeclaredMonthly = $this->getComplaintsDeclaredMonthly($locationId, $complaintTypeId);
@@ -108,7 +119,9 @@ final class DashboardStatisticsProvider implements ProviderInterface
         $qb = $this->entityManager->createQueryBuilder()
             ->select('c.declarationDate, c.closureDate')
             ->from(Complaint::class, 'c')
-            ->where('c.closureDate IS NOT NULL');
+            ->where('c.closureDate IS NOT NULL')
+            ->andWhere('c.closed = :isClosed')
+            ->setParameter('isClosed', true);
 
         $applyCommonFiltersForAverage = $this->getClosure($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
         $applyCommonFiltersForAverage($qb, 'c');

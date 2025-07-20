@@ -9,7 +9,6 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 class UpdateComplaintMeritsHandler
 {
-
     public function __construct(private readonly LoggerInterface $logger)
     {
     }

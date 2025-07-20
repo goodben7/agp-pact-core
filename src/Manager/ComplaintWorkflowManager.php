@@ -3,6 +3,7 @@
 namespace App\Manager;
 
 use App\Constant\GeneralParameterCategory;
+use App\Constant\WorkflowStepName;
 use App\Entity\AttachedFile;
 use App\Entity\Complaint;
 use App\Entity\ComplaintHistory;
@@ -23,7 +24,6 @@ use App\Entity\RoadAxis;
 use App\Entity\Location;
 use App\Entity\Complainant;
 
-
 readonly class ComplaintWorkflowManager
 {
     public function __construct(
@@ -31,10 +31,8 @@ readonly class ComplaintWorkflowManager
         private MessageBusInterface    $bus,
         private Security               $security,
         private ValidatorInterface     $validator,
-    )
-    {
+    ) {
     }
-
 
     public function applyAction(Complaint $complaint, WorkflowAction $action, array $data = []): Complaint
     {
@@ -48,10 +46,10 @@ readonly class ComplaintWorkflowManager
 
         if (!$transition) {
             throw new \LogicException(sprintf(
-                'No valid transition found for action "%s" from step "%s" on complaint ID %d.',
-                $complaint->getId(),
+                'No valid transition found for action "%s" from step "%s" on complaint ID %s.',
+                $action->getName() ?: 'NULL',
                 $complaint->getCurrentWorkflowStep() ? $complaint->getCurrentWorkflowStep()->getName() : 'NULL',
-                $action->getName() ?: 'NULL'
+                $complaint->getId()
             ));
         }
 
@@ -71,11 +69,16 @@ readonly class ComplaintWorkflowManager
         }
 
         $uiConfig = $complaint->getCurrentWorkflowStep()->getUiConfiguration();
+        $inputFields = [];
         if ($uiConfig && $uiConfig->getInputFields()) {
-            $this->validateDynamicFields($data, $uiConfig->getInputFields());
+            $allInputFields = $uiConfig->getInputFields();
+            $inputFields = array_filter($allInputFields, function ($field) {
+                return isset($field['name']) && $field['name'] !== 'assignmentType';
+            });
+            $this->validateDynamicFields($data, $inputFields);
         }
 
-        $extractedFields = $this->extractAndHydrateDynamicFields($data, $uiConfig->getInputFields() ?? []);
+        $extractedFields = $this->extractAndHydrateDynamicFields($data, $inputFields);
 
         $comment = $extractedFields['comment'] ?? null;
         $file = $extractedFields['file'] ?? null;
@@ -96,109 +99,47 @@ readonly class ComplaintWorkflowManager
         $nextExpectedAction = $this->findNextExpectedAction($newStep);
         $complaint->setCurrentWorkflowAction($nextExpectedAction);
 
-        if (isset($extractedFields['description'])) {
-            $complaint->setDescription($extractedFields['description']);
-        }
-        if (isset($extractedFields['locationDetail'])) {
-            $complaint->setLocationDetail($extractedFields['locationDetail']);
-        }
-        if (isset($extractedFields['latitude'])) {
-            $complaint->setLatitude($extractedFields['latitude']);
-        }
-        if (isset($extractedFields['longitude'])) {
-            $complaint->setLongitude($extractedFields['longitude']);
-        }
-        if (isset($extractedFields['receivabilityDecisionJustification'])) {
-            $complaint->setReceivabilityDecisionJustification($extractedFields['receivabilityDecisionJustification']);
-        }
-        if (isset($extractedFields['meritsAnalysis'])) {
-            $complaint->setMeritsAnalysis($extractedFields['meritsAnalysis']);
-        }
-        if (isset($extractedFields['resolutionProposal'])) {
-            $complaint->setResolutionProposal($extractedFields['resolutionProposal']);
-        }
-        if (isset($extractedFields['internalDecisionComments'])) {
-            $complaint->setInternalDecisionComments($extractedFields['internalDecisionComments']);
-        }
-        if (isset($extractedFields['executionActionsDescription'])) {
-            $complaint->setExecutionActionsDescription($extractedFields['executionActionsDescription']);
-        }
-        if (isset($extractedFields['personInChargeOfExecution'])) {
-            $complaint->setPersonInChargeOfExecution($extractedFields['personInChargeOfExecution']);
-        }
-        if (isset($extractedFields['satisfactionFollowUpComments'])) {
-            $complaint->setSatisfactionFollowUpComments($extractedFields['satisfactionFollowUpComments']);
-        }
-        if (isset($extractedFields['escalationComments'])) {
-            $complaint->setEscalationComments($extractedFields['escalationComments']);
-        }
-        if (isset($extractedFields['closureReason'])) {
-            $complaint->setClosureReason($extractedFields['closureReason']);
-        }
-        if (isset($extractedFields['proposedResolutionDescription'])) {
-            $complaint->setProposedResolutionDescription($extractedFields['proposedResolutionDescription']);
-        }
-        if (isset($extractedFields['incidentDate'])) {
-            try {
-                $complaint->setIncidentDate(new \DateTimeImmutable($extractedFields['incidentDate']));
-            } catch (\Exception $e) {
+        $fieldSetterMap = [
+            'description' => 'setDescription',
+            'locationDetail' => 'setLocationDetail',
+            'latitude' => 'setLatitude',
+            'longitude' => 'setLongitude',
+            'isReceivable' => 'setIsReceivable',
+            'receivabilityDecisionJustification' => 'setReceivabilityDecisionJustification',
+            'meritsAnalysis' => 'setMeritsAnalysis',
+            'resolutionProposal' => 'setResolutionProposal',
+            'internalDecisionComments' => 'setInternalDecisionComments',
+            'executionActionsDescription' => 'setExecutionActionsDescription',
+            'personInChargeOfExecution' => 'setPersonInChargeOfExecution',
+            'satisfactionFollowUpComments' => 'setSatisfactionFollowUpComments',
+            'escalationComments' => 'setEscalationComments',
+            'closureReason' => 'setClosureReason',
+            'proposedResolutionDescription' => 'setProposedResolutionDescription',
+            'incidentDate' => 'setIncidentDate',
+            'closureDate' => 'setClosureDate',
+            'complaintType' => 'setComplaintType',
+            'incidentCause' => 'setIncidentCause',
+            'roadAxis' => 'setRoadAxis',
+            'location' => 'setLocation',
+            'internalResolutionDecision' => 'setInternalResolutionDecision',
+            'complainantDecision' => 'setComplainantDecision',
+            'satisfactionFollowUpResult' => 'setSatisfactionFollowUpResult',
+            'escalationLevel' => 'setEscalationLevel',
+            'complainant' => 'setComplainant',
+            'assignedTo' => 'setAssignedTo',
+            'currentAssignee' => 'setCurrentAssignee',
+            'involvedCompany' => 'setInvolvedCompany',
+            'closed' => 'setClosed',
+        ];
 
-            }
-        }
-        if (isset($extractedFields['closureDate'])) {
-            try {
-                $complaint->setClosureDate(new \DateTimeImmutable($extractedFields['closureDate']));
-            } catch (\Exception $e) {
-
+        foreach ($fieldSetterMap as $fieldName => $setterMethod) {
+            if (array_key_exists($fieldName, $extractedFields)) {
+                $complaint->$setterMethod($extractedFields[$fieldName]);
             }
         }
 
-        if (isset($extractedFields['complaintType'])) {
-            $complaintType = $this->em->getRepository(GeneralParameter::class)->find($this->extractIdFromIri($extractedFields['complaintType']));
-            $complaint->setComplaintType($complaintType);
-        }
-        if (isset($extractedFields['incidentCause'])) {
-            $incidentCause = $this->em->getRepository(GeneralParameter::class)->find($this->extractIdFromIri($extractedFields['incidentCause']));
-            $complaint->setIncidentCause($$incidentCause);
-        }
-        if (isset($extractedFields['roadAxis'])) {
-            $roadAxis = $this->em->getRepository(RoadAxis::class)->find($this->extractIdFromIri($extractedFields['roadAxis']));
-            $complaint->setRoadAxis($roadAxis);
-        }
-        if (isset($extractedFields['location'])) {
-            $location = $this->em->getRepository(Location::class)->find($this->extractIdFromIri($extractedFields['location']));
-            $complaint->setLocation($location);
-        }
-        if (isset($extractedFields['internalResolutionDecision'])) {
-            $internalResolutionDecision = $this->em->getRepository(GeneralParameter::class)->find($this->extractIdFromIri($extractedFields['internalResolutionDecision']));
-            $complaint->setInternalResolutionDecision($internalResolutionDecision);
-        }
-        if (isset($extractedFields['complainantDecision'])) {
-            $complainantDecision = $this->em->getRepository(GeneralParameter::class)->find($this->extractIdFromIri($extractedFields['complainantDecision']));
-            $complaint->setComplainantDecision($complainantDecision);
-        }
-        if (isset($extractedFields['satisfactionFollowUpResult'])) {
-            $satisfactionFollowUpResult = $this->em->getRepository(GeneralParameter::class)->find($this->extractIdFromIri($extractedFields['satisfactionFollowUpResult']));
-            $complaint->setSatisfactionFollowUpResult($satisfactionFollowUpResult);
-        }
-        if (isset($extractedFields['escalationLevel'])) {
-            $escalationLevel = $this->em->getRepository(GeneralParameter::class)->find($this->extractIdFromIri($extractedFields['escalationLevel']));
-            $complaint->setEscalationLevel($escalationLevel);
-        }
-        if (isset($extractedFields['complainant'])) {
-            $complainant = $this->em->getRepository(Complainant::class)->find($this->extractIdFromIri($extractedFields['complainant']));
-            $complaint->setComplainant($complainant);
-        }
-        if (isset($extractedFields['assignedTo'])) {
-            $user = $this->em->getRepository(User::class)->find($this->extractIdFromIri($extractedFields['assignedTo']));
-            $complaint->setAssignedTo($user);
-        }
-        if (isset($extractedFields['currentAssignee'])) {
-            $complaint->setCurrentAssignee($extractedFields['currentAssignee']);
-        }
-        if (isset($extractedFields['involvedCompany'])) {
-            $company = $this->em->getRepository(Company::class)->find($this->extractIdFromIri($extractedFields['involvedCompany']));
-            $complaint->setInvolvedCompany($company);
+        if ($action->getName() === 'verify_receivability_action') {
+            $complaint->setIsReceivable($newStep->getName() === WorkflowStepName::RECEIVABLE);
         }
 
         if ($file instanceof UploadedFile) {
@@ -218,11 +159,11 @@ readonly class ComplaintWorkflowManager
             }
 
             $fileTypeParam = $this->em->getRepository(GeneralParameter::class)->findOneBy(['category' => GeneralParameterCategory::FILE_TYPE, 'value' => $fileTypeCategory]);
-            if (!$fileTypeParam)
+            if (!$fileTypeParam) {
                 throw new \Exception(sprintf('Not found file type parameter for category "%s".', $fileTypeCategory));
+            }
 
             $attachedFile->setFile($file);
-
 
             $attachedFile
                 ->setFileType($fileTypeParam)
@@ -268,7 +209,7 @@ readonly class ComplaintWorkflowManager
             $fieldType = $fieldConfig['type'] ?? 'text';
             $fieldValue = $data[$fieldName] ?? null;
 
-            if ($fieldValue === null) {
+            if (!array_key_exists($fieldName, $data)) {
                 continue;
             }
 
@@ -277,18 +218,16 @@ readonly class ComplaintWorkflowManager
                     if (is_string($fieldValue)) {
                         $id = $this->extractIdFromIri($fieldValue);
                         if ($id === null) {
+                            $extracted[$fieldName] = null;
                             continue 2;
                         }
 
+                        $entity = null;
                         if (isset($fieldConfig['optionsCategory'])) {
                             $category = $fieldConfig['optionsCategory'];
                             $entity = $this->em->getRepository(GeneralParameter::class)->findOneBy(['id' => $id, 'category' => $category]);
-                            if ($entity) {
-                                $extracted[$fieldName] = $entity;
-                            }
                         } elseif (isset($fieldConfig['optionsResource'])) {
                             $resource = $fieldConfig['optionsResource'];
-                            $entity = null;
                             switch ($resource) {
                                 case 'api/companies':
                                     $entity = $this->em->getRepository(Company::class)->find($id);
@@ -306,10 +245,10 @@ readonly class ComplaintWorkflowManager
                                     $entity = $this->em->getRepository(Complainant::class)->find($id);
                                     break;
                             }
-                            if ($entity) {
-                                $extracted[$fieldName] = $entity;
-                            }
                         }
+                        $extracted[$fieldName] = $entity;
+                    } else {
+                        $extracted[$fieldName] = $fieldValue;
                     }
                     break;
 
@@ -324,7 +263,7 @@ readonly class ComplaintWorkflowManager
 
                 case 'date':
                     try {
-                        $extracted[$fieldName] = new \DateTimeImmutable($fieldValue);
+                        $extracted[$fieldName] = $fieldValue ? new \DateTimeImmutable($fieldValue) : null;
                     } catch (\Exception $e) {
                         $extracted[$fieldName] = null;
                     }
@@ -360,7 +299,7 @@ readonly class ComplaintWorkflowManager
 
             $fieldConstraints = [];
 
-            if ($fieldRequired) { // Apply NotBlank for all required fields, including files now checked by NotNull
+            if ($fieldRequired) {
                 if ($fieldType === 'file') {
                     $fieldConstraints[] = new Assert\NotNull([
                         'message' => sprintf('%s is required.', $fieldLabel)
@@ -376,13 +315,11 @@ readonly class ComplaintWorkflowManager
                 if (is_string($rule)) {
                     switch ($rule) {
                         case 'not_blank':
-                            // Only add if not already marked as required by $fieldRequired
                             if (!$fieldRequired && $fieldType !== 'file') {
                                 $fieldConstraints[] = new Assert\NotBlank([
                                     'message' => sprintf('%s cannot be blank.', $fieldLabel)
                                 ]);
                             }
-                            // If it's a file type and not required by $fieldRequired, but has 'not_blank', use NotNull
                             if (!$fieldRequired && $fieldType === 'file') {
                                 $fieldConstraints[] = new Assert\NotNull([
                                     'message' => sprintf('%s cannot be blank.', $fieldLabel)
@@ -400,12 +337,10 @@ readonly class ComplaintWorkflowManager
                                 'message' => sprintf('%s must be numeric.', $fieldLabel)
                             ]);
                             break;
-                        // Add more dynamic rules as needed
                     }
                 }
             }
 
-            // Type-specific constraints
             switch ($fieldType) {
                 case 'select':
                     $fieldConstraints[] = new Assert\Callback([
@@ -472,7 +407,6 @@ readonly class ComplaintWorkflowManager
                             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                             'application/vnd.ms-excel',
                             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                            // Add other common file types if necessary
                         ],
                         'mimeTypesMessage' => 'Please upload a valid image, PDF, or document (Word/Excel).',
                     ]);

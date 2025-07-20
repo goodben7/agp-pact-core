@@ -2,11 +2,15 @@
 
 namespace App\Dto\Company;
 
+use App\Entity\GeneralParameter;
+
 class CompanyUpdateDTO
 {
     public ?string $name = null;
-    public ?string $type = null;
+    public ?GeneralParameter $type = null;
     public ?string $contactEmail = null;
     public ?string $contactPhone = null;
-    public ?bool $isActive = null;
+    public ?bool $active = true;
+    public ?array $roadAxes = [];
+    public ?bool $canProcessSensitiveComplaint = null;
 }

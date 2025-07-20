@@ -52,6 +52,12 @@ class ComplaintWorkflowMessageHandler
             return;
         }
 
+        $isReceivable = $complaint->isReceivable();
+        if ($isReceivable === null) {
+            $this->logger->error(sprintf("isReceivable is null for complaint %s during verify_receivability_action. Workflow logic might be incomplete.", $complaintId));
+            return;
+        }
+
         switch ($actionName) {
             case 'create_complaint_action':
                 $this->bus->dispatch(new ComplaintRegisteredMessage(

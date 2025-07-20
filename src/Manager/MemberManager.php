@@ -9,11 +9,9 @@ use App\Repository\ProfileRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Message\Command\CreateUserCommand;
 use App\Exception\UnavailableDataException;
-use App\Constant\GeneralParameterCompanyType;
 use App\Entity\Member;
 use App\Entity\User;
 use App\Message\Command\CommandBusInterface;
-use App\Model\UserProxyInterface;
 
 readonly class MemberManager
 {
@@ -41,28 +39,11 @@ readonly class MemberManager
             if (null !== $member->getUserId()) {
                 throw new UnavailableDataException(sprintf('Member with id: %s already has a user account', $memberId));
             }
-
-            // Get the company from the member
-            $company = $member->getCompany();
             
-            // Get the company type (GeneralParameter)
-            $companyType = $company->getType();
-            
-            // Determine the profile based on company type code
-            $personType = match ($companyType->getCode()) {
-                GeneralParameterCompanyType::PRIVATE_COMPANY_CODE => UserProxyInterface::PERSON_COMPANY,
-                GeneralParameterCompanyType::NGO_CODE => UserProxyInterface::PERSON_NGO,
-                GeneralParameterCompanyType::GOVERNMENT_AGENCY_CODE => UserProxyInterface::PERSON_CONTROL_MISSION,
-                GeneralParameterCompanyType::INTERNAL_COMMITTEE_CODE => UserProxyInterface::PERSON_COMMITTEE,
-                GeneralParameterCompanyType::LOCAL_COMMITTEE_CODE => UserProxyInterface::PERSON_COMMITTEE,
-                default => UserProxyInterface::PERSON_LAMBDA,
-            };
-            
-            // Find the profile based on personType
-            $profile = $this->profileRepository->findOneBy(['personType' => $personType]);
+            $profile = $this->profileRepository->findOneBy(['personType' => $data->personType]);
             
             if (null === $profile) {
-                throw new UnavailableDataException(sprintf('Cannot find profile with personType: %s', $personType));
+                throw new UnavailableDataException(sprintf('Cannot find profile with personType: %s', $data->personType));
             }
 
             $command = new CreateUserCommand(

@@ -119,7 +119,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\GeneratedValue( strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(groups: ['user:get', 'generated_report:list', 'generated_report:get'])]
+    #[Groups(groups: ['user:get', 'generated_report:list', 'generated_report:get', 'complaint_history:get', 'complaint_history:list', 'attached_file:get'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 180, nullable:true)]
@@ -145,7 +145,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $phone = null;
 
     #[ORM\Column(length: 120, nullable: true)]
-    #[Groups(groups: ['user:get', 'user:patch', 'generated_report:list', 'generated_report:get'])]
+    #[Groups(groups: ['user:get', 'user:patch', 'generated_report:list', 'generated_report:get', 'complaint_history:get', 'complaint_history:list'])]
     private ?string $displayName = null;
 
     #[ORM\Column]
