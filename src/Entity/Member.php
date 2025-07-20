@@ -149,6 +149,13 @@ class Member
     #[Groups(['member:get', 'member:post', 'member:patch'])]
     private ?string $position = null;
 
+    public function __construct()
+    {
+        if (is_null($this->createdAt))
+            $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
     public function getId(): ?string
     {
         return $this->id;
