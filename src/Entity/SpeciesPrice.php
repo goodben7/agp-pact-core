@@ -23,13 +23,13 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
         ),
         new Get(),
         new Post(
-            security: "is_granted('ROLE_SPECIES_PRICE_CREATE')",
             denormalizationContext: ['groups' => 'species_price:post',],
+            security: "is_granted('ROLE_SPECIES_PRICE_CREATE')",
             processor: PersistProcessor::class,
         ),
         new Patch(
+            denormalizationContext: ['groups' => 'species_price:patch',],
             security: "is_granted('ROLE_SPECIES_PRICE_UPDATE')",
-            denormalizationContext: ['groups' =>'species_price:patch',],
             processor: PersistProcessor::class,
         ),
     ],
@@ -58,35 +58,35 @@ class SpeciesPrice
     #[Groups(['species_price:list', 'species_price:get'])]
     private ?string $id = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'prices')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['species_price:list', 'species_price:get', 'species_price:post','species_price:patch'])]
-    private ?GeneralParameter $speciesType = null;
+    #[Groups(['species_price:list', 'species_price:get', 'species_price:post', 'species_price:patch'])]
+    private ?Species $speciesType = null;
 
     #[ORM\ManyToOne(inversedBy: 'speciesPrices')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['species_price:list', 'species_price:get', 'species_price:post','species_price:patch'])]
+    #[Groups(['species_price:list', 'species_price:get', 'species_price:post', 'species_price:patch'])]
     private ?RoadAxis $roadAxis = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['species_price:list', 'species_price:get', 'species_price:post','species_price:patch'])]
+    #[Groups(['species_price:list', 'species_price:get', 'species_price:post', 'species_price:patch'])]
     private ?float $pricePerUnit = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['species_price:list', 'species_price:get', 'species_price:post','species_price:patch'])]
+    #[Groups(['species_price:list', 'species_price:get', 'species_price:post', 'species_price:patch'])]
     private ?GeneralParameter $unit = null;
 
     #[ORM\ManyToOne]
-    #[Groups(['species_price:list', 'species_price:get', 'species_price:post','species_price:patch'])]
+    #[Groups(['species_price:list', 'species_price:get', 'species_price:post', 'species_price:patch'])]
     private ?GeneralParameter $currency = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['species_price:list', 'species_price:get', 'species_price:post','species_price:patch'])]
+    #[Groups(['species_price:list', 'species_price:get', 'species_price:post', 'species_price:patch'])]
     private ?\DateTimeImmutable $effectiveDate = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['species_price:list', 'species_price:get', 'species_price:post','species_price:patch'])]
+    #[Groups(['species_price:list', 'species_price:get', 'species_price:post', 'species_price:patch'])]
     private ?\DateTimeImmutable $expirationDate = null;
 
     public function getId(): ?string
@@ -94,12 +94,12 @@ class SpeciesPrice
         return $this->id;
     }
 
-    public function getSpeciesType(): ?GeneralParameter
+    public function getSpeciesType(): ?Species
     {
         return $this->speciesType;
     }
 
-    public function setSpeciesType(?GeneralParameter $speciesType): static
+    public function setSpeciesType(?Species $speciesType): static
     {
         $this->speciesType = $speciesType;
 

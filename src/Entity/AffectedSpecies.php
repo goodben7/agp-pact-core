@@ -63,10 +63,10 @@ class AffectedSpecies
     #[ORM\JoinColumn(nullable: false)]
     private ?Complaint $complaint = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'affectedInstances')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list'])]
-    private ?GeneralParameter $speciesType = null;
+    private ?Species $speciesType = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list'])]
@@ -86,6 +86,7 @@ class AffectedSpecies
     #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list'])]
     private ?GeneralParameter $assetType = null;
 
+
     public function getId(): ?string
     {
         return $this->id;
@@ -103,12 +104,12 @@ class AffectedSpecies
         return $this;
     }
 
-    public function getSpeciesType(): ?GeneralParameter
+    public function getSpeciesType(): ?Species
     {
         return $this->speciesType;
     }
 
-    public function setSpeciesType(?GeneralParameter $speciesType): static
+    public function setSpeciesType(?Species $speciesType): static
     {
         $this->speciesType = $speciesType;
 
