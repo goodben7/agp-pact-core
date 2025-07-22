@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Doctrine\IdGenerator;
 use App\Repository\CauseRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -62,11 +63,14 @@ use Symfony\Component\Serializer\Attribute\Groups;
     ])]
 class Cause
 {
+    const ID_PREFIX = "CS";
+
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(IdGenerator::class)]
+    #[ORM\Column(length: 16)]
     #[Groups(['cause:get', 'cause:list'])]
-    private ?int $id = null;
+    private ?string $id = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['cause:get', 'cause:list', 'cause:post', 'cause:patch'])]
@@ -93,7 +97,7 @@ class Cause
     #[Groups(['cause:get', 'cause:list', 'cause:post', 'cause:patch'])]
     private ?GeneralParameter $assetType = null;
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
