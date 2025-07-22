@@ -159,4 +159,9 @@ return static function (): iterable {
     yield Permission::new('ROLE_MEMBER_UPDATE', "Modifier un membre");
     yield Permission::new('ROLE_USER_SET_ACCESS', "Modifier les accès d'un utilisateur");
 
+    yield Permission::new('ROLE_SPECIES_LIST', "Consulter la liste des espèces");
+    yield Permission::new('ROLE_SPECIES_DETAILS', "Consulter les détails d'une espèce");
+    yield Permission::new('ROLE_SPECIES_CREATE', "Créer une espèce");
+    yield Permission::new('ROLE_SPECIES_UPDATE', "Modifier une espèce");
+
 };

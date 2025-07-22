@@ -166,6 +166,6 @@ class AffectedSpecies
 
     public function __toString(): string
     {
-        return $this->getSpeciesType()->getValue();
+        return $this->getSpeciesType()->getName();
     }
 }
