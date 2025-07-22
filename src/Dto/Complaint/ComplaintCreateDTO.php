@@ -2,6 +2,7 @@
 
 namespace App\Dto\Complaint;
 
+use App\Entity\Cause;
 use App\Entity\User;
 use App\Entity\Company;
 use App\Entity\Location;
@@ -16,7 +17,8 @@ class ComplaintCreateDTO
 
     public ?\DateTimeImmutable $incidentDate = null;
 
-    public ?GeneralParameter $incidentCause = null;
+    /** @var Cause[]|null */
+    public ?array $incidentCauses = null;
 
     public ?string $description = null;
 

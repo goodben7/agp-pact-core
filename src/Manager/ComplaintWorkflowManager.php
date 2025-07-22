@@ -31,7 +31,8 @@ readonly class ComplaintWorkflowManager
         private MessageBusInterface    $bus,
         private Security               $security,
         private ValidatorInterface     $validator,
-    ) {
+    )
+    {
     }
 
     public function applyAction(Complaint $complaint, WorkflowAction $action, array $data = []): Complaint
@@ -118,7 +119,6 @@ readonly class ComplaintWorkflowManager
             'incidentDate' => 'setIncidentDate',
             'closureDate' => 'setClosureDate',
             'complaintType' => 'setComplaintType',
-            'incidentCause' => 'setIncidentCause',
             'roadAxis' => 'setRoadAxis',
             'location' => 'setLocation',
             'internalResolutionDecision' => 'setInternalResolutionDecision',
@@ -135,6 +135,15 @@ readonly class ComplaintWorkflowManager
         foreach ($fieldSetterMap as $fieldName => $setterMethod) {
             if (array_key_exists($fieldName, $extractedFields)) {
                 $complaint->$setterMethod($extractedFields[$fieldName]);
+            }
+        }
+
+        if (array_key_exists('incidentCauses', $extractedFields)) {
+            $complaint->getIncidentCauses()->clear();
+            if (is_iterable($extractedFields['incidentCauses'])) {
+                foreach ($extractedFields['incidentCauses'] as $incidentCause) {
+                    $complaint->addIncidentCause($incidentCause);
+                }
             }
         }
 
@@ -215,7 +224,46 @@ readonly class ComplaintWorkflowManager
 
             switch ($fieldType) {
                 case 'select':
-                    if (is_string($fieldValue)) {
+                    $isMultiple = $fieldConfig['multiple'] ?? false;
+                    if ($isMultiple) {
+                        $entities = [];
+                        if (is_array($fieldValue)) {
+                            foreach ($fieldValue as $iri) {
+                                if (!is_string($iri)) continue;
+                                $id = $this->extractIdFromIri($iri);
+                                if ($id === null) continue;
+
+                                $entity = null;
+                                if (isset($fieldConfig['optionsCategory'])) {
+                                    $category = $fieldConfig['optionsCategory'];
+                                    $entity = $this->em->getRepository(GeneralParameter::class)->findOneBy(['id' => $id, 'category' => $category]);
+                                } elseif (isset($fieldConfig['optionsResource'])) {
+                                    $resource = $fieldConfig['optionsResource'];
+                                    switch ($resource) {
+                                        case 'api/companies':
+                                            $entity = $this->em->getRepository(Company::class)->find($id);
+                                            break;
+                                        case 'api/users':
+                                            $entity = $this->em->getRepository(User::class)->find($id);
+                                            break;
+                                        case 'api/road_axes':
+                                            $entity = $this->em->getRepository(RoadAxis::class)->find($id);
+                                            break;
+                                        case 'api/locations':
+                                            $entity = $this->em->getRepository(Location::class)->find($id);
+                                            break;
+                                        case 'api/complainants':
+                                            $entity = $this->em->getRepository(Complainant::class)->find($id);
+                                            break;
+                                    }
+                                }
+                                if ($entity) {
+                                    $entities[] = $entity;
+                                }
+                            }
+                        }
+                        $extracted[$fieldName] = $entities;
+                    } elseif (is_string($fieldValue)) {
                         $id = $this->extractIdFromIri($fieldValue);
                         if ($id === null) {
                             $extracted[$fieldName] = null;
@@ -343,15 +391,25 @@ readonly class ComplaintWorkflowManager
 
             switch ($fieldType) {
                 case 'select':
+                    $isMultiple = $fieldConfig['multiple'] ?? false;
                     $fieldConstraints[] = new Assert\Callback([
-                        'callback' => function ($iri, $context) use ($fieldConfig, $fieldLabel, $fieldRequired) {
-                            if ($fieldRequired && empty($iri)) {
+                        'callback' => function ($value, $context) use ($fieldConfig, $fieldLabel, $fieldRequired, $isMultiple) {
+                            $iris = [];
+                            if ($isMultiple) {
+                                $iris = is_array($value) ? $value : [];
+                            } elseif (!empty($value)) {
+                                $iris = [$value];
+                            }
+
+                            if ($fieldRequired && empty($iris)) {
                                 $context->buildViolation(sprintf('%s is required.', $fieldLabel))
                                     ->addViolation();
                                 return;
                             }
 
-                            if (!empty($iri) && is_string($iri)) {
+                            foreach ($iris as $iri) {
+                                if (!is_string($iri)) continue;
+
                                 $id = $this->extractIdFromIri($iri);
                                 if ($id === null) {
                                     $context->buildViolation(sprintf('%s has an invalid format.', $fieldLabel))
@@ -366,6 +424,7 @@ readonly class ComplaintWorkflowManager
                                     $entityExists = $entity !== null;
                                 } elseif (isset($fieldConfig['optionsResource'])) {
                                     $resource = $fieldConfig['optionsResource'];
+                                    $entity = null;
                                     switch ($resource) {
                                         case 'api/companies':
                                             $entity = $this->em->getRepository(Company::class)->find($id);
@@ -382,8 +441,6 @@ readonly class ComplaintWorkflowManager
                                         case 'api/complainants':
                                             $entity = $this->em->getRepository(Complainant::class)->find($id);
                                             break;
-                                        default:
-                                            $entity = null;
                                     }
                                     $entityExists = $entity !== null;
                                 }
