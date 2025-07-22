@@ -26,8 +26,7 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 
 #[ORM\Entity(repositoryClass: PrejudiceRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => 'prejudice:get'],
-    operations:[
+    operations: [
         new Get(
             security: 'is_granted("ROLE_PREJUDICE_DETAILS")',
             provider: ItemProvider::class
@@ -50,7 +49,8 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
             security: "is_granted('ROLE_PREJUDICE_DELETE')",
             processor: DeletePrejudiceProcessor::class,
         ),
-    ]
+    ],
+    normalizationContext: ['groups' => 'prejudice:get']
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'id' => 'exact',
@@ -69,30 +69,30 @@ class Prejudice
     #[ORM\Id]
     #[ORM\GeneratedValue( strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
-    #[ORM\Column(length: 16)] 
-    #[Groups(['prejudice:get'])]  
+    #[ORM\Column(length: 16)]
+    #[Groups(['prejudice:get'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['prejudice:get'])]  
+    #[Groups(['prejudice:get'])]
     private ?string $label = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['prejudice:get'])]  
+    #[Groups(['prejudice:get'])]
     private ?GeneralParameter $category = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['prejudice:get'])]  
+    #[Groups(['prejudice:get'])]
     private ?GeneralParameter $complaintType = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['prejudice:get'])]  
+    #[Groups(['prejudice:get'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['prejudice:get'])]  
+    #[Groups(['prejudice:get'])]
     private ?bool $active = null;
 
     #[ORM\Column]
@@ -101,8 +101,8 @@ class Prejudice
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['prejudice:get'])]  
-    private ?GeneralParameter $incidentCause = null;
+    #[Groups(['prejudice:get'])]
+    private ?Cause $incidentCause = null;
 
     /**
      * @var Collection<int, PrejudiceConsequence>
@@ -183,7 +183,7 @@ class Prejudice
 
     /**
      * Get the value of deleted
-     */ 
+     */
     public function isDeleted(): bool|null
     {
         return $this->deleted;
@@ -193,7 +193,7 @@ class Prejudice
      * Set the value of deleted
      *
      * @return  self
-     */ 
+     */
     public function setDeleted(bool $deleted)
     {
         $this->deleted = $deleted;
@@ -203,8 +203,8 @@ class Prejudice
 
     /**
      * Get the value of incidentCause
-     */ 
-    public function getIncidentCause(): GeneralParameter|null
+     */
+    public function getIncidentCause(): ?Cause
     {
         return $this->incidentCause;
     }
@@ -212,9 +212,10 @@ class Prejudice
     /**
      * Set the value of incidentCause
      *
+     * @param Cause|null $incidentCause
      * @return  self
-     */ 
-    public function setIncidentCause(?GeneralParameter $incidentCause): static
+     */
+    public function setIncidentCause(?Cause $incidentCause): static
     {
         $this->incidentCause = $incidentCause;
 

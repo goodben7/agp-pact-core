@@ -80,10 +80,10 @@ readonly class ComplaintManager
         }
 
         $isSensitive = false;
-        if ($data->incidentCause) {
+        if (!empty($data->incidentCauses)) {
             $prejudiceRepository = $this->em->getRepository(Prejudice::class);
 
-            $matchingPrejudices = $prejudiceRepository->findBy(['incidentCause' => $data->incidentCause]);
+            $matchingPrejudices = $prejudiceRepository->findBy(['incidentCause' => $data->incidentCauses]);
 
             foreach ($matchingPrejudices as $prejudice) {
                 $complaintType = $prejudice->getComplaintType();
@@ -135,7 +135,6 @@ readonly class ComplaintManager
         $complaint = (new Complaint())
             ->setComplaintType($data->complaintType)
             ->setIncidentDate($data->incidentDate)
-            ->setIncidentCause($data->incidentCause)
             ->setDescription($data->description)
             ->setRoadAxis($data->roadAxis)
             ->setLocationDetail($data->locationDetail)
@@ -147,6 +146,12 @@ readonly class ComplaintManager
             ->setIsSensitive($isSensitive)
             ->setDeclarationDate(new \DateTimeImmutable())
             ->setCreatedBy($userId);
+
+        if (!empty($data->incidentCauses)) {
+            foreach ($data->incidentCauses as $incidentCause) {
+                $complaint->addIncidentCause($incidentCause);
+            }
+        }
 
 
         $initialStep = $this->em->getRepository(WorkflowStep::class)->findOneBy(['isInitial' => true]);

@@ -68,7 +68,7 @@ use App\State\Complaint\ComplaintApplyActionProcessor;
         'id' => 'exact',
         'complaintType.id' => 'exact',
         'currentWorkflowStep.id' => 'exact',
-        'incidentCause.id' => 'exact',
+        'incidentCauses.id' => 'exact',
         'roadAxis.id' => 'exact',
         'location.id' => 'exact',
         'complainant.id' => 'exact',
@@ -110,10 +110,13 @@ class Complaint
     #[Groups(['complaint:get', 'complaint:list'])]
     private ?\DateTimeImmutable $declarationDate = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    /**
+     * @var Collection<int, Cause>
+     */
+    #[ORM\ManyToMany(targetEntity: Cause::class)]
+    #[ORM\JoinTable(name: 'complaint_incident_causes')]
     #[Groups(['complaint:get', 'complaint:list'])]
-    private ?GeneralParameter $incidentCause = null;
+    private Collection $incidentCauses;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['complaint:get', 'complaint:list'])]
@@ -313,6 +316,7 @@ class Complaint
         $this->affectedSpecies = new ArrayCollection();
         $this->availableActions = new ArrayCollection();
         $this->complaintStepAssignments = new ArrayCollection();
+        $this->incidentCauses = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -356,14 +360,26 @@ class Complaint
         return $this;
     }
 
-    public function getIncidentCause(): ?GeneralParameter
+    /**
+     * @return Collection<int, Cause>
+     */
+    public function getIncidentCauses(): Collection
     {
-        return $this->incidentCause;
+        return $this->incidentCauses;
     }
 
-    public function setIncidentCause(?GeneralParameter $incidentCause): static
+    public function addIncidentCause(Cause $incidentCause): static
     {
-        $this->incidentCause = $incidentCause;
+        if (!$this->incidentCauses->contains($incidentCause)) {
+            $this->incidentCauses->add($incidentCause);
+        }
+
+        return $this;
+    }
+
+    public function removeIncidentCause(Cause $incidentCause): static
+    {
+        $this->incidentCauses->removeElement($incidentCause);
 
         return $this;
     }
@@ -481,7 +497,7 @@ class Complaint
         return $this->internalResolutionDecision;
     }
 
-    public function setInternalResolutionDecision(?string $internalResolutionDecision): static
+    public function setInternalResolutionDecision(?GeneralParameter $internalResolutionDecision): static
     {
         $this->internalResolutionDecision = $internalResolutionDecision;
 

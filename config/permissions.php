@@ -29,8 +29,8 @@ return static function (): iterable {
     yield Permission::new('ROLE_GENERAL_PARAMETER_LIST', "Consulter la liste des paramètres généraux");
     yield Permission::new('ROLE_GENERAL_PARAMETER_DETAILS', "Consulter un paramètre général");
     yield Permission::new('ROLE_GENERAL_PARAMETER_CREATE', "Créer un paramètre général");
-    yield Permission::new('ROLE_GENERAL_PARAMETER_UPDATE', "Modifier un paramètre général"); 
-    yield Permission::new('ROLE_GENERAL_PARAMETER_DELETE', "Supprimer un paramètre général"); 
+    yield Permission::new('ROLE_GENERAL_PARAMETER_UPDATE', "Modifier un paramètre général");
+    yield Permission::new('ROLE_GENERAL_PARAMETER_DELETE', "Supprimer un paramètre général");
 
     yield Permission::new('ROLE_COMPLAINT_LIST', "Consulter la liste des plaintes");
     yield Permission::new('ROLE_COMPLAINT_DETAILS', "Consulter les détails d'une plainte");
@@ -90,20 +90,20 @@ return static function (): iterable {
     yield Permission::new('ROLE_VICTIM_CREATE', 'Créer une victime');
     yield Permission::new('ROLE_VICTIM_UPDATE', 'Modifier une victime');
 
-    yield Permission::new('ROLE_WORKFLOW_STEP_LIST', 'Consulter la liste des étapes de workflow');
-    yield Permission::new('ROLE_WORKFLOW_STEP_DETAILS', 'Consulter les détails d\'une étape de workflow');
-    yield Permission::new('ROLE_WORKFLOW_STEP_CREATE', 'Créer une étape de workflow');
-    yield Permission::new('ROLE_WORKFLOW_STEP_UPDATE', 'Modifier une étape de workflow');
+    yield Permission::new('ROLE_WORKFLOW_STEP_LIST', 'Consulter la liste des étapes de traitement');
+    yield Permission::new('ROLE_WORKFLOW_STEP_DETAILS', 'Consulter les détails d\'une étape de traitement');
+    yield Permission::new('ROLE_WORKFLOW_STEP_CREATE', 'Créer une étape de traitement');
+    yield Permission::new('ROLE_WORKFLOW_STEP_UPDATE', 'Modifier une étape de traitement');
 
-    yield Permission::new('ROLE_WORKFLOW_ACTION_LIST', 'Consulter la liste des actions de workflow');
-    yield Permission::new('ROLE_WORKFLOW_ACTION_DETAILS', 'Consulter les détails d\'une action de workflow');
-    yield Permission::new('ROLE_WORKFLOW_ACTION_CREATE', 'Créer une action de workflow');
-    yield Permission::new('ROLE_WORKFLOW_ACTION_UPDATE', 'Modifier une action de workflow');
+    yield Permission::new('ROLE_WORKFLOW_ACTION_LIST', 'Consulter la liste des actions de traitement');
+    yield Permission::new('ROLE_WORKFLOW_ACTION_DETAILS', 'Consulter les détails d\'une action de traitement');
+    yield Permission::new('ROLE_WORKFLOW_ACTION_CREATE', 'Créer une action de traitement');
+    yield Permission::new('ROLE_WORKFLOW_ACTION_UPDATE', 'Modifier une action de traitement');
 
-    yield Permission::new('ROLE_WORKFLOW_TRANSITION_LIST', 'Consulter la liste des transitions de workflow');
-    yield Permission::new('ROLE_WORKFLOW_TRANSITION_DETAILS', 'Consulter les détails d\'une transition de workflow');
-    yield Permission::new('ROLE_WORKFLOW_TRANSITION_CREATE', 'Créer une transition de workflow');
-    yield Permission::new('ROLE_WORKFLOW_TRANSITION_UPDATE', 'Modifier une transition de workflow');
+    yield Permission::new('ROLE_WORKFLOW_TRANSITION_LIST', 'Consulter la liste des transitions de traitement');
+    yield Permission::new('ROLE_WORKFLOW_TRANSITION_DETAILS', 'Consulter les détails d\'une transition de traitement');
+    yield Permission::new('ROLE_WORKFLOW_TRANSITION_CREATE', 'Créer une transition de traitement');
+    yield Permission::new('ROLE_WORKFLOW_TRANSITION_UPDATE', 'Modifier une transition de traitement');
 
     yield Permission::new('ROLE_NOTIFICATION_TEMPLATE_LIST', "Consulter la liste des modèles de notification");
     yield Permission::new('ROLE_NOTIFICATION_TEMPLATE_DETAILS', "Consulter les détails d'un modèle de notification");
@@ -119,10 +119,10 @@ return static function (): iterable {
     yield Permission::new('ROLE_COMPANY_UPDATE', "Modifier une entité");
     yield Permission::new('ROLE_COMPANY_DETAILS', "Consulter les détails d'une entité");
 
-    yield Permission::new('ROLE_COMPTAINT_CONSEQUENCE_LIST', 'Consulter la liste les conséquences des plaintes');
-    yield Permission::new('ROLE_COMPTAINT_CONSEQUENCE_DETAILS', 'Voir les détails des conséquences des plaintes');
-    yield Permission::new('ROLE_COMPTAINT_CONSEQUENCE_CREATE', 'Créer de nouvelles conséquences pour les plaintes');
-    yield Permission::new('ROLE_COMPTAINT_CONSEQUENCE_UPDATE', 'Mettre à jour les conséquences des plaintes');
+    yield Permission::new('ROLE_COMPLAINT_CONSEQUENCE_LIST', 'Consulter la liste les conséquences des plaintes');
+    yield Permission::new('ROLE_COMPLAINT_CONSEQUENCE_DETAILS', 'Voir les détails des conséquences des plaintes');
+    yield Permission::new('ROLE_COMPLAINT_CONSEQUENCE_CREATE', 'Créer de nouvelles conséquences pour les plaintes');
+    yield Permission::new('ROLE_COMPLAINT_CONSEQUENCE_UPDATE', 'Mettre à jour les conséquences des plaintes');
 
     yield Permission::new('ROLE_VICTIM_LIST', 'Consulter la liste des victimes');
     yield Permission::new('ROLE_VICTIM_DETAILS', 'Voir les détails des victimes');
@@ -151,7 +151,7 @@ return static function (): iterable {
     yield Permission::new('ROLE_PREJUDICE_LIST', "Consulter la liste des préjudices");
     yield Permission::new('ROLE_PREJUDICE_CREATE', "Créer un préjudice");
     yield Permission::new('ROLE_PREJUDICE_UPDATE', "Modifier un préjudice");
-    yield Permission::new( 'ROLE_PREJUDICE_DELETE', "Supprimer un préjudice"); 
+    yield Permission::new( 'ROLE_PREJUDICE_DELETE', "Supprimer un préjudice");
 
     yield Permission::new('ROLE_MEMBER_DETAILS', "Consulter les détails d'un membre");
     yield Permission::new('ROLE_MEMBER_LIST', "Consulter la liste des membres");
@@ -163,5 +163,10 @@ return static function (): iterable {
     yield Permission::new('ROLE_SPECIES_DETAILS', "Consulter les détails d'une espèce");
     yield Permission::new('ROLE_SPECIES_CREATE', "Créer une espèce");
     yield Permission::new('ROLE_SPECIES_UPDATE', "Modifier une espèce");
+
+    yield Permission::new('ROLE_CAUSE_LIST', "Consulter la liste des causes");
+    yield Permission::new('ROLE_CAUSE_DETAILS', "Consulter les détails d'une cause");
+    yield Permission::new('ROLE_CAUSE_CREATE', "Créer une cause");
+    yield Permission::new('ROLE_CAUSE_UPDATE', "Modifier une cause");
 
 };
