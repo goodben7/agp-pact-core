@@ -90,7 +90,7 @@ class Cause
 
     #[ORM\Column]
     #[Groups(['cause:get', 'cause:list'])]
-    private ?bool $deleted = null;
+    private ?bool $deleted = false;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
