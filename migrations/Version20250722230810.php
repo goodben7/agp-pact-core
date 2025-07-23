@@ -36,6 +36,9 @@ final class Version20250722230810 extends AbstractMigration
             ALTER TABLE complaint_incident_causes ADD CONSTRAINT FK_A509B57C66E2221E FOREIGN KEY (cause_id) REFERENCES cause (id) ON DELETE CASCADE
         SQL);
         $this->addSql(<<<'SQL'
+            ALTER TABLE prejudice DROP FOREIGN KEY FK_39465C1F9E27466D
+        SQL);
+        $this->addSql(<<<'SQL'
             ALTER TABLE prejudice ADD CONSTRAINT FK_39465C1F9E27466D FOREIGN KEY (incident_cause_id) REFERENCES cause (id)
         SQL);
     }
@@ -60,6 +63,12 @@ final class Version20250722230810 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE complaint_incident_causes
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE prejudice DROP FOREIGN KEY FK_39465C1F9E27466D
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE prejudice ADD CONSTRAINT FK_39465C1F9E27466D FOREIGN KEY (incident_cause_id) REFERENCES general_parameter (id) ON UPDATE NO ACTION ON DELETE NO ACTION
         SQL);
     }
 }
