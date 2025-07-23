@@ -100,6 +100,7 @@ class Species
     {
         $this->affectedInstances = new ArrayCollection();
         $this->prices = new ArrayCollection();
+        $this->deleted = false;
     }
 
     public function getId(): ?string
