@@ -108,9 +108,6 @@ final class Version20250610142710 extends AbstractMigration
             ALTER TABLE complaint ADD CONSTRAINT FK_5F2732B59FB715DA FOREIGN KEY (current_workflow_step_id) REFERENCES workflow_step (id)
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE complaint ADD CONSTRAINT FK_5F2732B59E27466D FOREIGN KEY (incident_cause_id) REFERENCES general_parameter (id)
-        SQL);
-        $this->addSql(<<<'SQL'
             ALTER TABLE complaint ADD CONSTRAINT FK_5F2732B57D3C2BE7 FOREIGN KEY (road_axis_id) REFERENCES road_axis (id)
         SQL);
         $this->addSql(<<<'SQL'
@@ -257,9 +254,6 @@ final class Version20250610142710 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE complaint DROP FOREIGN KEY FK_5F2732B59FB715DA
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE complaint DROP FOREIGN KEY FK_5F2732B59E27466D
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE complaint DROP FOREIGN KEY FK_5F2732B57D3C2BE7
