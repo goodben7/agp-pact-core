@@ -90,6 +90,15 @@ class NotificationTemplate
     #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
     private ?string $sentVia = null;
 
+    #[ORM\Column]
+    #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
+    private ?bool $isSensitive = false;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
+    private ?Profile $profile = null;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -199,6 +208,46 @@ class NotificationTemplate
     public function setSentVia(string $sentVia): static
     {
         $this->sentVia = $sentVia;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of isSensitive
+     */ 
+    public function getIsSensitive(): bool|null
+    {
+        return $this->isSensitive;
+    }
+
+    /**
+     * Set the value of isSensitive
+     *
+     * @return  self
+     */ 
+    public function setIsSensitive(?bool $isSensitive): static
+    {
+        $this->isSensitive = $isSensitive;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of profile
+     */ 
+    public function getProfile(): Profile|null
+    {
+        return $this->profile;
+    }
+
+    /**
+     * Set the value of profile
+     *
+     * @return  self
+     */ 
+    public function setProfile(?Profile $profile): static
+    {
+        $this->profile = $profile;
 
         return $this;
     }
