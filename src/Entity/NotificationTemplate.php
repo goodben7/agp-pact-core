@@ -102,7 +102,7 @@ class NotificationTemplate
     #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
     private ?Profile $profile = null;
 
-    #[ORM\Column(type: Types::JSON)]
+    #[ORM\Column(type: Types::JSON, options: ['default' => '[]'])]
     #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
     #[Assert\Choice(
         choices: [

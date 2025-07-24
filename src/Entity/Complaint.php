@@ -305,6 +305,7 @@ class Complaint
     private ?string $createdBy = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
     private ?bool $isReceivable = null;
 
 
