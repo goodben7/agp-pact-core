@@ -72,6 +72,10 @@ class WorkflowAction
     #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list'])]
     private ?bool $requiresFile = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['workflow_action:get', 'workflow_action:list', 'workflow_transition:get', 'workflow_transition:list', 'complaint:get', 'complaint:list'])]
+    private ?bool $showForm = null;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -133,6 +137,18 @@ class WorkflowAction
     public function setRequiresFile(bool $requiresFile): static
     {
         $this->requiresFile = $requiresFile;
+
+        return $this;
+    }
+
+    public function isShowForm(): ?bool
+    {
+        return $this->showForm;
+    }
+
+    public function setShowForm(?bool $showForm): static
+    {
+        $this->showForm = $showForm;
 
         return $this;
     }

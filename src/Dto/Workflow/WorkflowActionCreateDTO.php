@@ -13,4 +13,5 @@ class WorkflowActionCreateDTO
     public ?bool $requiresComment = false;
 
     public ?bool $requiresFile = false;
+    public ?bool $showForm = false;
 }

@@ -22,7 +22,8 @@ readonly class WorkflowActionManager
             ->setLabel($data->label)
             ->setDescription($data->description)
             ->setRequiresComment($data->requiresComment)
-            ->setRequiresFile($data->requiresFile);
+            ->setRequiresFile($data->requiresFile)
+            ->setShowForm($data->showForm);
 
         $this->em->persist($action);
         $this->em->flush();
