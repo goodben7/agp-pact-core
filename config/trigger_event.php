@@ -18,5 +18,6 @@ return static function (): iterable {
     yield TriggerEvent::new('App\Message\ResolutionExecutedMessage', "Résolution exécutée");
     yield TriggerEvent::new('App\Message\ResolutionProposedMessage', "Résolution proposée");
     yield TriggerEvent::new('App\Message\SatisfactionFollowedUpMessage', "Suivi de la satisfaction effectué");
+    yield TriggerEvent::new('App\Message\AssignedMessage', "Plainte assignée à une entreprise");
 };
 

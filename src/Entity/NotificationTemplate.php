@@ -3,41 +3,34 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\Get;
-use App\Doctrine\IdGenerator;
-use ApiPlatform\Metadata\Post;
-use App\Enum\NotificationType;
-use Doctrine\DBAL\Types\Types;
-use ApiPlatform\Metadata\Patch;
-use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Doctrine\Orm\State\ItemProvider;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\ApiResource;
+use App\Doctrine\IdGenerator;
+use App\Enum\NotificationType;
 use App\Repository\NotificationTemplateRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 
 #[ORM\Entity(repositoryClass: NotificationTemplateRepository::class)]
 #[ApiResource(
     operations: [
         new GetCollection(
-            security: 'is_granted("ROLE_NOTIFICATION_TEMPLATE_LIST")',
-            provider: CollectionProvider::class
+            security: 'is_granted("ROLE_NOTIFICATION_TEMPLATE_LIST")'
         ),
         new Get(
-            security: 'is_granted("ROLE_NOTIFICATION_TEMPLATE_DETAILS")',
-            provider: ItemProvider::class
+            security: 'is_granted("ROLE_NOTIFICATION_TEMPLATE_DETAILS")'
         ),
         new Post(
             denormalizationContext: ['groups' => 'notification_template:post'],
             security: 'is_granted("ROLE_NOTIFICATION_TEMPLATE_CREATE")',
-            processor: PersistProcessor::class,
         ),
         new Patch(
             denormalizationContext: ['groups' => 'notification_template:patch'],
             security: 'is_granted("ROLE_NOTIFICATION_TEMPLATE_UPDATE")',
-            processor: PersistProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => 'notification_template:get']
@@ -45,6 +38,10 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 class NotificationTemplate
 {
     public const ID_PREFIX = "NT";
+
+    public const RECIPIENT_PROFILE_USERS = 'profile_users';
+    public const RECIPIENT_COMPLAINANT = 'complainant';
+    public const RECIPIENT_INVOLVED_COMPANY = 'involved_company';
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -54,10 +51,12 @@ class NotificationTemplate
     private ?string $id = null;
 
     #[ORM\Column(length: 120)]
+    #[Assert\NotBlank]
     #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 10)]
+    #[Assert\NotBlank]
     #[Assert\Choice(callback: [NotificationType::class, 'getAll'], message: 'Invalid notification type.')]
     #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
     private ?string $type = null;
@@ -66,19 +65,22 @@ class NotificationTemplate
     #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
     private ?string $subject = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank]
     #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
     private ?string $content = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
     private ?string $triggerEvent = null;
 
     #[ORM\Column]
     #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
-    private ?bool $active = null;
+    private ?bool $active = true;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Email]
     #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
     private ?string $senderEmail = null;
 
@@ -87,17 +89,31 @@ class NotificationTemplate
     private ?string $senderName = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
     private ?string $sentVia = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
-    private ?bool $isSensitive = false;
+    private ?bool $isSensitive = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
     #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
     private ?Profile $profile = null;
+
+    #[ORM\Column(type: Types::JSON)]
+    #[Groups(['notification_template:get', 'notification_template:post', 'notification_template:patch'])]
+    #[Assert\Choice(
+        choices: [
+            self::RECIPIENT_PROFILE_USERS,
+            self::RECIPIENT_COMPLAINANT,
+            self::RECIPIENT_INVOLVED_COMPANY,
+        ],
+        multiple: true,
+        message: 'Le sélecteur de destinataire "{{ value }}" n\'est pas valide.'
+    )]
+    private array $recipientSelectors = [];
 
     public function getId(): ?string
     {
@@ -212,19 +228,11 @@ class NotificationTemplate
         return $this;
     }
 
-    /**
-     * Get the value of isSensitive
-     */ 
-    public function getIsSensitive(): bool|null
+    public function getIsSensitive(): ?bool
     {
         return $this->isSensitive;
     }
 
-    /**
-     * Set the value of isSensitive
-     *
-     * @return  self
-     */ 
     public function setIsSensitive(?bool $isSensitive): static
     {
         $this->isSensitive = $isSensitive;
@@ -232,22 +240,26 @@ class NotificationTemplate
         return $this;
     }
 
-    /**
-     * Get the value of profile
-     */ 
-    public function getProfile(): Profile|null
+    public function getProfile(): ?Profile
     {
         return $this->profile;
     }
 
-    /**
-     * Set the value of profile
-     *
-     * @return  self
-     */ 
     public function setProfile(?Profile $profile): static
     {
         $this->profile = $profile;
+
+        return $this;
+    }
+
+    public function getRecipientSelectors(): array
+    {
+        return $this->recipientSelectors;
+    }
+
+    public function setRecipientSelectors(array $recipientSelectors): static
+    {
+        $this->recipientSelectors = $recipientSelectors;
 
         return $this;
     }

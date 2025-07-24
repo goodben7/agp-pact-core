@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Member;
+use App\Entity\Profile;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -20,9 +21,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         parent::__construct($registry, User::class);
     }
 
-    /**
-     * Used to upgrade (rehash) the user's password automatically over time.
-     */
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
         if (!$user instanceof User) {
@@ -34,49 +32,33 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
-    //    /**
-    //     * @return User[] Returns an array of User objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('u.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?User
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
-
     /**
-     * 
+     *
      * @param string $userId
-     * @return string|null 
+     * @return string|null
      */
     public function findCompanyIdByUserId(string $userId): ?string
     {
         $entityManager = $this->getEntityManager();
-        
+
         $memberRepository = $entityManager->getRepository(Member::class);
         $member = $memberRepository->findOneBy(['userId' => $userId]);
-        
+
         if (!$member) {
             return null;
         }
-        
+
         $company = $member->getCompany();
-        
+
         return $company?->getId();
+    }
+
+    public function findUsersByProfile(Profile $profile)
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.profile = :profile')
+            ->setParameter('profile', $profile)
+            ->getQuery()
+            ->getResult();
     }
 }

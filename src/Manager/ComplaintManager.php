@@ -3,6 +3,7 @@
 namespace App\Manager;
 
 
+use App\Entity\Company;
 use App\Entity\Victim;
 use App\Entity\Complaint;
 use App\Entity\Prejudice;
@@ -12,8 +13,8 @@ use App\Entity\WorkflowStep;
 use App\Entity\AffectedSpecies;
 use App\Entity\WorkflowTransition;
 use App\Entity\ComplaintConsequence;
-use App\Entity\PrejudiceConsequence;
 use App\Dto\Complaint\AttachedFileDto;
+use App\Message\AssignedMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Dto\Complaint\ComplaintCreateDTO;
 use App\Exception\UnavailableDataException;
@@ -221,6 +222,16 @@ readonly class ComplaintManager
                 )
             );
         }
+
+        $company = $this->em->getRepository(Company::class)->findOneBy(['location' => $complaint->getLocation()]);
+        if ($company) {
+            $this->bus->dispatch(
+                new AssignedMessage(
+                    complaintId: $complaint->getId(),
+                )
+            );
+        }
+
         return $complaint;
     }
 
