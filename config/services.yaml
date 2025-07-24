@@ -45,13 +45,17 @@ services:
             $token: '%env(ULTRAMSG_TOKEN)%'
         tags: [ 'app.notification_sender' ]
 
+    App\Service\MailNotificationSender:
+        tags: [ 'app.notification_sender' ]
+
+
     App\Provider\Auth\MultiFieldUserProvider:
         arguments:
             $entityManager: '@doctrine.orm.entity_manager'
 
     App\MessageHandler\GenerateReportHandler:
         arguments:
-            $projectDir: '%kernel.project_dir%' # Injecte le chemin racine du projet
+            $projectDir: '%kernel.project_dir%'
 
     App\Service\Generator\PdfGeneratorService:
         arguments:
