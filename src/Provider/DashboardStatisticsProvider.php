@@ -29,14 +29,15 @@ final class DashboardStatisticsProvider implements ProviderInterface
         $stats = new DashboardStatistics();
 
         $filters = $context['filters'] ?? [];
-        $locationId = $filters['locationId'] ?? null;
+        $locationId = $filters['location'] ?? null;
+        $involvedCompanyId = $filters['involvedCompany'] ?? null;
         $roadAxisId = $filters['roadAxisId'] ?? null;
         $complaintTypeId = $filters['complaintTypeId'] ?? null;
         $startDate = $filters['declarationDate']['after'] ?? null;
         $endDate = $filters['declarationDate']['before'] ?? null;
 
         try {
-            $applyCommonFilters = $this->getClosure($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
+            $applyCommonFilters = $this->getClosure($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate, $involvedCompanyId);
 
             $qb1 = $this->entityManager->createQueryBuilder()
                 ->select('COUNT(c.id) AS count')
@@ -103,7 +104,7 @@ final class DashboardStatisticsProvider implements ProviderInterface
             $stats->openSensitiveComplaints = $stats->complaintStats['sensitive']['open'];
             $stats->closedSensitiveComplaints = $stats->complaintStats['sensitive']['closed'];
 
-            $stats->averageResolutionTimeDays = $this->calculateAverageResolutionTime($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
+            $stats->averageResolutionTimeDays = $this->calculateAverageResolutionTime($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate, $involvedCompanyId);
             $stats->complaintsDeclaredMonthly = $this->getComplaintsDeclaredMonthly($locationId, $complaintTypeId);
 
         } catch (\Exception $e) {
@@ -114,7 +115,7 @@ final class DashboardStatisticsProvider implements ProviderInterface
         return $stats;
     }
 
-    private function calculateAverageResolutionTime(?string $roadAxisId, ?string $locationId, ?string $complaintTypeId, ?string $startDate, ?string $endDate): ?float
+    private function calculateAverageResolutionTime(?string $roadAxisId, ?string $locationId, ?string $complaintTypeId, ?string $startDate, ?string $endDate, ?string $involvedCompanyId): ?float
     {
         $qb = $this->entityManager->createQueryBuilder()
             ->select('c.declarationDate, c.closureDate')
@@ -123,7 +124,7 @@ final class DashboardStatisticsProvider implements ProviderInterface
             ->andWhere('c.closed = :isClosed')
             ->setParameter('isClosed', true);
 
-        $applyCommonFiltersForAverage = $this->getClosure($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate);
+        $applyCommonFiltersForAverage = $this->getClosure($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate, $involvedCompanyId);
         $applyCommonFiltersForAverage($qb, 'c');
 
         $closedComplaintsData = $qb->getQuery()->getResult();
@@ -186,9 +187,9 @@ final class DashboardStatisticsProvider implements ProviderInterface
         return $data;
     }
 
-    public function getClosure(mixed $roadAxisId, mixed $locationId, mixed $complaintTypeId, mixed $startDate, mixed $endDate): \Closure
+    public function getClosure(mixed $roadAxisId, mixed $locationId, mixed $complaintTypeId, mixed $startDate, mixed $endDate, mixed $involvedCompanyId): \Closure
     {
-        return function (QueryBuilder $qb, string $alias) use ($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate) {
+        return function (QueryBuilder $qb, string $alias) use ($roadAxisId, $locationId, $complaintTypeId, $startDate, $endDate, $involvedCompanyId) {
             if ($roadAxisId) {
                 $qb
                     ->andWhere(sprintf('%s.roadAxis = :roadAxisId', $alias))
@@ -213,6 +214,11 @@ final class DashboardStatisticsProvider implements ProviderInterface
                 $qb
                     ->andWhere(sprintf('%s.declarationDate <= :endDate', $alias))
                     ->setParameter('endDate', (new \DateTimeImmutable($endDate))->setTime(23, 59, 59));
+            }
+            if ($involvedCompanyId) {
+                $qb
+                    ->andWhere(sprintf('%s.involvedCompany = :involvedCompanyId', $alias))
+                    ->setParameter('involvedCompanyId', $involvedCompanyId);
             }
         };
     }

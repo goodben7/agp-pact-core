@@ -348,7 +348,7 @@ readonly class ComplaintWorkflowManager
             $fieldConstraints = [];
 
             if ($fieldRequired) {
-                if ($fieldType === 'file') {
+                if (in_array($fieldType, ['file', 'boolean', 'checkbox'])) {
                     $fieldConstraints[] = new Assert\NotNull([
                         'message' => sprintf('%s is required.', $fieldLabel)
                     ]);
@@ -363,15 +363,16 @@ readonly class ComplaintWorkflowManager
                 if (is_string($rule)) {
                     switch ($rule) {
                         case 'not_blank':
-                            if (!$fieldRequired && $fieldType !== 'file') {
-                                $fieldConstraints[] = new Assert\NotBlank([
-                                    'message' => sprintf('%s cannot be blank.', $fieldLabel)
-                                ]);
-                            }
-                            if (!$fieldRequired && $fieldType === 'file') {
-                                $fieldConstraints[] = new Assert\NotNull([
-                                    'message' => sprintf('%s cannot be blank.', $fieldLabel)
-                                ]);
+                            if (!$fieldRequired) {
+                                if (in_array($fieldType, ['file', 'boolean', 'checkbox'])) {
+                                    $fieldConstraints[] = new Assert\NotNull([
+                                        'message' => sprintf('%s cannot be blank.', $fieldLabel)
+                                    ]);
+                                } else {
+                                    $fieldConstraints[] = new Assert\NotBlank([
+                                        'message' => sprintf('%s cannot be blank.', $fieldLabel)
+                                    ]);
+                                }
                             }
                             break;
                         case 'email':

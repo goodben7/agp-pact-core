@@ -28,11 +28,11 @@ use App\Dto\Company\CompanyUpdateDTO;
 #[ApiResource(
     operations: [
         new GetCollection(
-            security: 'is_granted("ROLE_COMPANY_LIST")',
+            //security: 'is_granted("ROLE_COMPANY_LIST")',
             provider: CollectionProvider::class
         ),
         new Get(
-            security: 'is_granted("ROLE_COMPANY_DETAILS")',
+            //security: 'is_granted("ROLE_COMPANY_DETAILS")',
             provider: ItemProvider::class
         ),
         new Post(

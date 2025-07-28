@@ -24,12 +24,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new GetCollection(
             normalizationContext: ['groups' => ['cause:list']],
-            security: 'is_granted("ROLE_CAUSE_LIST")',
+            //security: 'is_granted("ROLE_CAUSE_LIST")',
             provider: CollectionProvider::class
         ),
         new Get(
             normalizationContext: ['groups' => ['cause:get']],
-            security: 'is_granted("ROLE_CAUSE_DETAILS")',
+            //security: 'is_granted("ROLE_CAUSE_DETAILS")',
             provider: ItemProvider::class
         ),
         new Post(
