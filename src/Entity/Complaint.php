@@ -308,6 +308,13 @@ class Complaint
     #[Groups(['complaint:get', 'complaint:list'])]
     private ?bool $isReceivable = null;
 
+    /**
+     * @var Collection<int, Offender>
+     */
+    #[ORM\OneToMany(targetEntity: Offender::class, mappedBy: 'complaint', orphanRemoval: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
+    private Collection $offenders;
+
 
     public function __construct()
     {
@@ -318,6 +325,7 @@ class Complaint
         $this->availableActions = new ArrayCollection();
         $this->complaintStepAssignments = new ArrayCollection();
         $this->incidentCauses = new ArrayCollection();
+        $this->offenders = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -1020,6 +1028,36 @@ class Complaint
     public function setIsReceivable(?bool $isReceivable): static
     {
         $this->isReceivable = $isReceivable;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Offender>
+     */
+    public function getOffenders(): Collection
+    {
+        return $this->offenders;
+    }
+
+    public function addOffender(Offender $offender): static
+    {
+        if (!$this->offenders->contains($offender)) {
+            $this->offenders->add($offender);
+            $offender->setComplaint($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOffender(Offender $offender): static
+    {
+        if ($this->offenders->removeElement($offender)) {
+            // set the owning side to null (unless already changed)
+            if ($offender->getComplaint() === $this) {
+                $offender->setComplaint(null);
+            }
+        }
 
         return $this;
     }

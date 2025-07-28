@@ -169,4 +169,8 @@ return static function (): iterable {
     yield Permission::new('ROLE_CAUSE_CREATE', "Créer une cause");
     yield Permission::new('ROLE_CAUSE_UPDATE', "Modifier une cause");
 
+    yield Permission::new('ROLE_OFFENDER_LIST', "Consulter la liste des contrevenants");
+    yield Permission::new('ROLE_OFFENDER_DETAILS', "Consulter les détails d'un contrevenant");
+    yield Permission::new('ROLE_OFFENDER_CREATE', "Créer un contrevenant");
+    yield Permission::new('ROLE_OFFENDER_UPDATE', "Modifier un contrevenant");
 };
