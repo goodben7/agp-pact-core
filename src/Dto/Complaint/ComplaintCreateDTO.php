@@ -2,13 +2,14 @@
 
 namespace App\Dto\Complaint;
 
-use App\Entity\Cause;
 use App\Entity\User;
+use App\Entity\Cause;
 use App\Entity\Company;
 use App\Entity\Location;
 use App\Entity\RoadAxis;
 use App\Entity\GeneralParameter;
 use App\Dto\Victim\VictimCreateDTO;
+use App\Dto\Victim\OffenderCreateDTO;
 use App\Dto\Complainant\ComplainantCreateDTO;
 
 class ComplaintCreateDTO
@@ -40,6 +41,9 @@ class ComplaintCreateDTO
 
     /** @var VictimCreateDTO[] $victims */
     public ?array $victims = null;
+
+    /** @var OffenderCreateDTO[] $offenders */
+    public ?array $offenders = null;
 
     /** @var AffectedSpeciesCreateDTO[] $affectedSpecies */
     public ?array $affectedSpecies = null;

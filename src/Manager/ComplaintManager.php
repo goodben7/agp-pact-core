@@ -21,6 +21,7 @@ use App\Exception\UnavailableDataException;
 use App\Message\ComplaintRegisteredMessage;
 use Symfony\Bundle\SecurityBundle\Security;
 use App\Constant\GeneralParameterComplaintType;
+use App\Entity\Offender;
 use App\Entity\User;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -179,6 +180,20 @@ readonly class ComplaintManager
                     ->setFamilyRelationship($victimDto->familyRelationship);
 
                 $complaint->addVictim($victim);
+            }
+        }
+
+        if ($data->offenders) {
+            foreach ($data->offenders as $offenderDto) {
+                $offender = (new Offender())
+                    ->setFirstName($offenderDto->firstName)
+                    ->setLastName($offenderDto->lastName)
+                    ->setMiddleName($offenderDto->middleName)
+                    ->setGender($offenderDto->gender)
+                    ->setDescription($offenderDto->description)
+                ;
+
+                $complaint->addOffender($offender);
             }
         }
 
