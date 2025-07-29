@@ -42,7 +42,7 @@ class CreateUserCommand extends Command
 
             $u = new User();
             $u->setEmail($email);
-            $u->setPersonType(UserProxyInterface::PERSON_ADMIN);
+            $u->setPersonType(UserProxyInterface::PERSON_SUPER_ADMIN);
             $u->setPlainPassword($password);
 
             $this->um->create($u);

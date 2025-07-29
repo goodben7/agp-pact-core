@@ -211,7 +211,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles[] = 'ROLE_USER';
         $roles[] = $this->getPersonRole();
 
-        if (UserProxyInterface::PERSON_ADMIN === $this->personType) {
+        if (UserProxyInterface::PERSON_ADMIN === $this->personType || UserProxyInterface::PERSON_SUPER_ADMIN === $this->personType) {
             $roles = array_merge($roles, array_values((array)PermissionManager::getInstance()->getPermissionsAsListChoices()));
         } elseif (null !== $this->profile) {
             $roles = array_merge($roles, $this->profile->getPermissions());
@@ -412,6 +412,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             "ROLE_INFRASTRUCTURE_CELL" => UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
             "ROLE_WORLD_BANK" => UserProxyInterface::PERSON_WORLD_BANK,
             "ROLE_ADMIN" => UserProxyInterface::PERSON_ADMIN,
+            "ROLE_SUPER_ADMIN" => UserProxyInterface::PERSON_SUPER_ADMIN,
             "ROLE_COMPLAINANT" => UserProxyInterface::PERSON_COMPLAINANT,
             "ROLE_LAMBDA" => UserProxyInterface::PERSON_LAMBDA,
         ]);
@@ -427,6 +428,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
             UserProxyInterface::PERSON_WORLD_BANK,
             UserProxyInterface::PERSON_ADMIN,
+            UserProxyInterface::PERSON_SUPER_ADMIN,
             UserProxyInterface::PERSON_COMPLAINANT,
             UserProxyInterface::PERSON_LAMBDA,
         ];
@@ -442,6 +444,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             "Cellule d'infrastructure" => UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
             "Banque mondiale" => UserProxyInterface::PERSON_WORLD_BANK,
             "Administrateur" => UserProxyInterface::PERSON_ADMIN,
+            "Super administrateur" => UserProxyInterface::PERSON_SUPER_ADMIN,
             "Plaignant" => UserProxyInterface::PERSON_COMPLAINANT,
             "Lambda" => UserProxyInterface::PERSON_LAMBDA,
         ];

@@ -8,13 +8,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RequireAccessDto
 {
     public function __construct(
-        
+
         #[Assert\Email]
         public ?string $email = null,
-        
+
         #[Assert\NotNull]
         #[Assert\NotBlank]
-        public ?string $plainPassword = null, 
+        public ?string $plainPassword = null,
 
         public ?string $phone = null,
 
@@ -23,6 +23,7 @@ class RequireAccessDto
         #[Assert\NotNull]
         #[Assert\NotBlank]
         #[Assert\Choice(choices: [
+            UserProxyInterface::PERSON_SUPER_ADMIN,
             UserProxyInterface::PERSON_ADMIN,
             UserProxyInterface::PERSON_COMMITTEE,
             UserProxyInterface::PERSON_NGO,
@@ -36,6 +37,6 @@ class RequireAccessDto
         public ?string $personType = null,
 
     )
-    {  
+    {
     }
 }
