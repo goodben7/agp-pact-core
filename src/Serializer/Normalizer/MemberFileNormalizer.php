@@ -29,17 +29,26 @@ readonly class MemberFileNormalizer implements NormalizerInterface
      */
     public function normalize($data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
+        $context[self::ALREADY_NORMALIZED] = true;
         $normalized = $this->normalizer->normalize($data, $format, $context);
 
-        $file = $this->requestStack->getCurrentRequest()->getUriForPath($this->storage->resolveUri($data, 'profilePictureFile'));
-        $normalized['profilePicture'] = $file;
+        $normalized['profilePicture'] = null;
+
+        if ($data->getProfilePicture()) {
+            $path = $this->storage->resolveUri($data, 'profilePictureFile');
+            $request = $this->requestStack->getCurrentRequest();
+
+            if ($path && $request) {
+                $normalized['profilePicture'] = $request->getUriForPath($path);
+            }
+        }
 
         return $normalized;
     }
 
     public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
-        return $data instanceof Member;
+        return !isset($context[self::ALREADY_NORMALIZED]) && $data instanceof Member;
     }
 
     public function getSupportedTypes(?string $format = null): array
