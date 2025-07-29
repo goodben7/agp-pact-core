@@ -96,6 +96,10 @@ class Species
     #[ORM\OneToMany(targetEntity: SpeciesPrice::class, mappedBy: 'speciesType')]
     private Collection $prices;
 
+    #[ORM\ManyToOne]
+    #[Groups(['species:get', 'species:list', 'species:post', 'species:patch'])]
+    private ?GeneralParameter $unit = null;
+
     public function __construct()
     {
         $this->affectedInstances = new ArrayCollection();
@@ -222,5 +226,17 @@ class Species
     public function __toString(): string
     {
         return $this->name ?? '';
+    }
+
+    public function getUnit(): ?GeneralParameter
+    {
+        return $this->unit;
+    }
+
+    public function setUnit(?GeneralParameter $unit): static
+    {
+        $this->unit = $unit;
+
+        return $this;
     }
 }
