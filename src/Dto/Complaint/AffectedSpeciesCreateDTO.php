@@ -11,8 +11,6 @@ class AffectedSpeciesCreateDTO
 
     public ?Species $speciesType = null;
 
-    public ?string $speciesNature = null;
-
     public ?float $affectedQuantity = null;
 
     public ?GeneralParameter $affectedUnit = null;
