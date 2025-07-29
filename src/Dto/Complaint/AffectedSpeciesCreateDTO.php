@@ -3,12 +3,13 @@
 namespace App\Dto\Complaint;
 
 use App\Entity\GeneralParameter;
+use App\Entity\Species;
 
 class AffectedSpeciesCreateDTO
 {
     public ?string $complaintId = null;
 
-    public ?GeneralParameter $speciesType = null;
+    public ?Species $speciesType = null;
 
     public ?string $speciesNature = null;
 
