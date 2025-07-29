@@ -94,6 +94,9 @@ class Profile
     #[Groups(['profile:get'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $description = null;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -181,6 +184,18 @@ class Profile
     public function buildCreatedAt(): void
     {
         $this->createdAt = new \DateTimeImmutable();
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
     }
 
 }
