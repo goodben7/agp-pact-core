@@ -93,7 +93,6 @@ class Cause
     private ?bool $deleted = false;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
     #[Groups(['cause:get', 'cause:list', 'cause:post', 'cause:patch'])]
     private ?GeneralParameter $assetType = null;
 
