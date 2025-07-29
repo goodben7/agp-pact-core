@@ -24,8 +24,7 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 #[ORM\Entity(repositoryClass: ProfileRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
-    normalizationContext: ['groups' => 'profile:get'],
-    operations:[
+    operations: [
         new Get(
             security: 'is_granted("ROLE_PROFILE_DETAILS")',
             provider: ItemProvider::class
@@ -35,16 +34,17 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
             provider: CollectionProvider::class
         ),
         new Post(
-            security: 'is_granted("ROLE_PROFILE_CREATE")',
             denormalizationContext: ['groups' => 'profile:post',],
+            security: 'is_granted("ROLE_PROFILE_CREATE")',
             processor: PersistProcessor::class,
         ),
         new Patch(
-            security: 'is_granted("ROLE_PROFILE_UPDATE")',
             denormalizationContext: ['groups' => 'profile:patch',],
+            security: 'is_granted("ROLE_PROFILE_UPDATE")',
             processor: PersistProcessor::class,
         ),
-    ]
+    ],
+    normalizationContext: ['groups' => 'profile:get']
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'id' => 'exact',
@@ -95,6 +95,7 @@ class Profile
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['profile:get', 'profile:post', 'profile:patch'])]
     private ?string $description = null;
 
     public function getId(): ?string
