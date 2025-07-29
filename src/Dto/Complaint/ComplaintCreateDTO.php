@@ -9,7 +9,7 @@ use App\Entity\Location;
 use App\Entity\RoadAxis;
 use App\Entity\GeneralParameter;
 use App\Dto\Victim\VictimCreateDTO;
-use App\Dto\Victim\OffenderCreateDTO;
+use App\Dto\OffenderCreateDTO;
 use App\Dto\Complainant\ComplainantCreateDTO;
 
 class ComplaintCreateDTO

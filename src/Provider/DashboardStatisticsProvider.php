@@ -5,6 +5,7 @@ namespace App\Provider;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\DashboardStatistics;
+use App\Constant\GeneralParameterPersonType;
 use App\Entity\Complaint;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
@@ -53,7 +54,9 @@ final class DashboardStatisticsProvider implements ProviderInterface
             $qb2 = $this->entityManager->createQueryBuilder()
                 ->select('gt.value AS type, COUNT(c.id) AS count')
                 ->from(Complaint::class, 'c')
-                ->join('c.complaintType', 'gt');
+                ->join('c.complaintType', 'gt')
+                ->andWhere('gt.category = :personTypeCategory')
+                ->setParameter('personTypeCategory', GeneralParameterPersonType::CATEGORY_PERSON_TYPE);
             $applyCommonFilters($qb2, 'c');
             $qb2->groupBy('gt.value');
             $stats->complaintsByType = $qb2->getQuery()->getResult();

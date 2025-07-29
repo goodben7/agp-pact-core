@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Dto\Victim;
+namespace App\Dto;
 
 use App\Entity\GeneralParameter;
 
