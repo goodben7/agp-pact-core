@@ -17,9 +17,7 @@ use App\Repository\PrejudiceRepository;
 use App\State\CreatePrejudiceProcessor;
 use App\State\DeletePrejudiceProcessor;
 use App\State\UpdatePrejudiceProcessor;
-use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
-use Doctrine\Common\Collections\ArrayCollection;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
@@ -43,7 +41,7 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
         new Patch(
             security: 'is_granted("ROLE_PREJUDICE_UPDATE")',
             input: PrejudiceUpdateDTO::class,
-            processor: UpdatePrejudiceProcessor::class,
+            processor: UpdatePrejudiceProcessor::class
         ),
         new Delete(
             security: "is_granted('ROLE_PREJUDICE_DELETE')",
@@ -55,10 +53,6 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 #[ApiFilter(SearchFilter::class, properties: [
     'id' => 'exact',
     'label' => 'ipartial',
-    'category.code' => 'exact',
-    'category.category' => 'exact',
-    'complaintType.code' => 'exact',
-    'complaintType.category' => 'exact',
     'active' => 'exact',
     'deleted' => 'exact',
 ])]
@@ -67,7 +61,7 @@ class Prejudice
     public const ID_PREFIX = "PJ";
 
     #[ORM\Id]
-    #[ORM\GeneratedValue( strategy: 'CUSTOM')]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
     #[Groups(['prejudice:get'])]
@@ -76,16 +70,6 @@ class Prejudice
     #[ORM\Column(length: 255)]
     #[Groups(['prejudice:get'])]
     private ?string $label = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['prejudice:get'])]
-    private ?GeneralParameter $category = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['prejudice:get'])]
-    private ?GeneralParameter $complaintType = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['prejudice:get'])]
@@ -100,21 +84,8 @@ class Prejudice
     private ?bool $deleted = false;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['prejudice:get'])]
-    private ?Cause $incidentCause = null;
-
-    /**
-     * @var Collection<int, PrejudiceConsequence>
-     */
-    #[ORM\OneToMany(targetEntity: PrejudiceConsequence::class, mappedBy: 'prejudice', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups(['prejudice:get'])]
-    private Collection $consequences;
-
-    public function __construct()
-    {
-        $this->consequences = new ArrayCollection();
-    }
+    private ?GeneralParameter $assetType = null;
 
     public function getId(): ?string
     {
@@ -129,30 +100,6 @@ class Prejudice
     public function setLabel(string $label): static
     {
         $this->label = $label;
-
-        return $this;
-    }
-
-    public function getCategory(): ?GeneralParameter
-    {
-        return $this->category;
-    }
-
-    public function setCategory(?GeneralParameter $category): static
-    {
-        $this->category = $category;
-
-        return $this;
-    }
-
-    public function getComplaintType(): ?GeneralParameter
-    {
-        return $this->complaintType;
-    }
-
-    public function setComplaintType(?GeneralParameter $complaintType): static
-    {
-        $this->complaintType = $complaintType;
 
         return $this;
     }
@@ -189,65 +136,22 @@ class Prejudice
         return $this->deleted;
     }
 
-    /**
-     * Set the value of deleted
-     *
-     * @return  self
-     */
-    public function setDeleted(bool $deleted)
+
+    public function setDeleted(bool $deleted): static
     {
         $this->deleted = $deleted;
 
         return $this;
     }
 
-    /**
-     * Get the value of incidentCause
-     */
-    public function getIncidentCause(): ?Cause
+    public function getAssetType(): ?GeneralParameter
     {
-        return $this->incidentCause;
+        return $this->assetType;
     }
 
-    /**
-     * Set the value of incidentCause
-     *
-     * @param Cause|null $incidentCause
-     * @return  self
-     */
-    public function setIncidentCause(?Cause $incidentCause): static
+    public function setAssetType(?GeneralParameter $assetType): static
     {
-        $this->incidentCause = $incidentCause;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, PrejudiceConsequence>
-     */
-    public function getConsequences(): Collection
-    {
-        return $this->consequences;
-    }
-
-    public function addConsequence(PrejudiceConsequence $consequence): static
-    {
-        if (!$this->consequences->contains($consequence)) {
-            $this->consequences->add($consequence);
-            $consequence->setPrejudice($this);
-        }
-
-        return $this;
-    }
-
-    public function removeConsequence(PrejudiceConsequence $consequence): static
-    {
-        if ($this->consequences->removeElement($consequence)) {
-            // set the owning side to null (unless already changed)
-            if ($consequence->getPrejudice() === $this) {
-                $consequence->setPrejudice(null);
-            }
-        }
+        $this->assetType = $assetType;
 
         return $this;
     }

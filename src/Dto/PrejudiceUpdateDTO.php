@@ -2,25 +2,16 @@
 
 namespace App\Dto;
 
-use App\Entity\Cause;
+
 use App\Entity\GeneralParameter;
-use Symfony\Component\Validator\Constraints as Assert;
 
 class PrejudiceUpdateDTO
 {
     public ?string $label = null;
 
-    public ?GeneralParameter $category = null;
-
-    public ?GeneralParameter $complaintType = null;
-
     public ?string $description = null;
 
+    public ?GeneralParameter $assetType = null;
+
     public ?bool $active = null;
-
-    public ?Cause $incidentCause = null;
-
-    #[Assert\Valid()]
-    /** @var array<\App\Entity\PrejudiceConsequence> */
-    public array $consequences = [];
 }

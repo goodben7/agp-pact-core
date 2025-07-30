@@ -2,18 +2,13 @@
 
 namespace App\Entity;
 
-use App\Entity\Victim;
-use App\Entity\AttachedFile;
 use ApiPlatform\Metadata\Get;
 use App\Doctrine\IdGenerator;
 use ApiPlatform\Metadata\Post;
-use App\Entity\WorkflowAction;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
-use App\Entity\AffectedSpecies;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
-use App\Entity\ComplaintConsequence;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use App\Repository\ComplaintRepository;
@@ -111,9 +106,9 @@ class Complaint
     private ?\DateTimeImmutable $declarationDate = null;
 
     /**
-     * @var Collection<int, Cause>
+     * @var Collection<int, Prejudice>
      */
-    #[ORM\ManyToMany(targetEntity: Cause::class)]
+    #[ORM\ManyToMany(targetEntity: Prejudice::class)]
     #[ORM\JoinTable(name: 'complaint_incident_causes')]
     #[Groups(['complaint:get', 'complaint:list'])]
     private Collection $incidentCauses;
@@ -370,14 +365,14 @@ class Complaint
     }
 
     /**
-     * @return Collection<int, Cause>
+     * @return Collection<int, Prejudice>
      */
     public function getIncidentCauses(): Collection
     {
         return $this->incidentCauses;
     }
 
-    public function addIncidentCause(Cause $incidentCause): static
+    public function addIncidentCause(Prejudice $incidentCause): static
     {
         if (!$this->incidentCauses->contains($incidentCause)) {
             $this->incidentCauses->add($incidentCause);
@@ -386,7 +381,7 @@ class Complaint
         return $this;
     }
 
-    public function removeIncidentCause(Cause $incidentCause): static
+    public function removeIncidentCause(Prejudice $incidentCause): static
     {
         $this->incidentCauses->removeElement($incidentCause);
 

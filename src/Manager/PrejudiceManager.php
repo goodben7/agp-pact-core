@@ -8,8 +8,10 @@ use App\Dto\PrejudiceUpdateDTO;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Exception\UnavailableDataException;
 use App\Exception\UnauthorizedActionException;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 
-class PrejudiceManager
+readonly class PrejudiceManager
 {
     public function __construct(
         private EntityManagerInterface $em
@@ -19,19 +21,12 @@ class PrejudiceManager
 
     public function create(PrejudiceCreateDTO $dto): Prejudice
     {
-        $prejudice = new Prejudice();
-
-        $prejudice->setLabel($dto->label);
-        $prejudice->setCategory($dto->category);
-        $prejudice->setComplaintType($dto->complaintType);
-        $prejudice->setDescription($dto->description);
-        $prejudice->setActive($dto->active ?? true);
-        $prejudice->setIncidentCause($dto->incidentCause);
-        $prejudice->setDeleted(false);
-
-        foreach ($dto->consequences as $consequence) {
-            $prejudice->addConsequence($consequence);
-        }
+        $prejudice = (new Prejudice())
+            ->setLabel($dto->label)
+            ->setDescription($dto->description)
+            ->setActive($dto->active ?? true)
+            ->setAssetType($dto->assetType)
+            ->setDeleted(false);
 
         $this->em->persist($prejudice);
         $this->em->flush();
@@ -39,7 +34,11 @@ class PrejudiceManager
         return $prejudice;
     }
 
-    public function delete(string $prejudiceId): void 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function delete(string $prejudiceId): void
     {
         $prejudice = $this->findPrejudice($prejudiceId);
 
@@ -53,25 +52,19 @@ class PrejudiceManager
         $this->em->flush();
     }
 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
     public function update(string $prejudiceId, PrejudiceUpdateDTO $dto): Prejudice
     {
         $prejudice = $this->findPrejudice($prejudiceId);
 
-        $prejudice->setLabel($dto->label ?? $prejudice->getLabel());
-        $prejudice->setCategory($dto->category  ?? $prejudice->getCategory());
-        $prejudice->setComplaintType($dto->complaintType ?? $prejudice->getComplaintType());
-        $prejudice->setDescription($dto->description ?? $prejudice->getDescription());
-        $prejudice->setActive($dto->active ?? $prejudice->isActive());
-        $prejudice->setIncidentCause($dto->incidentCause ?? $prejudice->getIncidentCause());
-
-        foreach ($prejudice->getConsequences() as $existingConsequence) {
-            $prejudice->removeConsequence($existingConsequence);
-            $this->em->remove($existingConsequence);
-        }
-
-        foreach ($dto->consequences as $newConsequence) {
-            $prejudice->addConsequence($newConsequence);
-        }
+        ($prejudice)
+            ->setLabel($dto->label ?? $prejudice->getLabel())
+            ->setDescription($dto->description ?? $prejudice->getDescription())
+            ->setAssetType($dto->assetType ?? $prejudice->getAssetType())
+            ->setActive($dto->active ?? $prejudice->isActive());
 
         $this->em->persist($prejudice);
         $this->em->flush();
@@ -79,14 +72,17 @@ class PrejudiceManager
         return $prejudice;
     }
 
-    private function findPrejudice(string $prejudiceId): Prejudice 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    private function findPrejudice(string $prejudiceId): Prejudice
     {
         $prejudice = $this->em->find(Prejudice::class, $prejudiceId);
 
-        if (null === $prejudice) {
+        if (null === $prejudice)
             throw new UnavailableDataException(sprintf('cannot find Prejudice with id: %s', $prejudiceId));
-        }
 
-        return $prejudice; 
+        return $prejudice;
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Dto\Complaint;
 
+use App\Entity\Prejudice;
 use App\Entity\User;
-use App\Entity\Cause;
 use App\Entity\Company;
 use App\Entity\Location;
 use App\Entity\RoadAxis;
@@ -18,7 +18,7 @@ class ComplaintCreateDTO
 
     public ?\DateTimeImmutable $incidentDate = null;
 
-    /** @var Cause[]|null */
+    /** @var Prejudice[]|null */
     public ?array $incidentCauses = null;
 
     public ?string $description = null;

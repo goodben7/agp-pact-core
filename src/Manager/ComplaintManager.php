@@ -37,6 +37,8 @@ readonly class ComplaintManager
 
     public function create(ComplaintCreateDTO $data): Complaint
     {
+        /** @var User $user */
+        $user = $this->security->getUser();
         $complainant = null;
 
         if (!$data->isAnonymous) {
@@ -45,16 +47,14 @@ readonly class ComplaintManager
 
                 if ($data->newComplainant->contactPhone) {
                     $existingComplainant = $complainantRepository->findOneBy(['contactPhone' => $data->newComplainant->contactPhone]);
-                    if ($existingComplainant) {
+                    if ($existingComplainant)
                         $complainant = $existingComplainant;
-                    }
                 }
 
                 if (!$complainant && $data->newComplainant->contactEmail) {
                     $existingComplainant = $complainantRepository->findOneBy(['contactEmail' => $data->newComplainant->contactEmail]);
-                    if ($existingComplainant) {
+                    if ($existingComplainant)
                         $complainant = $existingComplainant;
-                    }
                 }
 
                 if (!$complainant) {
@@ -81,58 +81,7 @@ readonly class ComplaintManager
             }
         }
 
-        $isSensitive = false;
-        if (!empty($data->incidentCauses)) {
-            $prejudiceRepository = $this->em->getRepository(Prejudice::class);
-
-            $matchingPrejudices = $prejudiceRepository->findBy(['incidentCause' => $data->incidentCauses]);
-
-            foreach ($matchingPrejudices as $prejudice) {
-                $complaintType = $prejudice->getComplaintType();
-                if ($complaintType && $complaintType->getCode() === GeneralParameterComplaintType::SENSITIVE_COMPLAINT_CODE) {
-                    $isSensitive = true;
-                    break;
-                }
-            }
-        }
-
-        if (!$isSensitive && $data->complaintConsequences) {
-            $prejudiceRepository = $this->em->getRepository(Prejudice::class);
-
-            $sensitivePrejudices = $prejudiceRepository->findByComplaintTypeCode(GeneralParameterComplaintType::SENSITIVE_COMPLAINT_CODE);
-
-            if ($sensitivePrejudices) {
-                $sensitiveConsequenceTypeIds = [];
-
-                foreach ($sensitivePrejudices as $prejudice) {
-                    foreach ($prejudice->getConsequences() as $prejudiceConsequence) {
-                        $type = $prejudiceConsequence->getConsequenceType();
-                        if ($type) {
-                            $sensitiveConsequenceTypeIds[$type->getId()] = true;
-                        }
-                    }
-                }
-
-                foreach ($data->complaintConsequences as $consequenceDto) {
-                    $type = $consequenceDto->consequenceType;
-                    if ($type && isset($sensitiveConsequenceTypeIds[$type->getId()])) {
-                        $isSensitive = true;
-                        break;
-                    }
-                }
-            }
-        }
-        $userId = null;
-
-        if (!$data->isAnonymous) {
-
-            /**
-             * @var User $user
-             */
-            $user = $this->security->getUser();
-
-            $userId = $user->getId();
-        }
+        $userId = $user?->getId();
 
         $complaint = (new Complaint())
             ->setComplaintType($data->complaintType)
@@ -145,16 +94,21 @@ readonly class ComplaintManager
             ->setLongitude($data->longitude)
             ->setComplainant($complainant)
             ->setAssignedTo($data->assignedTo)
-            ->setIsSensitive($isSensitive)
             ->setDeclarationDate(new \DateTimeImmutable())
             ->setCreatedBy($userId);
 
+
+        $isSensitive = false;
         if (!empty($data->incidentCauses)) {
             foreach ($data->incidentCauses as $incidentCause) {
                 $complaint->addIncidentCause($incidentCause);
+                $complaintType = $incidentCause->getComplaintType();
+                if ($complaintType && $complaintType->getCode() === GeneralParameterComplaintType::SENSITIVE_COMPLAINT_CODE)
+                    $isSensitive = true;
             }
         }
 
+        $complaint->setIsSensitive($isSensitive);
 
         $initialStep = $this->em->getRepository(WorkflowStep::class)->findOneBy(['isInitial' => true]);
         if (!$initialStep)
@@ -190,8 +144,7 @@ readonly class ComplaintManager
                     ->setLastName($offenderDto->lastName)
                     ->setMiddleName($offenderDto->middleName)
                     ->setGender($offenderDto->gender)
-                    ->setDescription($offenderDto->description)
-                ;
+                    ->setDescription($offenderDto->description);
 
                 $complaint->addOffender($offender);
             }
