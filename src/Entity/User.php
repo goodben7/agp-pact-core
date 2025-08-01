@@ -107,7 +107,9 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     'displayName' => 'ipartial',
     'deleted' => 'exact',
     'profile' => 'exact',
-    'locked' => 'exact'
+    'locked' => 'exact',
+    'roadAxis'  => 'exact',
+    'roadAxis.id' => 'exact',
 ])]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt', 'updatedAt'])]
 #[ApiFilter(DateFilter::class, properties: ['createdAt', 'updatedAt'])]
