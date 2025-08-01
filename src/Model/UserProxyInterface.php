@@ -12,4 +12,5 @@ interface UserProxyInterface {
     public const PERSON_WORLD_BANK = 'WBK';
     public const PERSON_COMPLAINANT = 'CMP';
     public const PERSON_LAMBDA = 'LAM';
+    public const PERSON_ADMINISTRATOR_MANAGER = 'ADM_MGR';
 }

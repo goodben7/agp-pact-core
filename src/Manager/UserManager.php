@@ -43,6 +43,7 @@ class UserManager
             $user->setDisplayName($model->displayName);
             $user->setProfile($model->profile);
             $user->setPersonType($model->profile->getPersonType());
+            $user->setRoadAxis($model->roadAxis);
 
             $this->em->persist($user);
             $this->em->flush();

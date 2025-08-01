@@ -11,7 +11,7 @@ use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use App\Entity\User;
 
-class RestrictComplaintByCreatorExtension implements QueryCollectionExtensionInterface
+class RestrictComplaintByRoadAxisExtension implements QueryCollectionExtensionInterface
 {
     public function __construct(private Security $security)
     {
@@ -34,10 +34,14 @@ class RestrictComplaintByCreatorExtension implements QueryCollectionExtensionInt
         if (!$user)
             return;
 
-        if (UserProxyInterface::PERSON_LAMBDA === $user->getPersonType() || UserProxyInterface::PERSON_COMPLAINANT === $user->getPersonType()) {
-            $rootAlias = $queryBuilder->getRootAliases()[0];
-            $queryBuilder->andWhere(sprintf('(%s.createdBy = :currentUser) AND (%s.createdBy IS NOT NULL)', $rootAlias, $rootAlias));
-            $queryBuilder->setParameter('currentUser', $user->getId());
+        if (UserProxyInterface::PERSON_ADMINISTRATOR_MANAGER === $user->getPersonType()) {
+            $roadAxis = $user->getRoadAxis();
+            
+            if ($roadAxis) {
+                $rootAlias = $queryBuilder->getRootAliases()[0];
+                $queryBuilder->andWhere(sprintf('%s.roadAxis = :roadAxisId', $rootAlias));
+                $queryBuilder->setParameter('roadAxisId', $roadAxis->getId());
+            }
         }
     }
 }

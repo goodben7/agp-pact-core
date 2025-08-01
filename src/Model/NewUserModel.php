@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use App\Entity\Profile;
+use App\Entity\RoadAxis;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class NewUserModel
@@ -23,6 +24,8 @@ class NewUserModel
         public ?string $phone = null,
 
         public ?string $displayName = null,
+
+        public ?RoadAxis $roadAxis = null,
 
     )
     {  

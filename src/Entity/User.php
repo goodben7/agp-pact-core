@@ -173,6 +173,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:get'])]
     private ?string $personType = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(groups: ['user:get'])]
+    private ?RoadAxis $roadAxis = null;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -458,5 +463,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __toString()
     {
         return $this->getDisplayName() ?? sprintf("User %s", $this->id);
+    }
+
+    /**
+     * Get the value of roadAxis
+     */ 
+    public function getRoadAxis(): RoadAxis|null
+    {
+        return $this->roadAxis;
+    }
+
+    /**
+     * Set the value of roadAxis
+     *
+     * @return  self
+     */ 
+    public function setRoadAxis(?RoadAxis $roadAxis): static
+    {
+        $this->roadAxis = $roadAxis;
+
+        return $this;
     }
 }
