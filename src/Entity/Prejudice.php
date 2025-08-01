@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Metadata\Get;
 use App\Doctrine\IdGenerator;
 use ApiPlatform\Metadata\Post;
@@ -53,8 +54,11 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 #[ApiFilter(SearchFilter::class, properties: [
     'id' => 'exact',
     'label' => 'ipartial',
+])]
+#[ApiFilter(BooleanFilter::class, properties: [
     'active' => 'exact',
     'deleted' => 'exact',
+    'isSensible' => 'exact',
 ])]
 class Prejudice
 {
@@ -86,6 +90,9 @@ class Prejudice
     #[ORM\ManyToOne]
     #[Groups(['prejudice:get'])]
     private ?GeneralParameter $assetType = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $isSensible = null;
 
     public function getId(): ?string
     {
@@ -152,6 +159,18 @@ class Prejudice
     public function setAssetType(?GeneralParameter $assetType): static
     {
         $this->assetType = $assetType;
+
+        return $this;
+    }
+
+    public function isSensible(): ?bool
+    {
+        return $this->isSensible;
+    }
+
+    public function setIsSensible(?bool $isSensible): static
+    {
+        $this->isSensible = $isSensible;
 
         return $this;
     }

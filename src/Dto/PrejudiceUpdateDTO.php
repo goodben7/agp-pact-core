@@ -13,5 +13,7 @@ class PrejudiceUpdateDTO
 
     public ?GeneralParameter $assetType = null;
 
+    public ?bool $isSensible = null;
+
     public ?bool $active = null;
 }
