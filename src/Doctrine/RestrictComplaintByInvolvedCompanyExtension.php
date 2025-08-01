@@ -16,9 +16,10 @@ use App\Repository\MemberRepository;
 class RestrictComplaintByInvolvedCompanyExtension implements QueryCollectionExtensionInterface
 {
     public function __construct(
-        private Security $security,
+        private Security         $security,
         private MemberRepository $memberRepository
-    ) {
+    )
+    {
     }
 
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
@@ -43,7 +44,7 @@ class RestrictComplaintByInvolvedCompanyExtension implements QueryCollectionExte
              * @var Member $member
              */
             $member = $this->memberRepository->findOneBy(['userId' => $user->getId()]);
-            
+
             if ($member && $member->getCompany()) {
                 $rootAlias = $queryBuilder->getRootAliases()[0];
                 $queryBuilder->andWhere(sprintf('%s.involvedCompany = :companyId', $rootAlias));

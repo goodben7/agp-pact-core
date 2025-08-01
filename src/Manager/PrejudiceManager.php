@@ -26,6 +26,7 @@ readonly class PrejudiceManager
             ->setDescription($dto->description)
             ->setActive($dto->active ?? true)
             ->setAssetType($dto->assetType)
+            ->setIsSensible($dto->isSensible ?? false)
             ->setDeleted(false);
 
         $this->em->persist($prejudice);
@@ -64,6 +65,7 @@ readonly class PrejudiceManager
             ->setLabel($dto->label ?? $prejudice->getLabel())
             ->setDescription($dto->description ?? $prejudice->getDescription())
             ->setAssetType($dto->assetType ?? $prejudice->getAssetType())
+            ->setIsSensible($dto->isSensible ?? $prejudice->isSensible())
             ->setActive($dto->active ?? $prejudice->isActive());
 
         $this->em->persist($prejudice);
