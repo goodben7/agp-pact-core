@@ -118,6 +118,7 @@ return static function (): iterable {
     yield Permission::new('ROLE_COMPANY_LIST', "Consulter la liste des entités");
     yield Permission::new('ROLE_COMPANY_UPDATE', "Modifier une entité");
     yield Permission::new('ROLE_COMPANY_DETAILS', "Consulter les détails d'une entité");
+    yield Permission::new('ROLE_COMPANY_DELETE', "Supprimer une entité"); 
 
     yield Permission::new('ROLE_COMPLAINT_CONSEQUENCE_LIST', 'Consulter la liste les conséquences des plaintes');
     yield Permission::new('ROLE_COMPLAINT_CONSEQUENCE_DETAILS', 'Voir les détails des conséquences des plaintes');
