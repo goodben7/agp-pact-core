@@ -306,7 +306,7 @@ class Complaint
     /**
      * @var Collection<int, Offender>
      */
-    #[ORM\OneToMany(targetEntity: Offender::class, mappedBy: 'complaint', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Offender::class, mappedBy: 'complaint', orphanRemoval: true, cascade: ['persist', 'remove'])]
     #[Groups(['complaint:get', 'complaint:list'])]
     private Collection $offenders;
 

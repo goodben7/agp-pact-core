@@ -191,4 +191,9 @@ class Offender
     {
         return $this->fullName = $this->firstName . ' ' . $this->middleName . ' ' . $this->lastName;
     }
+
+    public function __tostring(): string
+    {
+        return $this->getFullName();
+    }
 }
