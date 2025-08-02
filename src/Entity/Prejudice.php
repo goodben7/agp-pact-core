@@ -27,11 +27,11 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 #[ApiResource(
     operations: [
         new Get(
-            security: 'is_granted("ROLE_PREJUDICE_DETAILS")',
+            security: 'is_granted("ROLE_USER")',
             provider: ItemProvider::class
         ),
         new GetCollection(
-            security: 'is_granted("ROLE_PREJUDICE_LIST")',
+            security: 'is_granted("ROLE_USER")',
             provider: CollectionProvider::class
         ),
         new Post(
@@ -165,6 +165,11 @@ class Prejudice
     }
 
     public function isSensible(): ?bool
+    {
+        return $this->isSensible;
+    }
+
+    public function getIsSensible(): ?bool
     {
         return $this->isSensible;
     }
