@@ -92,6 +92,7 @@ class Prejudice
     private ?GeneralParameter $assetType = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['prejudice:get'])]
     private ?bool $isSensible = null;
 
     public function getId(): ?string
