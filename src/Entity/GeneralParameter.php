@@ -73,7 +73,7 @@ class GeneralParameter
     private ?string $value = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch', 'attached_file:get', 'species:get', 'species:list'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch', 'attached_file:get', 'species:get', 'species:list', 'prejudice:get'])]
     private ?string $code = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
