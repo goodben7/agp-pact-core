@@ -102,9 +102,10 @@ readonly class ComplaintManager
         if (!empty($data->incidentCauses)) {
             foreach ($data->incidentCauses as $incidentCause) {
                 $complaint->addIncidentCause($incidentCause);
-                $complaintType = $incidentCause->getComplaintType();
-                if ($complaintType && $complaintType->getCode() === GeneralParameterComplaintType::SENSITIVE_COMPLAINT_CODE)
+                // Check if the incident cause (Prejudice) is sensible
+                if ($incidentCause->isSensible()) {
                     $isSensitive = true;
+                }
             }
         }
 

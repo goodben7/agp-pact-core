@@ -5,6 +5,7 @@ namespace App\ApiResource;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use App\Dto\DashboardStatisticsCategory;
 use App\Provider\DashboardStatisticsProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
@@ -22,64 +23,29 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
         ),
     ],
     formats: ['json' => ['application/json']],
-    filters: [
-        SearchFilter::class,
-        DateFilter::class,
-    ],
 )]
+#[ApiFilter(SearchFilter::class, properties: ['location' => 'exact', 'involvedCompany' => 'exact', 'roadAxisId' => 'exact', 'complaintTypeId' => 'exact'])]
+#[ApiFilter(DateFilter::class, properties: ['declarationDate'])]
 final class DashboardStatistics
 {
     #[Groups(["dashboard_stats:read"])]
-    public ?array $complaintsByStatus = null;
+    public DashboardStatisticsCategory $general;
 
     #[Groups(["dashboard_stats:read"])]
-    public ?array $complaintsByType = null;
-
-    #[Groups(["dashboard_stats:read"])]
-    public ?array $complaintsBySensitivity = null;
-
-    /**
-     * @var array{
-     *     general: array{total: int, open: int, closed: int, rejected: int},
-     *     sensitive: array{total: int, open: int, closed: int, rejected: int}
-     * }
-     */
-    #[Groups(["dashboard_stats:read"])]
-    public array $complaintStats = [];
-
-    #[Groups(["dashboard_stats:read"])]
-    public ?int $totalComplaints = null;
-    #[Groups(["dashboard_stats:read"])]
-    public ?int $openComplaints = null;
-
-    #[Groups(["dashboard_stats:read"])]
-    public int $totalRejectedComplaints = 0;
-
-    #[Groups(["dashboard_stats:read"])]
-    public int $totalSensitiveComplaints = 0;
-    #[Groups(["dashboard_stats:read"])]
-    public int $openSensitiveComplaints = 0;
-    #[Groups(["dashboard_stats:read"])]
-    public int $closedSensitiveComplaints = 0;
-
-    #[Groups(["dashboard_stats:read"])]
-    public ?float $averageResolutionTimeDays = null;
+    public DashboardStatisticsCategory $sensitive;
 
     #[Groups(["dashboard_stats:read"])]
     public ?array $papsByVulnerability = null;
 
-    #[Groups(["dashboard_stats:read"])]
-    public ?array $complaintsDeclaredMonthly = null;
-
-    #[ApiFilter(SearchFilter::class, strategy: "exact", properties: ["location.id" => "exact"])]
-    public ?string $locationId = null;
-
-    #[ApiFilter(SearchFilter::class, strategy: "exact", properties: ["complaintType.id" => "exact"])]
+    public ?string $location = null;
+    public ?string $involvedCompany = null;
+    public ?string $roadAxisId = null;
     public ?string $complaintTypeId = null;
+    public ?\DateTimeInterface $declarationDate = null;
 
-    #[ApiFilter(DateFilter::class, properties: ["declarationDate"])]
-    public ?\DateTimeInterface $startDate = null;
-
-    #[ApiFilter(DateFilter::class, properties: ["declarationDate"])]
-    public ?\DateTimeInterface $endDate = null;
+    public function __construct()
+    {
+        $this->general = new DashboardStatisticsCategory();
+        $this->sensitive = new DashboardStatisticsCategory();
+    }
 }
