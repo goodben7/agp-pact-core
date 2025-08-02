@@ -13,7 +13,7 @@ use App\Entity\Member;
 use App\Entity\User;
 use App\Repository\MemberRepository;
 
-class RestrictComplaintByInvolvedCompanyExtension implements QueryCollectionExtensionInterface
+class RestrictComplaintByLocationExtension implements QueryCollectionExtensionInterface
 {
     public function __construct(
         private Security         $security,
@@ -39,16 +39,16 @@ class RestrictComplaintByInvolvedCompanyExtension implements QueryCollectionExte
         if (!$user)
             return;
 
-        if (UserProxyInterface::PERSON_NGO === $user->getPersonType() || UserProxyInterface::PERSON_COMPANY === $user->getPersonType()) {
+        if (UserProxyInterface::PERSON_COMMITTEE === $user->getPersonType()) {
             /**
              * @var Member $member
              */
             $member = $this->memberRepository->findOneBy(['userId' => $user->getId()]);
 
-            if ($member && $member->getCompany()) {
+            if ($member && $member->getCompany() && $member->getCompany()->getLocation()) {
                 $rootAlias = $queryBuilder->getRootAliases()[0];
-                $queryBuilder->andWhere(sprintf('%s.involvedCompany = :companyId', $rootAlias));
-                $queryBuilder->setParameter('companyId', $member->getCompany()->getId());
+                $queryBuilder->andWhere(sprintf('%s.location = :locationId', $rootAlias));
+                $queryBuilder->setParameter('locationId', $member->getCompany()->getLocation()->getId());
             }
         }
     }

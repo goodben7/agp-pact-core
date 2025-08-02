@@ -74,6 +74,8 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
     'active' => 'exact',
     'jobTitle' => 'ipartial',
     'rank' => 'ipartial',
+    'userId' => 'exact',
+    'company.id' => 'exact',
 ])]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt', 'contractStartDate', 'contractEndDate'])]
 #[ApiFilter(DateFilter::class, properties: ['createdAt', 'contractStartDate', 'contractEndDate'])]
