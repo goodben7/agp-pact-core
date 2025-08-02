@@ -11,6 +11,7 @@ use App\Repository\RoadAxisRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
+use App\Constant\GeneralParameterPersonType;
 
 final readonly class DashboardStatisticsProvider implements ProviderInterface
 {
@@ -130,10 +131,9 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
         $qb = $this->entityManager->createQueryBuilder()
             ->select('c.isSensitive, gt.value AS type, COUNT(c.id) AS count')
             ->from(Complaint::class, 'c')
-            ->join('c.complaintType', 'gt');
-            // Supprimer ces lignes qui causent le problème :
-            // ->andWhere('gt.category = :complaintTypeCategory')
-            // ->setParameter('complaintTypeCategory', GeneralParameterComplaintType::CATEGORY_COMPLAINT_TYPE);
+            ->join('c.complaintType', 'gt')
+            ->where('gt.category = :personTypeCategory')
+            ->setParameter('personTypeCategory', GeneralParameterPersonType::CATEGORY_PERSON_TYPE);
         
         $applyCommonFilters($qb, 'c');
         $qb->groupBy('c.isSensitive', 'type');
