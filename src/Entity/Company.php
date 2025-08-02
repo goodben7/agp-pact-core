@@ -6,10 +6,12 @@ use ApiPlatform\Metadata\Get;
 use App\Doctrine\IdGenerator;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Dto\Company\CompanyCreateDTO;
+use App\Dto\Company\CompanyUpdateDTO;
 use App\Repository\CompanyRepository;
 use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
@@ -21,8 +23,8 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
+use App\State\GeneralParameter\DeleteCompanyProcessor;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Dto\Company\CompanyUpdateDTO;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 #[ApiResource(
@@ -45,6 +47,10 @@ use App\Dto\Company\CompanyUpdateDTO;
             input: CompanyUpdateDTO::class,
             processor: CompanyUpdateProcessor::class,
         ),
+        new Delete(
+            security: "is_granted('ROLE_COMPANY_DELETE')",
+            processor: DeleteCompanyProcessor::class,
+        ),
     ],
     normalizationContext: ['groups' => 'company:get']
 )]
@@ -57,6 +63,7 @@ use App\Dto\Company\CompanyUpdateDTO;
     'active' => 'exact',
     'roadAxes' => 'exact',
     'location.id' => 'exact',
+    'deleted' => 'exact'
 ])]
 #[ApiFilter(BooleanFilter::class, properties: ['canProcessSensitiveComplaint'])]
 class Company
@@ -130,6 +137,10 @@ class Company
     #[ORM\Column(nullable: true)]
     #[Groups(['company:get', 'company:post', 'company:patch'])]
     private ?bool $canProcessSensitiveComplaint = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['company:get'])]
+    private ?bool $deleted = false;
 
     public function __construct()
     {
@@ -338,6 +349,26 @@ class Company
     public function setCanProcessSensitiveComplaint(?bool $canProcessSensitiveComplaint): static
     {
         $this->canProcessSensitiveComplaint = $canProcessSensitiveComplaint;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of deleted
+     */ 
+    public function getDeleted(): bool|null
+    {
+        return $this->deleted;
+    }
+
+    /**
+     * Set the value of deleted
+     *
+     * @return  self
+     */ 
+    public function setDeleted(?bool $deleted): static
+    {
+        $this->deleted = $deleted;
 
         return $this;
     }

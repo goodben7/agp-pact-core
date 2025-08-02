@@ -8,6 +8,7 @@ use App\Model\NewCompanyModel;
 use App\Model\UpdateCompanyModel;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Exception\UnavailableDataException;
+use App\Exception\UnauthorizedActionException;
 
 readonly class CompanyManager
 {
@@ -86,5 +87,30 @@ readonly class CompanyManager
         $this->em->flush();
 
         return $company;
+    }
+
+    public function delete(string $companyId): void 
+    {
+        $company = $this->findCompany($companyId);
+
+        if ($company->getDeleted()) {
+            throw new UnauthorizedActionException('this action is not allowed');
+        }
+
+        $company->setDeleted(true);
+
+        $this->em->persist($company);
+        $this->em->flush();
+    }
+
+    private function findCompany(string $companyId): Company 
+    {
+        $company = $this->em->find(Company::class, $companyId);
+
+        if (null === $company) {
+            throw new UnavailableDataException(sprintf('cannot find company with id: %s', $companyId));
+        }
+
+        return $company; 
     }
 }
