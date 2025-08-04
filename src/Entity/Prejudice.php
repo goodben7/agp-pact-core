@@ -27,11 +27,9 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 #[ApiResource(
     operations: [
         new Get(
-            security: 'is_granted("ROLE_USER")',
             provider: ItemProvider::class
         ),
         new GetCollection(
-            security: 'is_granted("ROLE_USER")',
             provider: CollectionProvider::class
         ),
         new Post(
