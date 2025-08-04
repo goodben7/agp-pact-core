@@ -24,11 +24,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(
             normalizationContext: ['groups' => ['species:list']],
-            security: "is_granted('ROLE_SPECIES_LIST')"
         ),
         new Get(
             normalizationContext: ['groups' => ['species:get']],
-            security: "is_granted('ROLE_SPECIES_DETAILS')"
         ),
         new Post(
             denormalizationContext: ['groups' => ['species:post']],
