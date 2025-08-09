@@ -38,10 +38,10 @@ return static function (): iterable {
     yield Permission::new('ROLE_COMPLAINT_UPDATE', "Modifier une plainte");
     yield Permission::new('ROLE_COMPLAINT_APPLY_ACTION', "Appliquer une action sur une plainte");
 
-    yield Permission::new('ROLE_COMPLAINANT_LIST', 'Consulter la liste des plaintants');
-    yield Permission::new('ROLE_COMPLAINANT_DETAILS', 'Consulter les détails d\'un plaintant');
-    yield Permission::new('ROLE_COMPLAINANT_CREATE', 'Créer un plaintant');
-    yield Permission::new('ROLE_COMPLAINANT_UPDATE', 'Modifier un plaintant');
+    yield Permission::new('ROLE_COMPLAINANT_LIST', 'Consulter la liste des plaignants');
+    yield Permission::new('ROLE_COMPLAINANT_DETAILS', 'Consulter les détails d\'un plaignant');
+    yield Permission::new('ROLE_COMPLAINANT_CREATE', 'Créer un plaignant');
+    yield Permission::new('ROLE_COMPLAINANT_UPDATE', 'Modifier un plaignant');
 
     yield Permission::new('ROLE_COMPLAINT_TYPE_LIST', 'Consulter la liste des types de plainte');
     yield Permission::new('ROLE_COMPLAINT_TYPE_DETAILS', 'Consulter les détails d\'un type de plainte');
@@ -118,7 +118,7 @@ return static function (): iterable {
     yield Permission::new('ROLE_COMPANY_LIST', "Consulter la liste des entités");
     yield Permission::new('ROLE_COMPANY_UPDATE', "Modifier une entité");
     yield Permission::new('ROLE_COMPANY_DETAILS', "Consulter les détails d'une entité");
-    yield Permission::new('ROLE_COMPANY_DELETE', "Supprimer une entité"); 
+    yield Permission::new('ROLE_COMPANY_DELETE', "Supprimer une entité");
 
     yield Permission::new('ROLE_COMPLAINT_CONSEQUENCE_LIST', 'Consulter la liste les conséquences des plaintes');
     yield Permission::new('ROLE_COMPLAINT_CONSEQUENCE_DETAILS', 'Voir les détails des conséquences des plaintes');
@@ -152,7 +152,7 @@ return static function (): iterable {
     yield Permission::new('ROLE_PREJUDICE_LIST', "Consulter la liste des préjudices");
     yield Permission::new('ROLE_PREJUDICE_CREATE', "Créer un préjudice");
     yield Permission::new('ROLE_PREJUDICE_UPDATE', "Modifier un préjudice");
-    yield Permission::new( 'ROLE_PREJUDICE_DELETE', "Supprimer un préjudice");
+    yield Permission::new('ROLE_PREJUDICE_DELETE', "Supprimer un préjudice");
 
     yield Permission::new('ROLE_MEMBER_DETAILS', "Consulter les détails d'un membre");
     yield Permission::new('ROLE_MEMBER_LIST', "Consulter la liste des membres");
