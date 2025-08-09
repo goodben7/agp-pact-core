@@ -182,7 +182,7 @@ readonly class ComplaintManager
         $this->em->persist($complaint);
         $this->em->flush();
 
-        if (!$data->isAnonymous) {
+        if (!$data->isAnonymous && $complainant) {
             $this->bus->dispatch(
                 new ComplaintRegisteredMessage(
                     complaintId: $complaint->getId(),
@@ -192,11 +192,20 @@ readonly class ComplaintManager
             );
         }
 
-        $company = $this->em->getRepository(Company::class)->findOneBy(['location' => $complaint->getLocation()]);
+        $companyRepository = $this->em->getRepository(Company::class);
+        $company = $companyRepository->createQueryBuilder('c')
+            ->join('c.locations', 'l')
+            ->where('l = :location')
+            ->setParameter('location', $complaint->getLocation())
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
         if ($company) {
             $this->bus->dispatch(
                 new AssignedMessage(
                     complaintId: $complaint->getId(),
+                    assignedToCompanyId: $company->getId()
                 )
             );
         }
