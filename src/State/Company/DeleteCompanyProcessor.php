@@ -1,19 +1,24 @@
 <?php
 
-namespace App\State\GeneralParameter;
+namespace App\State\Company;
 
 use ApiPlatform\State\ProcessorInterface;
 use App\Manager\CompanyManager;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 
-class DeleteCompanyProcessor implements ProcessorInterface
+readonly class DeleteCompanyProcessor implements ProcessorInterface
 {
     public function __construct(private CompanyManager $manager)
-    {   
-    }
-
-    public function process(mixed $data, \ApiPlatform\Metadata\Operation $operation, array $uriVariables = [], array $context = [])
     {
-        return $this->manager->delete($uriVariables['id']);
     }
 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function process(mixed $data, \ApiPlatform\Metadata\Operation $operation, array $uriVariables = [], array $context = []): void
+    {
+        $this->manager->delete($uriVariables['id']);
+    }
 }
