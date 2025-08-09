@@ -27,6 +27,7 @@ readonly class CompanyUpdateProcessor implements ProcessorInterface
             $data->contactEmail,
             $data->contactPhone,
             $data->active,
+            $data->locations,
             $data->roadAxes,
             $data->canProcessSensitiveComplaint
         );

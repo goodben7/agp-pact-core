@@ -14,8 +14,8 @@ readonly class CompanyCreateProcessor implements ProcessorInterface
 {
     public function __construct(
         private CompanyManager $manager,
-        private EntityManagerInterface $em
-    ) {
+    )
+    {
     }
 
     /**

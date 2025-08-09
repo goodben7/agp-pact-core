@@ -17,7 +17,8 @@ class CompanyCreateDTO
 
     public ?bool $active = true;
 
-    public ?Location $location= null;
+    /** @var Location[] $locations  */
+    public ?array $locations = [];
 
     public ?array $roadAxes = [];
 

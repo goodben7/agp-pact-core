@@ -34,7 +34,6 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: CollectionProvider::class
         ),
         new Get(
-            //security: 'is_granted("ROLE_COMPANY_DETAILS")',
             provider: ItemProvider::class
         ),
         new Post(
@@ -103,11 +102,6 @@ class Company
     #[Groups(['company:get', 'company:post', 'company:patch'])]
     private ?bool $active = false;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['company:get', 'company:post', 'company:patch'])]
-    private ?Location $location = null;
-
     /**
      * @var Collection<int, Complaint>
      */
@@ -142,12 +136,20 @@ class Company
     #[Groups(['company:get'])]
     private ?bool $deleted = false;
 
+    /**
+     * @var Collection<int, Location>
+     */
+    #[ORM\ManyToMany(targetEntity: Location::class)]
+    #[Groups(['company:get', 'company:post', 'company:patch'])]
+    private Collection $locations;
+
     public function __construct()
     {
         $this->complaints = new ArrayCollection();
         $this->members = new ArrayCollection();
         $this->roadAxes = new ArrayCollection();
         $this->complaintStepAssignments = new ArrayCollection();
+        $this->locations = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -211,18 +213,6 @@ class Company
     public function setActive(bool $active): static
     {
         $this->active = $active;
-
-        return $this;
-    }
-
-    public function getLocation(): ?Location
-    {
-        return $this->location;
-    }
-
-    public function setLocation(?Location $location): static
-    {
-        $this->location = $location;
 
         return $this;
     }
@@ -355,7 +345,7 @@ class Company
 
     /**
      * Get the value of deleted
-     */ 
+     */
     public function getDeleted(): bool|null
     {
         return $this->deleted;
@@ -365,10 +355,34 @@ class Company
      * Set the value of deleted
      *
      * @return  self
-     */ 
+     */
     public function setDeleted(?bool $deleted): static
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Location>
+     */
+    public function getLocations(): Collection
+    {
+        return $this->locations;
+    }
+
+    public function addLocation(Location $location): static
+    {
+        if (!$this->locations->contains($location)) {
+            $this->locations->add($location);
+        }
+
+        return $this;
+    }
+
+    public function removeLocation(Location $location): static
+    {
+        $this->locations->removeElement($location);
 
         return $this;
     }

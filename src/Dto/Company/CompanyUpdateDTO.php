@@ -3,6 +3,7 @@
 namespace App\Dto\Company;
 
 use App\Entity\GeneralParameter;
+use App\Entity\Location;
 
 class CompanyUpdateDTO
 {
@@ -11,6 +12,8 @@ class CompanyUpdateDTO
     public ?string $contactEmail = null;
     public ?string $contactPhone = null;
     public ?bool $active = true;
+    /** @var Location[] $locations */
+    public ?array $locations = [];
     public ?array $roadAxes = [];
     public ?bool $canProcessSensitiveComplaint = null;
 }

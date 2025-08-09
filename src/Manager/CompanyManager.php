@@ -3,12 +3,15 @@
 namespace App\Manager;
 
 use App\Entity\Company;
+use App\Entity\Location;
 use App\Entity\RoadAxis;
 use App\Model\NewCompanyModel;
 use App\Model\UpdateCompanyModel;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Exception\UnavailableDataException;
 use App\Exception\UnauthorizedActionException;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 
 readonly class CompanyManager
 {
@@ -33,14 +36,7 @@ readonly class CompanyManager
             ->setActive($model->active)
             ->setCanProcessSensitiveComplaint($model->canProcessSensitiveComplaint);
 
-        if (!empty($model->roadAxes)) {
-            foreach ($model->roadAxes as $roadAxisId) {
-                $roadAxis = $this->em->getRepository(RoadAxis::class)->find($roadAxisId);
-                if ($roadAxis) {
-                    $company->addRoadAxe($roadAxis);
-                }
-            }
-        }
+        $this->extracted($model, $company);
 
         $this->em->persist($company);
         $this->em->flush();
@@ -58,11 +54,11 @@ readonly class CompanyManager
     public function updateFrom(UpdateCompanyModel $model, string $companyId): Company
     {
         $company = $this->em->getRepository(Company::class)->find($companyId);
-        
+
         if (!$company) {
             throw new UnavailableDataException("Company not found");
         }
-        
+
         $company
             ->setName($model->name)
             ->setType($model->type)
@@ -74,22 +70,19 @@ readonly class CompanyManager
         foreach ($company->getRoadAxes() as $roadAxis) {
             $company->removeRoadAxe($roadAxis);
         }
-        
-        if (!empty($model->roadAxes)) {
-            foreach ($model->roadAxes as $roadAxisId) {
-                $roadAxis = $this->em->getRepository(RoadAxis::class)->find($roadAxisId);
-                if ($roadAxis) {
-                    $company->addRoadAxe($roadAxis);
-                }
-            }
-        }
+
+        $this->extracted($model, $company);
 
         $this->em->flush();
 
         return $company;
     }
 
-    public function delete(string $companyId): void 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function delete(string $companyId): void
     {
         $company = $this->findCompany($companyId);
 
@@ -103,7 +96,11 @@ readonly class CompanyManager
         $this->em->flush();
     }
 
-    private function findCompany(string $companyId): Company 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    private function findCompany(string $companyId): Company
     {
         $company = $this->em->find(Company::class, $companyId);
 
@@ -111,6 +108,27 @@ readonly class CompanyManager
             throw new UnavailableDataException(sprintf('cannot find company with id: %s', $companyId));
         }
 
-        return $company; 
+        return $company;
+    }
+
+    public function extracted(NewCompanyModel|UpdateCompanyModel $model, Company $company): void
+    {
+        if (!empty($model->locations)) {
+            foreach ($model->locations as $locationId) {
+                $location = $this->em->getRepository(Location::class)->find($locationId);
+                if ($location) {
+                    $company->addLocation($location);
+                }
+            }
+        }
+
+        if (!empty($model->roadAxes)) {
+            foreach ($model->roadAxes as $roadAxisId) {
+                $roadAxis = $this->em->getRepository(RoadAxis::class)->find($roadAxisId);
+                if ($roadAxis) {
+                    $company->addRoadAxe($roadAxis);
+                }
+            }
+        }
     }
 }
