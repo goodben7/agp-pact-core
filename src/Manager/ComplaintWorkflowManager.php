@@ -148,7 +148,11 @@ readonly class ComplaintWorkflowManager
         }
 
         if ($action->getName() === 'verify_receivability_action') {
-            $complaint->setIsReceivable($newStep->getName() === WorkflowStepName::RECEIVABLE);
+            $complaint->setIsReceivable(true);
+        }
+
+        if ($action->getName() === 'mark_non_receivable') {
+            $complaint->setIsReceivable(false);
         }
 
         if ($file instanceof UploadedFile) {
