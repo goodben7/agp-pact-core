@@ -18,9 +18,7 @@ class RestrictComplaintByLocationExtension implements QueryCollectionExtensionIn
     public function __construct(
         private Security         $security,
         private MemberRepository $memberRepository
-    )
-    {
-    }
+    ) {}
 
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
@@ -45,10 +43,14 @@ class RestrictComplaintByLocationExtension implements QueryCollectionExtensionIn
              */
             $member = $this->memberRepository->findOneBy(['userId' => $user->getId()]);
 
-            if ($member && $member->getCompany() && $member->getCompany()->getLocation()) {
+            if ($member && $member->getCompany() && !$member->getCompany()->getLocations()->isEmpty()) {
                 $rootAlias = $queryBuilder->getRootAliases()[0];
-                $queryBuilder->andWhere(sprintf('%s.location = :locationId', $rootAlias));
-                $queryBuilder->setParameter('locationId', $member->getCompany()->getLocation()->getId());
+                $locationIds = [];
+                foreach ($member->getCompany()->getLocations() as $location) {
+                    $locationIds[] = $location->getId();
+                }
+                $queryBuilder->andWhere(sprintf('%s.location IN (:locationIds)', $rootAlias));
+                $queryBuilder->setParameter('locationIds', $locationIds);
             }
         }
     }
