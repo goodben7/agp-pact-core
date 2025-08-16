@@ -28,9 +28,7 @@ class ComplaintWorkflowMessageHandler
         private MessageBusInterface $bus,
         private ComplaintRepository $complaintRepository,
         private LoggerInterface     $logger
-    )
-    {
-    }
+    ) {}
 
     /**
      * @throws ExceptionInterface
@@ -43,7 +41,9 @@ class ComplaintWorkflowMessageHandler
 
         $this->logger->info(sprintf(
             "ComplaintWorkflowMessage received for complaint %s. Action: %s, New Step: %s",
-            $complaintId, $actionName, $newStepName
+            $complaintId,
+            $actionName,
+            $newStepName
         ));
 
         $complaint = $this->complaintRepository->find($complaintId);
@@ -62,8 +62,8 @@ class ComplaintWorkflowMessageHandler
             case 'create_complaint_action':
                 $this->bus->dispatch(new ComplaintRegisteredMessage(
                     $complaint->getId(),
-                    $complaint->getComplainant()->getContactEmail(),
-                    $complaint->getComplainant()->getContactPhone()
+                    $complaint->getComplainant()?->getContactEmail(),
+                    $complaint->getComplainant()?->getContactPhone()
                 ));
                 break;
 
@@ -155,7 +155,9 @@ class ComplaintWorkflowMessageHandler
             default:
                 $this->logger->warning(sprintf(
                     "ComplaintWorkflowMessage with unhandled action '%s' for complaint %s in step %s. No specific message dispatched.",
-                    $actionName, $complaintId, $newStepName
+                    $actionName,
+                    $complaintId,
+                    $newStepName
                 ));
                 break;
         }

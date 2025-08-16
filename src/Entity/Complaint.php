@@ -1020,6 +1020,11 @@ class Complaint
         return $this->isReceivable;
     }
 
+    public function getIsReceivable(): ?bool
+    {
+        return $this->isReceivable;
+    }
+
     public function setIsReceivable(?bool $isReceivable): static
     {
         $this->isReceivable = $isReceivable;

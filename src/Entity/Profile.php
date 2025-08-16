@@ -60,7 +60,7 @@ class Profile
     public const ID_PREFIX = "PR";
 
     #[ORM\Id]
-    #[ORM\GeneratedValue( strategy: 'CUSTOM')]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[Groups(['profile:get', 'user:get', 'workflow_transition:get', 'workflow_transition:list'])]
     #[ORM\Column(length: 16)]
@@ -79,7 +79,7 @@ class Profile
 
     #[ORM\Column(length: 3)]
     #[Assert\Choice(callback: [User::class, 'getPersonTypesAsList'])]
-    #[Groups(['profile:get', 'profile:post'])]
+    #[Groups(['profile:get', 'profile:post', 'profile:patch'])]
     private ?string $personType = null;
 
     #[ORM\Column]
@@ -198,5 +198,4 @@ class Profile
 
         return $this;
     }
-
 }
