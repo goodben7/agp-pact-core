@@ -27,6 +27,7 @@ class RequireAccessDto
             UserProxyInterface::PERSON_ADMIN,
             UserProxyInterface::PERSON_COMMITTEE,
             UserProxyInterface::PERSON_NGO,
+            UserProxyInterface::PERSON_GOV,
             UserProxyInterface::PERSON_COMPANY,
             UserProxyInterface::PERSON_CONTROL_MISSION,
             UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
@@ -36,7 +37,5 @@ class RequireAccessDto
         ])]
         public ?string $personType = null,
 
-    )
-    {
-    }
+    ) {}
 }

@@ -118,13 +118,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public const ID_PREFIX = "US";
 
     #[ORM\Id]
-    #[ORM\GeneratedValue( strategy: 'CUSTOM')]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
     #[Groups(groups: ['user:get', 'generated_report:list', 'generated_report:get', 'complaint_history:get', 'complaint_history:list', 'attached_file:get'])]
     private ?string $id = null;
 
-    #[ORM\Column(length: 180, nullable:true)]
+    #[ORM\Column(length: 180, nullable: true)]
     #[Groups(groups: ['user:get'])]
     private ?string $email = null;
 
@@ -225,7 +225,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return array_values(array_unique($roles));
-
     }
 
     /**
@@ -414,6 +413,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_search($this->personType, [
             "ROLE_COMMITTEE" => UserProxyInterface::PERSON_COMMITTEE,
             "ROLE_NGO" => UserProxyInterface::PERSON_NGO,
+            "ROLE_GOV" => UserProxyInterface::PERSON_GOV,
             "ROLE_COMPANY" => UserProxyInterface::PERSON_COMPANY,
             "ROLE_CONTROL_MISSION" => UserProxyInterface::PERSON_CONTROL_MISSION,
             "ROLE_INFRASTRUCTURE_CELL" => UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
@@ -430,6 +430,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return [
             UserProxyInterface::PERSON_COMMITTEE,
             UserProxyInterface::PERSON_NGO,
+            UserProxyInterface::PERSON_GOV,
             UserProxyInterface::PERSON_COMPANY,
             UserProxyInterface::PERSON_CONTROL_MISSION,
             UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
@@ -446,6 +447,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return [
             "Comité" => UserProxyInterface::PERSON_COMMITTEE,
             "ONG" => UserProxyInterface::PERSON_NGO,
+            "Gouvernement" => UserProxyInterface::PERSON_GOV,
             "Entreprise" => UserProxyInterface::PERSON_COMPANY,
             "Mission de contrôle" => UserProxyInterface::PERSON_CONTROL_MISSION,
             "Cellule d'infrastructure" => UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
@@ -469,7 +471,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Get the value of roadAxis
-     */ 
+     */
     public function getRoadAxis(): RoadAxis|null
     {
         return $this->roadAxis;
@@ -479,7 +481,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Set the value of roadAxis
      *
      * @return  self
-     */ 
+     */
     public function setRoadAxis(?RoadAxis $roadAxis): static
     {
         $this->roadAxis = $roadAxis;
