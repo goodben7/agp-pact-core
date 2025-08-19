@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Model\Workflow\DisplayFields;
-use App\Repository\WorkflowStepUIConfigurationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Model\Workflow\DisplayFields;
 use Symfony\Component\Serializer\Attribute\Groups;
+use App\Repository\WorkflowStepUIConfigurationRepository;
 
 #[ORM\Entity(repositoryClass: WorkflowStepUIConfigurationRepository::class)]
 class WorkflowStepUIConfiguration
@@ -35,7 +35,6 @@ class WorkflowStepUIConfiguration
 
     #[ORM\Column(nullable: true)]
     #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch'])]
-    /** @var DisplayFields[] $displayFields */
     private ?array $displayFields = null;
 
     #[ORM\Column(nullable: true)]
