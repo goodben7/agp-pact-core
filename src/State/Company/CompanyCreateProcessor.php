@@ -30,8 +30,9 @@ readonly class CompanyCreateProcessor implements ProcessorInterface
             $data->contactEmail,
             $data->contactPhone,
             $data->active,
+            $data->locations,
             $data->roadAxes,
-            $data->canProcessSensitiveComplaint
+            $data->canProcessSensitiveComplaint,
         );
 
         return $this->manager->create($model);
