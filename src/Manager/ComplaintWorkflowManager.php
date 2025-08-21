@@ -3,7 +3,6 @@
 namespace App\Manager;
 
 use App\Constant\GeneralParameterCategory;
-use App\Constant\WorkflowStepName;
 use App\Entity\AttachedFile;
 use App\Entity\Complaint;
 use App\Entity\ComplaintHistory;
@@ -33,9 +32,7 @@ readonly class ComplaintWorkflowManager
         private Security               $security,
         private ValidatorInterface     $validator,
         private AssignmentManager      $assignmentManager
-    )
-    {
-    }
+    ) {}
 
     /**
      * @throws ExceptionInterface
@@ -191,7 +188,7 @@ readonly class ComplaintWorkflowManager
             $this->em->persist($attachedFile);
         }
 
-        $this->assignmentManager->assignDefaultActor($complaint);
+        //$this->assignmentManager->assignDefaultActor($complaint);
 
         $history = (new ComplaintHistory())
             ->setComplaint($complaint)

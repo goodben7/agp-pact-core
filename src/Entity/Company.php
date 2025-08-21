@@ -23,14 +23,13 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
-use App\State\GeneralParameter\DeleteCompanyProcessor;
+use App\State\Company\DeleteCompanyProcessor;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 #[ApiResource(
     operations: [
         new GetCollection(
-            //security: 'is_granted("ROLE_COMPANY_LIST")',
             provider: CollectionProvider::class
         ),
         new Get(
@@ -73,13 +72,13 @@ class Company
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['company:get', 'complaint:get', 'complaint:list'])]
+    #[Groups(['company:get', 'complaint:get', 'complaint:list', 'default_assignment_rule:get', 'default_assignment_rule:list'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
-    #[Groups(['company:get', 'company:post', 'company:patch', 'complaint:get', 'complaint:list'])]
+    #[Groups(['company:get', 'company:post', 'company:patch', 'complaint:get', 'complaint:list', 'default_assignment_rule:get', 'default_assignment_rule:list'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne]

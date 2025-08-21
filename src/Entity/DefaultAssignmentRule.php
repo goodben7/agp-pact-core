@@ -9,9 +9,10 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Delete;
 use App\Doctrine\IdGenerator;
 use App\Repository\DefaultAssignmentRuleRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -54,21 +55,21 @@ class DefaultAssignmentRule
     #[Groups(['default_assignment_rule:get', 'default_assignment_rule:list', 'default_assignment_rule:post', 'default_assignment_rule:patch'])]
     private ?WorkflowStep $workflowStep = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\Column(nullable: true)]
     #[Groups(['default_assignment_rule:get', 'default_assignment_rule:list', 'default_assignment_rule:post', 'default_assignment_rule:patch'])]
-    private ?Location $location = null;
+    private ?bool $location = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\Column(nullable: true)]
     #[Groups(['default_assignment_rule:get', 'default_assignment_rule:list', 'default_assignment_rule:post', 'default_assignment_rule:patch'])]
-    private ?RoadAxis $roadAxis = null;
+    private ?bool $roadAxis = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToMany(targetEntity: Company::class)]
     #[Groups(['default_assignment_rule:get', 'default_assignment_rule:list', 'default_assignment_rule:post', 'default_assignment_rule:patch'])]
-    private ?Company $assignedCompany = null;
+    private Collection $assignedCompanies;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToMany(targetEntity: Profile::class)]
     #[Groups(['default_assignment_rule:get', 'default_assignment_rule:list', 'default_assignment_rule:post', 'default_assignment_rule:patch'])]
-    private ?Profile $assignedProfile = null;
+    private Collection $assignedProfiles;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['default_assignment_rule:get', 'default_assignment_rule:list', 'default_assignment_rule:post', 'default_assignment_rule:patch'])]
@@ -77,6 +78,12 @@ class DefaultAssignmentRule
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['default_assignment_rule:get', 'default_assignment_rule:list', 'default_assignment_rule:post', 'default_assignment_rule:patch'])]
     private ?string $description = null;
+
+    public function __construct()
+    {
+        $this->assignedCompanies = new ArrayCollection();
+        $this->assignedProfiles = new ArrayCollection();
+    }
 
     public function getId(): ?string
     {
@@ -95,50 +102,74 @@ class DefaultAssignmentRule
         return $this;
     }
 
-    public function getLocation(): ?Location
+    public function getLocation(): ?bool
     {
         return $this->location;
     }
 
-    public function setLocation(?Location $location): static
+    public function setLocation(?bool $location): static
     {
         $this->location = $location;
 
         return $this;
     }
 
-    public function getRoadAxis(): ?RoadAxis
+    public function getRoadAxis(): ?bool
     {
         return $this->roadAxis;
     }
 
-    public function setRoadAxis(?RoadAxis $roadAxis): static
+    public function setRoadAxis(?bool $roadAxis): static
     {
         $this->roadAxis = $roadAxis;
 
         return $this;
     }
 
-    public function getAssignedCompany(): ?Company
+    /**
+     * @return Collection<int, Company>
+     */
+    public function getAssignedCompanies(): Collection
     {
-        return $this->assignedCompany;
+        return $this->assignedCompanies;
     }
 
-    public function setAssignedCompany(?Company $assignedCompany): static
+    public function addAssignedCompany(Company $assignedCompany): static
     {
-        $this->assignedCompany = $assignedCompany;
+        if (!$this->assignedCompanies->contains($assignedCompany)) {
+            $this->assignedCompanies->add($assignedCompany);
+        }
 
         return $this;
     }
 
-    public function getAssignedProfile(): ?Profile
+    public function removeAssignedCompany(Company $assignedCompany): static
     {
-        return $this->assignedProfile;
+        $this->assignedCompanies->removeElement($assignedCompany);
+
+        return $this;
     }
 
-    public function setAssignedProfile(?Profile $assignedProfile): static
+    /**
+     * @return Collection<int, Profile>
+     */
+    public function getAssignedProfiles(): Collection
     {
-        $this->assignedProfile = $assignedProfile;
+        return $this->assignedProfiles;
+    }
+
+    public function addAssignedProfile(Profile $assignedProfile): static
+    {
+        if (!$this->assignedProfiles->contains($assignedProfile)) {
+            $this->assignedProfiles->add($assignedProfile);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignedProfile(Profile $assignedProfile): static
+    {
+        $this->assignedProfiles->removeElement($assignedProfile);
 
         return $this;
     }

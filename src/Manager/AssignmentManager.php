@@ -11,9 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 readonly class AssignmentManager
 {
-    public function __construct(private EntityManagerInterface $em)
-    {
-    }
+    public function __construct(private EntityManagerInterface $em) {}
 
     public function assignDefaultActor(Complaint $complaint): void
     {
@@ -27,14 +25,20 @@ readonly class AssignmentManager
             return;
         }
 
-        if ($company = $rule->getAssignedCompany()) {
+        // Assigner la première compagnie de la collection si elle existe
+        $assignedCompanies = $rule->getAssignedCompanies();
+        if (!$assignedCompanies->isEmpty()) {
+            $company = $assignedCompanies->first();
             $complaint->setInvolvedCompany($company);
         }
 
-        if ($profile = $rule->getAssignedProfile()) {
+        // Assigner le premier profil de la collection si il existe
+        $assignedProfiles = $rule->getAssignedProfiles();
+        if (!$assignedProfiles->isEmpty()) {
+            $profile = $assignedProfiles->first();
             // Trouver un utilisateur avec ce profil et la bonne localisation/axe
             // C'est la partie la plus complexe : comment choisir UN utilisateur parmi plusieurs ?
-            // Pour commencer, on peut se contenter d'assigner l'entreprise.
+            // Pour l'instant, on peut se contenter d'assigner l'entreprise.
             // $user = $this->findUserByProfileAndLocation($profile, $location, $roadAxis);
             // if ($user) {
             //     $complaint->setCurrentAssignee($user);
@@ -49,30 +53,67 @@ readonly class AssignmentManager
         $qb->where('r.workflowStep = :step')
             ->setParameter('step', $step);
 
-        $locationConditions = [];
-        $currentLocation = $location;
-        while ($currentLocation) {
-            $locationConditions[] = 'r.location = :loc' . $currentLocation->getId();
-            $qb->setParameter('loc' . $currentLocation->getId(), $currentLocation);
-            $currentLocation = $currentLocation->getParent();
+        // Construire les conditions pour la localisation et l'axe routier
+        $conditions = [];
+
+        // Si la plainte a une localisation, chercher les règles qui correspondent
+        if ($location) {
+            $conditions[] = 'r.location = true';
         }
 
-        $orX = $qb->expr()->orX();
+        // Si la plainte a un axe routier, chercher les règles qui correspondent
         if ($roadAxis) {
-            $orX->add('r.roadAxis = :roadAxis');
-            $qb->setParameter('roadAxis', $roadAxis);
+            $conditions[] = 'r.roadAxis = true';
         }
-        if (!empty($locationConditions)) {
-            foreach($locationConditions as $condition) {
-                $orX->add($condition);
-            }
-        }
-        $orX->add($qb->expr()->andX('r.location IS NULL', 'r.roadAxis IS NULL'));
 
-        $qb->andWhere($orX)
-            ->orderBy('r.priority', 'DESC')
+        // Si aucune condition spécifique, chercher les règles générales
+        if (empty($conditions)) {
+            $conditions[] = '(r.location IS NULL OR r.location = false) AND (r.roadAxis IS NULL OR r.roadAxis = false)';
+        }
+
+        // Ajouter les conditions avec OR
+        if (!empty($conditions)) {
+            $qb->andWhere('(' . implode(' OR ', $conditions) . ')');
+        }
+
+        $qb->orderBy('r.priority', 'DESC')
+            ->addOrderBy('r.id', 'ASC') // Pour avoir un ordre déterministe
             ->setMaxResults(1);
 
         return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * Méthode pour trouver toutes les règles applicables (utile pour le debug)
+     */
+    public function findApplicableRules(WorkflowStep $step, ?Location $location, ?RoadAxis $roadAxis): array
+    {
+        $qb = $this->em->getRepository(DefaultAssignmentRule::class)->createQueryBuilder('r');
+
+        $qb->where('r.workflowStep = :step')
+            ->setParameter('step', $step);
+
+        $conditions = [];
+
+        if ($location) {
+            $conditions[] = 'r.location = true';
+        }
+
+        if ($roadAxis) {
+            $conditions[] = 'r.roadAxis = true';
+        }
+
+        if (empty($conditions)) {
+            $conditions[] = '(r.location IS NULL OR r.location = false) AND (r.roadAxis IS NULL OR r.roadAxis = false)';
+        }
+
+        if (!empty($conditions)) {
+            $qb->andWhere('(' . implode(' OR ', $conditions) . ')');
+        }
+
+        $qb->orderBy('r.priority', 'DESC')
+            ->addOrderBy('r.id', 'ASC');
+
+        return $qb->getQuery()->getResult();
     }
 }

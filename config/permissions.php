@@ -174,4 +174,9 @@ return static function (): iterable {
     yield Permission::new('ROLE_OFFENDER_DETAILS', "Consulter les détails d'un contrevenant");
     yield Permission::new('ROLE_OFFENDER_CREATE', "Créer un contrevenant");
     yield Permission::new('ROLE_OFFENDER_UPDATE', "Modifier un contrevenant");
+
+    yield Permission::new('ROLE_DEFAULT_ASSIGNMENT_RULE_LIST', "Consulter la liste des règles d'assignation par défaut");
+    yield Permission::new('ROLE_DEFAULT_ASSIGNMENT_RULE_DETAILS', "Consulter les détails d'une règle d'assignation par défaut");
+    yield Permission::new('ROLE_DEFAULT_ASSIGNMENT_RULE_CREATE', "Créer une règle d'assignation par défaut");
+    yield Permission::new('ROLE_DEFAULT_ASSIGNMENT_RULE_UPDATE', "Modifier une règle d'assignation par défaut");
 };
