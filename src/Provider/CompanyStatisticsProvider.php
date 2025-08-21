@@ -12,9 +12,7 @@ final readonly class CompanyStatisticsProvider implements ProviderInterface
 {
     public function __construct(
         private ComplaintRepository $complaintRepository
-    )
-    {
-    }
+    ) {}
 
     /**
      * @return array<CompanyStatisticsDto>
@@ -26,7 +24,10 @@ final readonly class CompanyStatisticsProvider implements ProviderInterface
         $qb = $this->complaintRepository->createQueryBuilder('p')
             ->select(sprintf('NEW %s(c.id, c.name, COUNT(p.id))', CompanyStatisticsDto::class))
             ->join('p.involvedCompany', 'c')
-            ->where('p.involvedCompany IS NOT NULL');
+            ->join('c.type', 'ct')
+            ->where('p.involvedCompany IS NOT NULL')
+            ->andWhere('ct.code IN (:allowedCompanyTypes)')
+            ->setParameter('allowedCompanyTypes', ['CLO', 'CSI', 'NGO']);
 
         $this->applyFilters($qb, $filters);
 
@@ -50,8 +51,8 @@ final readonly class CompanyStatisticsProvider implements ProviderInterface
 
         if (!empty($filters['complaintTypeId'])) {
             $qb
-                ->andWhere('ct.id = :complaintTypeId')
-                ->leftJoin('p.complaintType', 'ct')
+                ->andWhere('ctype.id = :complaintTypeId')
+                ->leftJoin('p.complaintType', 'ctype')
                 ->setParameter('complaintTypeId', $filters['complaintTypeId']);
         }
 

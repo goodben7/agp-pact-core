@@ -26,7 +26,7 @@ class WorkflowStepUIConfiguration
     private ?string $mainComponentKey = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch', 'complaint:get', 'complaint:list'])]
+    #[Groups(['workflow_step:get', 'workflow_step:list', 'workflow_step:patch', 'complaint:get', 'complaint:list', 'default_assignment_rule:get', 'default_assignment_rule:list'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

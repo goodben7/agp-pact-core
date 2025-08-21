@@ -62,14 +62,14 @@ class Profile
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
-    #[Groups(['profile:get', 'user:get', 'workflow_transition:get', 'workflow_transition:list'])]
+    #[Groups(['profile:get', 'user:get', 'workflow_transition:get', 'workflow_transition:list', 'default_assignment_rule:get', 'default_assignment_rule:list'])]
     #[ORM\Column(length: 16)]
     private ?string $id = null;
 
     #[ORM\Column(length: 120)]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
-    #[Groups(['profile:get', 'profile:post', 'profile:patch', 'user:get', 'workflow_transition:get', 'workflow_transition:list'])]
+    #[Groups(['profile:get', 'profile:post', 'profile:patch', 'user:get', 'workflow_transition:get', 'workflow_transition:list', 'default_assignment_rule:get', 'default_assignment_rule:list'])]
     private ?string $label = null;
 
     #[ORM\Column(type: Types::SIMPLE_ARRAY)]
