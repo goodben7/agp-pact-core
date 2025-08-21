@@ -13,6 +13,8 @@ use App\Doctrine\IdGenerator;
 use App\Dto\Workflow\WorkflowStepCreateDTO;
 use App\Repository\WorkflowStepRepository;
 use App\State\Workflow\WorkflowStepCreateProcessor;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -104,6 +106,17 @@ class WorkflowStep
     #[ORM\Column(nullable: true)]
     #[Groups(['workflow_step:get', 'workflow_step:patch', 'workflow_step:list'])]
     private ?int $duration = null;
+
+    /**
+     * @var Collection<int, DefaultAssignmentRule>
+     */
+    #[ORM\OneToMany(targetEntity: DefaultAssignmentRule::class, mappedBy: 'workflowStep', orphanRemoval: true)]
+    private Collection $defaultAssignmentRules;
+
+    public function __construct()
+    {
+        $this->defaultAssignmentRules = new ArrayCollection();
+    }
 
     public function getId(): ?string
     {
@@ -243,6 +256,36 @@ class WorkflowStep
     public function setDuration(?int $duration): static
     {
         $this->duration = $duration;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DefaultAssignmentRule>
+     */
+    public function getDefaultAssignmentRules(): Collection
+    {
+        return $this->defaultAssignmentRules;
+    }
+
+    public function addDefaultAssignmentRule(DefaultAssignmentRule $defaultAssignmentRule): static
+    {
+        if (!$this->defaultAssignmentRules->contains($defaultAssignmentRule)) {
+            $this->defaultAssignmentRules->add($defaultAssignmentRule);
+            $defaultAssignmentRule->setWorkflowStep($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDefaultAssignmentRule(DefaultAssignmentRule $defaultAssignmentRule): static
+    {
+        if ($this->defaultAssignmentRules->removeElement($defaultAssignmentRule)) {
+            // set the owning side to null (unless already changed)
+            if ($defaultAssignmentRule->getWorkflowStep() === $this) {
+                $defaultAssignmentRule->setWorkflowStep(null);
+            }
+        }
 
         return $this;
     }

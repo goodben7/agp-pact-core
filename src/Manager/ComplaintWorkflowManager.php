@@ -16,6 +16,7 @@ use App\Message\ComplaintWorkflowMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -31,10 +32,14 @@ readonly class ComplaintWorkflowManager
         private MessageBusInterface    $bus,
         private Security               $security,
         private ValidatorInterface     $validator,
+        private AssignmentManager      $assignmentManager
     )
     {
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
     public function applyAction(Complaint $complaint, WorkflowAction $action, array $data = []): Complaint
     {
         /** @var User $currentUser */
@@ -172,9 +177,8 @@ readonly class ComplaintWorkflowManager
             }
 
             $fileTypeParam = $this->em->getRepository(GeneralParameter::class)->findOneBy(['category' => GeneralParameterCategory::FILE_TYPE, 'value' => $fileTypeCategory]);
-            if (!$fileTypeParam) {
+            if (!$fileTypeParam)
                 throw new \Exception(sprintf('Not found file type parameter for category "%s".', $fileTypeCategory));
-            }
 
             $attachedFile->setFile($file);
 
@@ -186,6 +190,8 @@ readonly class ComplaintWorkflowManager
 
             $this->em->persist($attachedFile);
         }
+
+        $this->assignmentManager->assignDefaultActor($complaint);
 
         $history = (new ComplaintHistory())
             ->setComplaint($complaint)
