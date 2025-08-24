@@ -37,7 +37,7 @@ class RestrictComplaintByLocationExtension implements QueryCollectionExtensionIn
         if (!$user)
             return;
 
-        if (UserProxyInterface::PERSON_COMMITTEE === $user->getPersonType() || UserProxyInterface::PERSON_NGO === $user->getPersonType() || UserProxyInterface::PERSON_COMPANY === $user->getPersonType()) {
+        if (UserProxyInterface::PERSON_COMMITTEE === $user->getPersonType() || UserProxyInterface::PERSON_COMPANY === $user->getPersonType()) {
             /**
              * @var Member $member
              */
