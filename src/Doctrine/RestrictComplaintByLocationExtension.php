@@ -43,7 +43,7 @@ class RestrictComplaintByLocationExtension implements QueryCollectionExtensionIn
              */
             $member = $this->memberRepository->findOneBy(['userId' => $user->getId()]);
 
-            if ($member && $member->getCompany() && !$member->getCompany()->getLocations()->isEmpty()) {
+            if (!$member?->getCompany()?->getLocations()->isEmpty()) {
                 $rootAlias = $queryBuilder->getRootAliases()[0];
                 $locationIds = [];
                 foreach ($member->getCompany()->getLocations() as $location) {
