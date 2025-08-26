@@ -422,6 +422,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             "ROLE_SUPER_ADMIN" => UserProxyInterface::PERSON_SUPER_ADMIN,
             "ROLE_COMPLAINANT" => UserProxyInterface::PERSON_COMPLAINANT,
             "ROLE_LAMBDA" => UserProxyInterface::PERSON_LAMBDA,
+            "ROLE_MANAGER" => UserProxyInterface::PERSON_MANAGER,
         ]);
     }
 
@@ -439,6 +440,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             UserProxyInterface::PERSON_SUPER_ADMIN,
             UserProxyInterface::PERSON_COMPLAINANT,
             UserProxyInterface::PERSON_LAMBDA,
+            UserProxyInterface::PERSON_MANAGER,
         ];
     }
 
@@ -456,6 +458,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             "Super administrateur" => UserProxyInterface::PERSON_SUPER_ADMIN,
             "Plaignant" => UserProxyInterface::PERSON_COMPLAINANT,
             "Lambda" => UserProxyInterface::PERSON_LAMBDA,
+            "Gestionnaire" => UserProxyInterface::PERSON_MANAGER,
         ];
     }
 

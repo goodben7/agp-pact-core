@@ -37,13 +37,13 @@ class RestrictComplaintByLocationExtension implements QueryCollectionExtensionIn
         if (!$user)
             return;
 
-        if (UserProxyInterface::PERSON_COMMITTEE === $user->getPersonType()) {
+        if (UserProxyInterface::PERSON_COMMITTEE === $user->getPersonType() || UserProxyInterface::PERSON_COMPANY === $user->getPersonType()) {
             /**
              * @var Member $member
              */
             $member = $this->memberRepository->findOneBy(['userId' => $user->getId()]);
 
-            if ($member && $member->getCompany() && !$member->getCompany()->getLocations()->isEmpty()) {
+            if (!$member?->getCompany()?->getLocations()->isEmpty()) {
                 $rootAlias = $queryBuilder->getRootAliases()[0];
                 $locationIds = [];
                 foreach ($member->getCompany()->getLocations() as $location) {
