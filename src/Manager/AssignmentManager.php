@@ -7,11 +7,17 @@ use App\Entity\DefaultAssignmentRule;
 use App\Entity\Location;
 use App\Entity\RoadAxis;
 use App\Entity\WorkflowStep;
+use App\Provider\AssignableCompaniesProvider;
+use App\Repository\ComplaintRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 readonly class AssignmentManager
 {
-    public function __construct(private EntityManagerInterface $em) {}
+    public function __construct(
+        private EntityManagerInterface $em,
+        private AssignableCompaniesProvider $assignableCompaniesProvider,
+        private ComplaintRepository $complaintRepository
+    ) {}
 
     public function assignDefaultActor(Complaint $complaint): void
     {
@@ -19,7 +25,7 @@ readonly class AssignmentManager
         $location = $complaint->getLocation();
         $roadAxis = $complaint->getRoadAxis();
 
-        $rule = $this->findBestMatchingRule($step, $location, $roadAxis);
+        $rule = $this->complaintRepository->findBestMatchingRule($step, $location, $roadAxis);
 
         if (!$rule) {
             return;
@@ -29,6 +35,18 @@ readonly class AssignmentManager
         $assignedCompanies = $rule->getAssignedCompanies();
         if (!$assignedCompanies->isEmpty()) {
             $company = $assignedCompanies->first();
+
+            // Vérifier si la compagnie peut traiter les plaintes sensibles si nécessaire
+            if ($complaint->getIsSensitive() && !$company->isCanProcessSensitiveComplaint()) {
+                // Chercher une autre compagnie dans la règle
+                foreach ($assignedCompanies as $alternativeCompany) {
+                    if ($alternativeCompany->isCanProcessSensitiveComplaint()) {
+                        $company = $alternativeCompany;
+                        break;
+                    }
+                }
+            }
+
             $complaint->setInvolvedCompany($company);
         }
 
@@ -46,41 +64,17 @@ readonly class AssignmentManager
         }
     }
 
-    private function findBestMatchingRule(WorkflowStep $step, ?Location $location, ?RoadAxis $roadAxis): ?DefaultAssignmentRule
+    /**
+     * Récupérer toutes les compagnies assignables pour une plainte
+     */
+    public function getAssignableCompanies(Complaint $complaint): array
     {
-        $qb = $this->em->getRepository(DefaultAssignmentRule::class)->createQueryBuilder('r');
-
-        $qb->where('r.workflowStep = :step')
-            ->setParameter('step', $step);
-
-        // Construire les conditions pour la localisation et l'axe routier
-        $conditions = [];
-
-        // Si la plainte a une localisation, chercher les règles qui correspondent
-        if ($location) {
-            $conditions[] = 'r.location = true';
-        }
-
-        // Si la plainte a un axe routier, chercher les règles qui correspondent
-        if ($roadAxis) {
-            $conditions[] = 'r.roadAxis = true';
-        }
-
-        // Si aucune condition spécifique, chercher les règles générales
-        if (empty($conditions)) {
-            $conditions[] = '(r.location IS NULL OR r.location = false) AND (r.roadAxis IS NULL OR r.roadAxis = false)';
-        }
-
-        // Ajouter les conditions avec OR
-        if (!empty($conditions)) {
-            $qb->andWhere('(' . implode(' OR ', $conditions) . ')');
-        }
-
-        $qb->orderBy('r.priority', 'DESC')
-            ->addOrderBy('r.id', 'ASC') // Pour avoir un ordre déterministe
-            ->setMaxResults(1);
-
-        return $qb->getQuery()->getOneOrNullResult();
+        return $this->complaintRepository->findAssignableCompanies(
+            $complaint->getCurrentWorkflowStep(),
+            $complaint->getLocation(),
+            $complaint->getRoadAxis(),
+            $complaint->getIsSensitive()
+        );
     }
 
     /**
@@ -88,32 +82,6 @@ readonly class AssignmentManager
      */
     public function findApplicableRules(WorkflowStep $step, ?Location $location, ?RoadAxis $roadAxis): array
     {
-        $qb = $this->em->getRepository(DefaultAssignmentRule::class)->createQueryBuilder('r');
-
-        $qb->where('r.workflowStep = :step')
-            ->setParameter('step', $step);
-
-        $conditions = [];
-
-        if ($location) {
-            $conditions[] = 'r.location = true';
-        }
-
-        if ($roadAxis) {
-            $conditions[] = 'r.roadAxis = true';
-        }
-
-        if (empty($conditions)) {
-            $conditions[] = '(r.location IS NULL OR r.location = false) AND (r.roadAxis IS NULL OR r.roadAxis = false)';
-        }
-
-        if (!empty($conditions)) {
-            $qb->andWhere('(' . implode(' OR ', $conditions) . ')');
-        }
-
-        $qb->orderBy('r.priority', 'DESC')
-            ->addOrderBy('r.id', 'ASC');
-
-        return $qb->getQuery()->getResult();
+        return $this->complaintRepository->findApplicableRules($step, $location, $roadAxis);
     }
 }
