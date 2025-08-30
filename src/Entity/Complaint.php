@@ -2,9 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Metadata\Get;
 use App\Doctrine\IdGenerator;
 use ApiPlatform\Metadata\Post;
+use App\Dto\Complaint\AssignCompanyRequest;
+use App\State\Complaint\ComplaintAssignCompanyProcessor;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
 use Doctrine\ORM\Mapping as ORM;
@@ -42,7 +45,7 @@ use App\State\Complaint\ComplaintApplyActionProcessor;
         ),
         new Patch(
             security: "is_granted('ROLE_COMPLAINT_UPDATE')",
-            processor: UpdateComplaintProcessor::class
+            processor: PersistProcessor::class
         ),
         new Post(
             uriTemplate: '/complaints/{id}/apply-action',
@@ -53,7 +56,12 @@ use App\State\Complaint\ComplaintApplyActionProcessor;
             security: "is_granted('ROLE_COMPLAINT_APPLY_ACTION')",
             input: ApplyActionRequest::class,
             processor: ComplaintApplyActionProcessor::class
-        )
+        ),
+        new Post(
+            uriTemplate: '/complaints/{id}/assign-company',
+            processor: ComplaintAssignCompanyProcessor::class,
+            input: AssignCompanyRequest::class,
+        ),
     ],
     normalizationContext: ['groups' => ['complaint:get']]
 )]
@@ -309,6 +317,10 @@ class Complaint
     #[ORM\OneToMany(targetEntity: Offender::class, mappedBy: 'complaint', orphanRemoval: true, cascade: ['persist', 'remove'])]
     #[Groups(['complaint:get', 'complaint:list'])]
     private Collection $offenders;
+
+    #[ORM\ManyToOne]
+    #[Groups(['complaint:get', 'complaint:list'])]
+    private ?Company $currentAssignedCompany = null;
 
 
     public function __construct()
@@ -1058,6 +1070,18 @@ class Complaint
                 $offender->setComplaint(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCurrentAssignedCompany(): ?Company
+    {
+        return $this->currentAssignedCompany;
+    }
+
+    public function setCurrentAssignedCompany(?Company $currentAssignedCompany): static
+    {
+        $this->currentAssignedCompany = $currentAssignedCompany;
 
         return $this;
     }

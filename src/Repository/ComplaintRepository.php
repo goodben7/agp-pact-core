@@ -30,30 +30,46 @@ class ComplaintRepository extends ServiceEntityRepository
     ): array {
         // Trouver toutes les règles d'assignation applicables
         $rules = $this->findApplicableRules($workflowStep, $location, $roadAxis);
-
+    
         $assignableCompanies = [];
-
+    
         foreach ($rules as $rule) {
             $companies = $rule->getAssignedCompanies();
-
+    
             foreach ($companies as $company) {
                 // Vérifier si la compagnie peut traiter les plaintes sensibles si nécessaire
                 if ($isSensitive && !$company->isCanProcessSensitiveComplaint()) {
                     continue;
                 }
-
+    
+                // Vérifier si la compagnie respecte les critères de localisation
+                if ($location && $rule->getLocation()) {
+                    // Si la règle s'applique aux localisations, vérifier que la compagnie couvre cette localisation
+                    if (!$company->getLocations()->contains($location)) {
+                        continue;
+                    }
+                }
+    
+                // Vérifier si la compagnie respecte les critères d'axe routier
+                if ($roadAxis && $rule->getRoadAxis()) {
+                    // Si la règle s'applique aux axes routiers, vérifier que la compagnie couvre cet axe
+                    if (!$company->getRoadAxes()->contains($roadAxis)) {
+                        continue;
+                    }
+                }
+    
                 // Éviter les doublons
                 if (!in_array($company, $assignableCompanies, true)) {
                     $assignableCompanies[] = $company;
                 }
             }
         }
-
+    
         // Si aucune règle spécifique, retourner toutes les compagnies actives compatibles
         if (empty($assignableCompanies)) {
             return $this->findDefaultAssignableCompanies($isSensitive, $location, $roadAxis);
         }
-
+    
         return $assignableCompanies;
     }
 

@@ -3,6 +3,7 @@
 namespace App\Manager;
 
 
+use App\Dto\Complaint\AssignCompanyRequest;
 use App\Entity\Company;
 use App\Entity\Victim;
 use App\Entity\Complaint;
@@ -228,6 +229,19 @@ readonly class ComplaintManager
         $attachedFile->setUploadedBy($this->security->getUser());
 
         $this->em->persist($attachedFile);
+        $this->em->flush();
+
+        return $complaint;
+    }
+
+    public function assignToCompany(string $id, AssignCompanyRequest $data): Complaint
+    {
+        $complaint = $this->em->getRepository(Complaint::class)->find($id);
+        if (!$complaint)
+            throw new UnavailableDataException('Complaint not found');
+
+        $complaint->setCurrentAssignedCompany($data->company);
+        
         $this->em->flush();
 
         return $complaint;

@@ -23,6 +23,7 @@ readonly class AssignableCompaniesProvider implements ProviderInterface
     {
         $complaintId = $uriVariables['complaintId'] ?? null;
 
+
         if (!$complaintId) {
             throw new NotFoundHttpException('Complaint ID is required');
         }
