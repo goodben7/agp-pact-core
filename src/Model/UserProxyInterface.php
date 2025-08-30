@@ -9,6 +9,7 @@ interface UserProxyInterface
     public const PERSON_COMMITTEE = 'COM';
     public const PERSON_NGO = 'NGO';
     public const PERSON_GOV = 'GOV';
+    public const PERSON_JUS = 'JUS';
     public const PERSON_COMPANY = 'ENT';
     public const PERSON_CONTROL_MISSION = 'CTL';
     public const PERSON_INFRASTRUCTURE_CELL = 'INF';

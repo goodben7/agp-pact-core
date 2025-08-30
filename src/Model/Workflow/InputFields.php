@@ -40,5 +40,7 @@ class InputFields
 
     public ?string $defaultValue = null;
 
+    public ?bool $multiple = null;
+
     public ?array $validationRules = null;
 }
