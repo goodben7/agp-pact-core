@@ -23,6 +23,7 @@ use App\Entity\Company;
 use App\Entity\RoadAxis;
 use App\Entity\Location;
 use App\Entity\Complainant;
+use App\Entity\Prejudice;
 
 readonly class ComplaintWorkflowManager
 {
@@ -439,6 +440,9 @@ readonly class ComplaintWorkflowManager
                                             break;
                                         case 'api/users':
                                             $entity = $this->em->getRepository(User::class)->find($id);
+                                            break;
+                                        case 'api/prejudices':
+                                            $entity = $this->em->getRepository(Prejudice::class)->find($id);
                                             break;
                                         case 'api/road_axes':
                                             $entity = $this->em->getRepository(RoadAxis::class)->find($id);
