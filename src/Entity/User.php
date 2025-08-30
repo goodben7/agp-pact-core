@@ -452,6 +452,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             "Comité" => UserProxyInterface::PERSON_COMMITTEE,
             "ONG" => UserProxyInterface::PERSON_NGO,
             "Gouvernement" => UserProxyInterface::PERSON_GOV,
+            "Justice" => UserProxyInterface::PERSON_JUS,
             "Entreprise" => UserProxyInterface::PERSON_COMPANY,
             "Mission de contrôle" => UserProxyInterface::PERSON_CONTROL_MISSION,
             "Cellule d'infrastructure" => UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,

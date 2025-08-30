@@ -78,7 +78,7 @@ class Profile
     private array $permissions = [];
 
     #[ORM\Column(length: 3)]
-    #[Assert\Choice(callback: [User::class, 'getPersonTypesAsList'])]
+    #[Assert\Choice(callback: [User::class, 'getAcceptedPersonList'])]
     #[Groups(['profile:get', 'profile:post', 'profile:patch'])]
     private ?string $personType = null;
 
