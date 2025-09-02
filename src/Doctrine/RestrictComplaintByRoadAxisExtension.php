@@ -34,7 +34,7 @@ class RestrictComplaintByRoadAxisExtension implements QueryCollectionExtensionIn
         if (!$user)
             return;
 
-        if (UserProxyInterface::PERSON_ADMINISTRATOR_MANAGER === $user->getPersonType() || UserProxyInterface::PERSON_NGO === $user->getPersonType()) {
+        if (UserProxyInterface::PERSON_ADMINISTRATOR_MANAGER === $user->getPersonType()) {
             $roadAxis = $user->getRoadAxis();
             
             if ($roadAxis) {

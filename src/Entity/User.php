@@ -424,6 +424,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             "ROLE_COMPLAINANT" => UserProxyInterface::PERSON_COMPLAINANT,
             "ROLE_LAMBDA" => UserProxyInterface::PERSON_LAMBDA,
             "ROLE_MANAGER" => UserProxyInterface::PERSON_MANAGER,
+            "ROLE_ADMINISTRATOR_MANAGER" => UserProxyInterface::PERSON_ADMINISTRATOR_MANAGER,
+            "ROLE_USER" => UserProxyInterface::PERSON_USER,
+            "ROLE_EMPLOYEE" => UserProxyInterface::PERSON_EMPLOYEE,
         ]);
     }
 
@@ -443,6 +446,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             UserProxyInterface::PERSON_COMPLAINANT,
             UserProxyInterface::PERSON_LAMBDA,
             UserProxyInterface::PERSON_MANAGER,
+            UserProxyInterface::PERSON_ADMINISTRATOR_MANAGER,
+            UserProxyInterface::PERSON_USER,
+            UserProxyInterface::PERSON_EMPLOYEE,
         ];
     }
 
@@ -462,6 +468,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             "Plaignant" => UserProxyInterface::PERSON_COMPLAINANT,
             "Lambda" => UserProxyInterface::PERSON_LAMBDA,
             "Gestionnaire" => UserProxyInterface::PERSON_MANAGER,
+            "Administrateur gestionnaire" => UserProxyInterface::PERSON_ADMINISTRATOR_MANAGER,
+            "Utilisateur" => UserProxyInterface::PERSON_USER,
+            "Employé" => UserProxyInterface::PERSON_EMPLOYEE,
         ];
     }
 
