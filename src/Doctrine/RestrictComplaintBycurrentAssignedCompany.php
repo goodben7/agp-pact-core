@@ -13,7 +13,7 @@ use App\Entity\Member;
 use App\Entity\User;
 use App\Repository\MemberRepository;
 
-class RestrictComplaintByLocationExtension implements QueryCollectionExtensionInterface
+class RestrictComplaintBycurrentAssignedCompany implements QueryCollectionExtensionInterface
 {
     public function __construct(
         private Security         $security,
@@ -37,20 +37,17 @@ class RestrictComplaintByLocationExtension implements QueryCollectionExtensionIn
         if (!$user)
             return;
 
-        if (UserProxyInterface::PERSON_COMMITTEE === $user->getPersonType() ) {
+        if (UserProxyInterface::PERSON_COMPANY === $user->getPersonType() ) {
             /**
              * @var Member $member
              */
             $member = $this->memberRepository->findOneBy(['userId' => $user->getId()]);
 
-            if ($member && $member->getCompany() && !$member->getCompany()->getLocations()->isEmpty()) {
+            if ($member && $member->getCompany()) {
                 $rootAlias = $queryBuilder->getRootAliases()[0];
-                $locationIds = [];
-                foreach ($member->getCompany()->getLocations() as $location) {
-                    $locationIds[] = $location->getId();
-                }
-                $queryBuilder->andWhere(sprintf('%s.location IN (:locationIds)', $rootAlias));
-                $queryBuilder->setParameter('locationIds', $locationIds);
+                $companyId = $member->getCompany()->getId();
+                $queryBuilder->andWhere(sprintf('%s.currentAssignedCompany = :companyId', $rootAlias));
+                $queryBuilder->setParameter('companyId', $companyId);
             }
         }
     }
