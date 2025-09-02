@@ -4,8 +4,8 @@ namespace App\Command;
 
 use App\Doctrine\RestrictComplaintByLocationExtension;
 use App\Entity\Complaint;
-use App\Entity\Company;
 use App\Entity\Location;
+use App\Entity\Company;
 use App\Entity\Member;
 use App\Entity\User;
 use App\Model\UserProxyInterface;
@@ -28,8 +28,7 @@ class TestRestrictComplaintByLocationCommand extends Command
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private Security $security,
-        private MemberRepository $memberRepository
+        private Security $security
     ) {
         parent::__construct();
     }
@@ -42,32 +41,26 @@ class TestRestrictComplaintByLocationCommand extends Command
         // Test with no user
         $this->testWithNoUser($io);
 
-        // Test with committee user without member association
-        $this->testWithCommitteeWithoutMember($io);
-
-        // Test with committee user with member but no company
-        $this->testWithCommitteeWithMemberNoCompany($io);
-
-        // Test with committee user with member and company but no location
-        $this->testWithCommitteeWithMemberCompanyNoLocation($io);
-
-        // Test with committee user with member, company and location
-        $this->testWithCommitteeWithMemberCompanyLocation($io);
-
-        // Test with NGO user without member association
-        $this->testWithNgoWithoutMember($io);
-
-        // Test with NGO user with member but no company
-        $this->testWithNgoWithMemberNoCompany($io);
-
-        // Test with NGO user with member and company but no location
-        $this->testWithNgoWithMemberCompanyNoLocation($io);
-
-        // Test with NGO user with member, company and location
-        $this->testWithNgoWithMemberCompanyLocation($io);
-
         // Test with non-committee user
         $this->testWithNonCommitteeUser($io);
+
+        // Test with committee user without member
+        $this->testWithCommitteeUserWithoutMember($io);
+
+        // Test with committee user with member but no company
+        $this->testWithCommitteeUserWithMemberNoCompany($io);
+
+        // Test with committee user with member and company but no locations
+        $this->testWithCommitteeUserWithMemberCompanyNoLocations($io);
+
+        // Test with committee user with member, company and locations
+        $this->testWithCommitteeUserWithMemberCompanyAndLocations($io);
+        
+        // Test with company user with member, company and locations
+        $this->testWithCompanyUserWithMemberCompanyAndLocations($io);
+        
+        // Test with ngo user with member, company and locations
+        $this->testWithNgoUserWithMemberCompanyAndLocations($io);
 
         $io->success('All tests completed');
 
@@ -82,7 +75,7 @@ class TestRestrictComplaintByLocationCommand extends Command
         $mockSecurity = $this->createMockSecurity(null);
         
         // Create a mock MemberRepository
-        $mockMemberRepository = $this->createMockMemberRepository(null);
+        $mockMemberRepository = $this->createMockMemberRepository();
         
         // Create the extension with the mock security and repository
         $extension = new RestrictComplaintByLocationExtension($mockSecurity, $mockMemberRepository);
@@ -112,9 +105,51 @@ class TestRestrictComplaintByLocationCommand extends Command
         }
     }
 
-    private function testWithCommitteeWithoutMember(SymfonyStyle $io): void
+    private function testWithNonCommitteeUser(SymfonyStyle $io): void
     {
-        $io->section('Test with committee user without member association');
+        $io->section('Test with non-committee user');
+        
+        // Create a mock non-committee user
+        $user = new User();
+        $user->setPersonType(UserProxyInterface::PERSON_LAMBDA);
+        
+        // Create a mock Security service that returns the non-committee user
+        $mockSecurity = $this->createMockSecurity($user);
+        
+        // Create a mock MemberRepository
+        $mockMemberRepository = $this->createMockMemberRepository();
+        
+        // Create the extension with the mock security and repository
+        $extension = new RestrictComplaintByLocationExtension($mockSecurity, $mockMemberRepository);
+        
+        // Create a query builder
+        $queryBuilder = $this->createQueryBuilder();
+        $initialDql = $queryBuilder->getDQL();
+        
+        // Apply the extension
+        $extension->applyToCollection(
+            $queryBuilder,
+            $this->createMockQueryNameGenerator(),
+            Complaint::class
+        );
+        
+        // Check if the query was modified
+        $finalDql = $queryBuilder->getDQL();
+        
+        $io->writeln('Initial DQL: ' . $initialDql);
+        $io->writeln('Final DQL: ' . $finalDql);
+        
+        // The query should not be modified since the user is not a committee member
+        if ($initialDql === $finalDql) {
+            $io->success('Test passed: Query was not modified for non-committee user');
+        } else {
+            $io->error('Test failed: Query was modified for non-committee user');
+        }
+    }
+
+    private function testWithCommitteeUserWithoutMember(SymfonyStyle $io): void
+    {
+        $io->section('Test with committee user without member');
         
         // Create a mock committee user
         $user = new User();
@@ -152,15 +187,15 @@ class TestRestrictComplaintByLocationCommand extends Command
         $io->writeln('Initial DQL: ' . $initialDql);
         $io->writeln('Final DQL: ' . $finalDql);
         
-        // The query should not be modified since there's no member associated with the user
+        // The query should not be modified since there's no member for the user
         if ($initialDql === $finalDql) {
-            $io->success('Test passed: Query was not modified for committee user without member association');
+            $io->success('Test passed: Query was not modified for committee user without member');
         } else {
-            $io->error('Test failed: Query was modified for committee user without member association');
+            $io->error('Test failed: Query was modified for committee user without member');
         }
     }
 
-    private function testWithCommitteeWithMemberNoCompany(SymfonyStyle $io): void
+    private function testWithCommitteeUserWithMemberNoCompany(SymfonyStyle $io): void
     {
         $io->section('Test with committee user with member but no company');
         
@@ -176,6 +211,9 @@ class TestRestrictComplaintByLocationCommand extends Command
         
         // Create a mock member without company
         $member = new Member();
+        $member->setUserId('U123');
+        $member->setDisplayName('Test Member');
+        $member->setActive(true);
         
         // Create a mock Security service that returns the committee user
         $mockSecurity = $this->createMockSecurity($user);
@@ -211,9 +249,9 @@ class TestRestrictComplaintByLocationCommand extends Command
         }
     }
 
-    private function testWithCommitteeWithMemberCompanyNoLocation(SymfonyStyle $io): void
+    private function testWithCommitteeUserWithMemberCompanyNoLocations(SymfonyStyle $io): void
     {
-        $io->section('Test with committee user with member and company but no location');
+        $io->section('Test with committee user with member and company but no locations');
         
         // Create a mock committee user
         $user = new User();
@@ -225,13 +263,16 @@ class TestRestrictComplaintByLocationCommand extends Command
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($user, 'U123');
         
-        // Create a mock company without location
+        // Create a mock company with no locations
         $company = new Company();
         $company->setName('Test Company');
         $company->setActive(true);
         
         // Create a mock member with company
         $member = new Member();
+        $member->setUserId('U123');
+        $member->setDisplayName('Test Member');
+        $member->setActive(true);
         $member->setCompany($company);
         
         // Create a mock Security service that returns the committee user
@@ -260,40 +301,17 @@ class TestRestrictComplaintByLocationCommand extends Command
         $io->writeln('Initial DQL: ' . $initialDql);
         $io->writeln('Final DQL: ' . $finalDql);
         
-        // The query should not be modified since the company has no location
+        // The query should not be modified since the company has no locations
         if ($initialDql === $finalDql) {
-            $io->success('Test passed: Query was not modified for committee user with member and company but no location');
+            $io->success('Test passed: Query was not modified for committee user with member and company but no locations');
         } else {
-            $io->error('Test failed: Query was modified for committee user with member and company but no location');
+            $io->error('Test failed: Query was modified for committee user with member and company but no locations');
         }
     }
 
-    private function testWithCommitteeWithMemberCompanyLocation(SymfonyStyle $io): void
+    private function testWithCommitteeUserWithMemberCompanyAndLocations(SymfonyStyle $io): void
     {
-        $io->section('Test with committee user with member, company and location');
-        
-        // Create a mock location
-        $location = new Location();
-        $location->setName('Test Location');
-        $location->setActive(true);
-        
-        // Set a mock ID for the location
-        $reflectionClass = new \ReflectionClass(Location::class);
-        $reflectionProperty = $reflectionClass->getProperty('id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($location, 'LC123');
-        
-        // Create a mock company with location
-        $company = new Company();
-        $company->setName('Test Company');
-        $company->setActive(true);
-        
-        // Add the location to the company using the proper method
-        $company->addLocation($location);
-        
-        // Create a mock member with company
-        $member = new Member();
-        $member->setCompany($company);
+        $io->section('Test with committee user with member, company and locations');
         
         // Create a mock committee user
         $user = new User();
@@ -304,6 +322,38 @@ class TestRestrictComplaintByLocationCommand extends Command
         $reflectionProperty = $reflectionClass->getProperty('id');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($user, 'U123');
+        
+        // Create mock locations
+        $location1 = new Location();
+        $location1->setName('Location 1');
+        $location1->setActive(true);
+        
+        // Set a mock ID for the location
+        $reflectionClass = new \ReflectionClass(Location::class);
+        $reflectionProperty = $reflectionClass->getProperty('id');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($location1, 'L123');
+        
+        $location2 = new Location();
+        $location2->setName('Location 2');
+        $location2->setActive(true);
+        
+        // Set a mock ID for the second location
+        $reflectionProperty->setValue($location2, 'L456');
+        
+        // Create a mock company with locations
+        $company = new Company();
+        $company->setName('Test Company');
+        $company->setActive(true);
+        $company->addLocation($location1);
+        $company->addLocation($location2);
+        
+        // Create a mock member with company
+        $member = new Member();
+        $member->setUserId('U123');
+        $member->setDisplayName('Test Member');
+        $member->setActive(true);
+        $member->setCompany($company);
         
         // Create a mock Security service that returns the committee user
         $mockSecurity = $this->createMockSecurity($user);
@@ -334,29 +384,34 @@ class TestRestrictComplaintByLocationCommand extends Command
         
         // The query should be modified to include the location restriction
         $hasLocationCondition = str_contains($finalDql, 'location IN (:locationIds)');
+        $hasSensitiveCondition = str_contains($finalDql, 'isSensitive = :isSensitive');
         $hasLocationParameter = false;
+        $hasSensitiveParameter = false;
         
         foreach ($parameters as $parameter) {
-            if ($parameter->getName() === 'locationIds' && in_array('LC123', $parameter->getValue())) {
-                $hasLocationParameter = true;
-                break;
+            if ($parameter->getName() === 'locationIds') {
+                $locationIds = $parameter->getValue();
+                $hasLocationParameter = in_array('L123', $locationIds) && in_array('L456', $locationIds);
+            }
+            if ($parameter->getName() === 'isSensitive' && $parameter->getValue() === false) {
+                $hasSensitiveParameter = true;
             }
         }
         
-        if ($hasLocationCondition && $hasLocationParameter) {
-            $io->success('Test passed: Query was correctly modified for committee user with member, company and location');
+        if ($hasLocationCondition && $hasSensitiveCondition && $hasLocationParameter && $hasSensitiveParameter) {
+            $io->success('Test passed: Query was correctly modified for committee user with member, company and locations');
         } else {
-            $io->error('Test failed: Query was not correctly modified for committee user with member, company and location');
+            $io->error('Test failed: Query was not correctly modified for committee user with member, company and locations');
         }
     }
-
-    private function testWithNgoWithoutMember(SymfonyStyle $io): void
+    
+    private function testWithCompanyUserWithMemberCompanyAndLocations(SymfonyStyle $io): void
     {
-        $io->section('Test with NGO user without member association');
+        $io->section('Test with company user with member, company and locations');
         
-        // Create a mock NGO user
+        // Create a mock company user
         $user = new User();
-        $user->setPersonType(UserProxyInterface::PERSON_NGO);
+        $user->setPersonType(UserProxyInterface::PERSON_COMPANY);
         
         // Set a mock ID for the user
         $reflectionClass = new \ReflectionClass(User::class);
@@ -364,174 +419,75 @@ class TestRestrictComplaintByLocationCommand extends Command
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($user, 'U123');
         
-        // Create a mock Security service that returns the NGO user
-        $mockSecurity = $this->createMockSecurity($user);
-        
-        // Create a mock MemberRepository that returns null (no member found)
-        $mockMemberRepository = $this->createMockMemberRepository(null);
-        
-        // Create the extension with the mock security and repository
-        $extension = new RestrictComplaintByLocationExtension($mockSecurity, $mockMemberRepository);
-        
-        // Create a query builder
-        $queryBuilder = $this->createQueryBuilder();
-        $initialDql = $queryBuilder->getDQL();
-        
-        // Apply the extension
-        $extension->applyToCollection(
-            $queryBuilder,
-            $this->createMockQueryNameGenerator(),
-            Complaint::class
-        );
-        
-        // Check if the query was modified
-        $finalDql = $queryBuilder->getDQL();
-        
-        $io->writeln('Initial DQL: ' . $initialDql);
-        $io->writeln('Final DQL: ' . $finalDql);
-        
-        // The query should not be modified since there's no member associated with the user
-        if ($initialDql === $finalDql) {
-            $io->success('Test passed: Query was not modified for NGO user without member association');
-        } else {
-            $io->error('Test failed: Query was modified for NGO user without member association');
-        }
-    }
-
-    private function testWithNgoWithMemberNoCompany(SymfonyStyle $io): void
-    {
-        $io->section('Test with NGO user with member but no company');
-        
-        // Create a mock NGO user
-        $user = new User();
-        $user->setPersonType(UserProxyInterface::PERSON_NGO);
-        
-        // Set a mock ID for the user
-        $reflectionClass = new \ReflectionClass(User::class);
-        $reflectionProperty = $reflectionClass->getProperty('id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($user, 'U123');
-        
-        // Create a mock member without company
-        $member = new Member();
-        
-        // Create a mock Security service that returns the NGO user
-        $mockSecurity = $this->createMockSecurity($user);
-        
-        // Create a mock MemberRepository that returns the member
-        $mockMemberRepository = $this->createMockMemberRepository($member);
-        
-        // Create the extension with the mock security and repository
-        $extension = new RestrictComplaintByLocationExtension($mockSecurity, $mockMemberRepository);
-        
-        // Create a query builder
-        $queryBuilder = $this->createQueryBuilder();
-        $initialDql = $queryBuilder->getDQL();
-        
-        // Apply the extension
-        $extension->applyToCollection(
-            $queryBuilder,
-            $this->createMockQueryNameGenerator(),
-            Complaint::class
-        );
-        
-        // Check if the query was modified
-        $finalDql = $queryBuilder->getDQL();
-        
-        $io->writeln('Initial DQL: ' . $initialDql);
-        $io->writeln('Final DQL: ' . $finalDql);
-        
-        // The query should not be modified since the member has no company
-        if ($initialDql === $finalDql) {
-            $io->success('Test passed: Query was not modified for NGO user with member but no company');
-        } else {
-            $io->error('Test failed: Query was modified for NGO user with member but no company');
-        }
-    }
-
-    private function testWithNgoWithMemberCompanyNoLocation(SymfonyStyle $io): void
-    {
-        $io->section('Test with NGO user with member and company but no location');
-        
-        // Create a mock NGO user
-        $user = new User();
-        $user->setPersonType(UserProxyInterface::PERSON_NGO);
-        
-        // Set a mock ID for the user
-        $reflectionClass = new \ReflectionClass(User::class);
-        $reflectionProperty = $reflectionClass->getProperty('id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($user, 'U123');
-        
-        // Create a mock company without location
-        $company = new Company();
-        $company->setName('Test Company');
-        $company->setActive(true);
-        
-        // Create a mock member with company
-        $member = new Member();
-        $member->setCompany($company);
-        
-        // Create a mock Security service that returns the NGO user
-        $mockSecurity = $this->createMockSecurity($user);
-        
-        // Create a mock MemberRepository that returns the member
-        $mockMemberRepository = $this->createMockMemberRepository($member);
-        
-        // Create the extension with the mock security and repository
-        $extension = new RestrictComplaintByLocationExtension($mockSecurity, $mockMemberRepository);
-        
-        // Create a query builder
-        $queryBuilder = $this->createQueryBuilder();
-        $initialDql = $queryBuilder->getDQL();
-        
-        // Apply the extension
-        $extension->applyToCollection(
-            $queryBuilder,
-            $this->createMockQueryNameGenerator(),
-            Complaint::class
-        );
-        
-        // Check if the query was modified
-        $finalDql = $queryBuilder->getDQL();
-        
-        $io->writeln('Initial DQL: ' . $initialDql);
-        $io->writeln('Final DQL: ' . $finalDql);
-        
-        // The query should not be modified since the company has no location
-        if ($initialDql === $finalDql) {
-            $io->success('Test passed: Query was not modified for NGO user with member and company but no location');
-        } else {
-            $io->error('Test failed: Query was modified for NGO user with member and company but no location');
-        }
-    }
-
-    private function testWithNgoWithMemberCompanyLocation(SymfonyStyle $io): void
-    {
-        $io->section('Test with NGO user with member, company and location');
-        
-        // Create a mock location
-        $location = new Location();
-        $location->setName('Test Location');
-        $location->setActive(true);
+        // Create mock locations
+        $location1 = new Location();
+        $location1->setName('Location 1');
+        $location1->setActive(true);
         
         // Set a mock ID for the location
         $reflectionClass = new \ReflectionClass(Location::class);
         $reflectionProperty = $reflectionClass->getProperty('id');
         $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($location, 'LC123');
+        $reflectionProperty->setValue($location1, 'L123');
         
-        // Create a mock company with location
+        $location2 = new Location();
+        $location2->setName('Location 2');
+        $location2->setActive(true);
+        
+        // Set a mock ID for the second location
+        $reflectionProperty->setValue($location2, 'L456');
+        
+        // Create a mock company with locations
         $company = new Company();
         $company->setName('Test Company');
         $company->setActive(true);
-        
-        // Add the location to the company using the proper method
-        $company->addLocation($location);
+        $company->addLocation($location1);
+        $company->addLocation($location2);
         
         // Create a mock member with company
         $member = new Member();
+        $member->setUserId('U123');
+        $member->setDisplayName('Test Member');
+        $member->setActive(true);
         $member->setCompany($company);
+        
+        // Create a mock Security service that returns the company user
+        $mockSecurity = $this->createMockSecurity($user);
+        
+        // Create a mock MemberRepository that returns the member
+        $mockMemberRepository = $this->createMockMemberRepository($member);
+        
+        // Create the extension with the mock security and repository
+        $extension = new RestrictComplaintByLocationExtension($mockSecurity, $mockMemberRepository);
+        
+        // Create a query builder
+        $queryBuilder = $this->createQueryBuilder();
+        $initialDql = $queryBuilder->getDQL();
+        
+        // Apply the extension
+        $extension->applyToCollection(
+            $queryBuilder,
+            $this->createMockQueryNameGenerator(),
+            Complaint::class
+        );
+        
+        // Check if the query was modified
+        $finalDql = $queryBuilder->getDQL();
+        
+        $io->writeln('Initial DQL: ' . $initialDql);
+        $io->writeln('Final DQL: ' . $finalDql);
+        
+        // The query should not be modified since the extension only applies to committee users
+        if ($initialDql === $finalDql) {
+            $io->success('Test passed: Query was not modified for company user');
+        } else {
+            $io->error('Test failed: Query was modified for company user');
+        }
+    }
+    
+    private function testWithNgoUserWithMemberCompanyAndLocations(SymfonyStyle $io): void
+    {
+        $io->section('Test with NGO user with member, company and locations');
         
         // Create a mock NGO user
         $user = new User();
@@ -542,6 +498,38 @@ class TestRestrictComplaintByLocationCommand extends Command
         $reflectionProperty = $reflectionClass->getProperty('id');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($user, 'U123');
+        
+        // Create mock locations
+        $location1 = new Location();
+        $location1->setName('Location 1');
+        $location1->setActive(true);
+        
+        // Set a mock ID for the location
+        $reflectionClass = new \ReflectionClass(Location::class);
+        $reflectionProperty = $reflectionClass->getProperty('id');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($location1, 'L123');
+        
+        $location2 = new Location();
+        $location2->setName('Location 2');
+        $location2->setActive(true);
+        
+        // Set a mock ID for the second location
+        $reflectionProperty->setValue($location2, 'L456');
+        
+        // Create a mock company with locations
+        $company = new Company();
+        $company->setName('Test Company');
+        $company->setActive(true);
+        $company->addLocation($location1);
+        $company->addLocation($location2);
+        
+        // Create a mock member with company
+        $member = new Member();
+        $member->setUserId('U123');
+        $member->setDisplayName('Test Member');
+        $member->setActive(true);
+        $member->setCompany($company);
         
         // Create a mock Security service that returns the NGO user
         $mockSecurity = $this->createMockSecurity($user);
@@ -565,97 +553,15 @@ class TestRestrictComplaintByLocationCommand extends Command
         
         // Check if the query was modified
         $finalDql = $queryBuilder->getDQL();
-        $parameters = $queryBuilder->getParameters();
         
         $io->writeln('Initial DQL: ' . $initialDql);
         $io->writeln('Final DQL: ' . $finalDql);
         
-        // The query should be modified to include the location restriction
-        $hasLocationCondition = str_contains($finalDql, 'location IN (:locationIds)');
-        $hasLocationParameter = false;
-        
-        foreach ($parameters as $parameter) {
-            if ($parameter->getName() === 'locationIds' && in_array('LC123', $parameter->getValue())) {
-                $hasLocationParameter = true;
-                break;
-            }
-        }
-        
-        if ($hasLocationCondition && $hasLocationParameter) {
-            $io->success('Test passed: Query was correctly modified for NGO user with member, company and location');
-        } else {
-            $io->error('Test failed: Query was not correctly modified for NGO user with member, company and location');
-        }
-    }
-
-    private function testWithNonCommitteeUser(SymfonyStyle $io): void
-    {
-        $io->section('Test with non-committee user');
-        
-        // Create a mock location
-        $location = new Location();
-        $location->setName('Test Location');
-        $location->setActive(true);
-        
-        // Set a mock ID for the location
-        $reflectionClass = new \ReflectionClass(Location::class);
-        $reflectionProperty = $reflectionClass->getProperty('id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($location, 'LC123');
-        
-        // Create a mock company with location
-        $company = new Company();
-        $company->setName('Test Company');
-        $company->setActive(true);
-        
-        // Add the location to the company using the proper method
-        $company->addLocation($location);
-        
-        // Create a mock member with company
-        $member = new Member();
-        $member->setCompany($company);
-        
-        // Create a mock non-committee user
-        $user = new User();
-        $user->setPersonType(UserProxyInterface::PERSON_LAMBDA);
-        
-        // Set a mock ID for the user
-        $reflectionClass = new \ReflectionClass(User::class);
-        $reflectionProperty = $reflectionClass->getProperty('id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($user, 'U123');
-        
-        // Create a mock Security service that returns the non-committee user
-        $mockSecurity = $this->createMockSecurity($user);
-        
-        // Create a mock MemberRepository that returns the member
-        $mockMemberRepository = $this->createMockMemberRepository($member);
-        
-        // Create the extension with the mock security and repository
-        $extension = new RestrictComplaintByLocationExtension($mockSecurity, $mockMemberRepository);
-        
-        // Create a query builder
-        $queryBuilder = $this->createQueryBuilder();
-        $initialDql = $queryBuilder->getDQL();
-        
-        // Apply the extension
-        $extension->applyToCollection(
-            $queryBuilder,
-            $this->createMockQueryNameGenerator(),
-            Complaint::class
-        );
-        
-        // Check if the query was modified
-        $finalDql = $queryBuilder->getDQL();
-        
-        $io->writeln('Initial DQL: ' . $initialDql);
-        $io->writeln('Final DQL: ' . $finalDql);
-        
-        // The query should not be modified since the user is not a committee member
+        // The query should not be modified since the extension only applies to committee users
         if ($initialDql === $finalDql) {
-            $io->success('Test passed: Query was not modified for non-committee user');
+            $io->success('Test passed: Query was not modified for NGO user');
         } else {
-            $io->error('Test failed: Query was modified for non-committee user');
+            $io->error('Test failed: Query was modified for NGO user');
         }
     }
 
@@ -685,12 +591,12 @@ class TestRestrictComplaintByLocationCommand extends Command
         };
     }
 
-    private function createMockMemberRepository(?Member $member): MemberRepository
+    private function createMockMemberRepository(?Member $member = null): MemberRepository
     {
         return new class($member) extends MemberRepository {
             private ?Member $mockMember;
             
-            public function __construct(?Member $mockMember)
+            public function __construct(?Member $mockMember = null)
             {
                 $this->mockMember = $mockMember;
             }
