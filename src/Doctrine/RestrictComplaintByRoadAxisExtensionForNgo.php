@@ -50,7 +50,9 @@ class RestrictComplaintByRoadAxisExtensionForNgo implements QueryCollectionExten
                     $roadAxisIds[] = $roadAxis->getId();
                 }
                 $queryBuilder->andWhere(sprintf('%s.roadAxis IN (:roadAxisIds)', $rootAlias));
+                $queryBuilder->andWhere(sprintf('%s.isSensitive = :isSensitive', $rootAlias));
                 $queryBuilder->setParameter('roadAxisIds', $roadAxisIds);
+                $queryBuilder->setParameter('isSensitive', true);
             }
         }
     }

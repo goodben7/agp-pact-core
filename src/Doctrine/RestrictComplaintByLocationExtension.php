@@ -50,7 +50,9 @@ class RestrictComplaintByLocationExtension implements QueryCollectionExtensionIn
                     $locationIds[] = $location->getId();
                 }
                 $queryBuilder->andWhere(sprintf('%s.location IN (:locationIds)', $rootAlias));
+                $queryBuilder->andWhere(sprintf('%s.isSensitive = :isSensitive', $rootAlias));
                 $queryBuilder->setParameter('locationIds', $locationIds);
+                $queryBuilder->setParameter('isSensitive', false);
             }
         }
     }
