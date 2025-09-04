@@ -9,13 +9,16 @@ use ApiPlatform\Metadata\Operation;
 use Symfony\Bundle\SecurityBundle\Security;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
+use App\Entity\Member;
 use App\Entity\User;
+use App\Repository\MemberRepository;
 
-class RestrictComplaintByRoadAxisExtension implements QueryCollectionExtensionInterface
+class RestrictComplaintBycurrentAssignedCompany implements QueryCollectionExtensionInterface
 {
-    public function __construct(private Security $security)
-    {
-    }
+    public function __construct(
+        private Security         $security,
+        private MemberRepository $memberRepository
+    ) {}
 
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
@@ -34,13 +37,17 @@ class RestrictComplaintByRoadAxisExtension implements QueryCollectionExtensionIn
         if (!$user)
             return;
 
-        if (UserProxyInterface::PERSON_ADMINISTRATOR_MANAGER === $user->getPersonType()) {
-            $roadAxis = $user->getRoadAxis();
-            
-            if ($roadAxis) {
+        if (UserProxyInterface::PERSON_COMPANY === $user->getPersonType() ) {
+            /**
+             * @var Member $member
+             */
+            $member = $this->memberRepository->findOneBy(['userId' => $user->getId()]);
+
+            if ($member && $member->getCompany()) {
                 $rootAlias = $queryBuilder->getRootAliases()[0];
-                $queryBuilder->andWhere(sprintf('%s.roadAxis = :roadAxisId', $rootAlias));
-                $queryBuilder->setParameter('roadAxisId', $roadAxis->getId());
+                $companyId = $member->getCompany()->getId();
+                $queryBuilder->andWhere(sprintf('%s.currentAssignedCompany = :companyId', $rootAlias));
+                $queryBuilder->setParameter('companyId', $companyId);
             }
         }
     }

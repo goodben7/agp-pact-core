@@ -2,7 +2,7 @@
 
 namespace App\Dto;
 
-use App\Model\UserProxyInterface;
+use App\Entity\User;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class RequireAccessDto
@@ -22,20 +22,7 @@ class RequireAccessDto
 
         #[Assert\NotNull]
         #[Assert\NotBlank]
-        #[Assert\Choice(choices: [
-            UserProxyInterface::PERSON_SUPER_ADMIN,
-            UserProxyInterface::PERSON_ADMIN,
-            UserProxyInterface::PERSON_COMMITTEE,
-            UserProxyInterface::PERSON_NGO,
-            UserProxyInterface::PERSON_GOV,
-            UserProxyInterface::PERSON_JUS,
-            UserProxyInterface::PERSON_COMPANY,
-            UserProxyInterface::PERSON_CONTROL_MISSION,
-            UserProxyInterface::PERSON_INFRASTRUCTURE_CELL,
-            UserProxyInterface::PERSON_WORLD_BANK,
-            UserProxyInterface::PERSON_COMPLAINANT,
-            UserProxyInterface::PERSON_LAMBDA
-        ])]
+        #[Assert\Choice(callback: [User::class, 'getAcceptedPersonList'])]
         public ?string $personType = null,
 
     ) {}

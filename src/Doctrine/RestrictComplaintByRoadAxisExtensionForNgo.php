@@ -13,7 +13,7 @@ use App\Entity\Member;
 use App\Entity\User;
 use App\Repository\MemberRepository;
 
-class RestrictComplaintByLocationExtension implements QueryCollectionExtensionInterface
+class RestrictComplaintByRoadAxisExtensionForNgo implements QueryCollectionExtensionInterface
 {
     public function __construct(
         private Security         $security,
@@ -37,22 +37,22 @@ class RestrictComplaintByLocationExtension implements QueryCollectionExtensionIn
         if (!$user)
             return;
 
-        if (UserProxyInterface::PERSON_COMMITTEE === $user->getPersonType() ) {
+        if (UserProxyInterface::PERSON_NGO === $user->getPersonType() ) {
             /**
              * @var Member $member
              */
             $member = $this->memberRepository->findOneBy(['userId' => $user->getId()]);
 
-            if ($member && $member->getCompany() && !$member->getCompany()->getLocations()->isEmpty()) {
+            if ($member && $member->getCompany() && !$member->getCompany()->getRoadAxes()->isEmpty()) {
                 $rootAlias = $queryBuilder->getRootAliases()[0];
-                $locationIds = [];
-                foreach ($member->getCompany()->getLocations() as $location) {
-                    $locationIds[] = $location->getId();
+                $roadAxisIds = [];
+                foreach ($member->getCompany()->getRoadAxes() as $roadAxis) {
+                    $roadAxisIds[] = $roadAxis->getId();
                 }
-                $queryBuilder->andWhere(sprintf('%s.location IN (:locationIds)', $rootAlias));
+                $queryBuilder->andWhere(sprintf('%s.roadAxis IN (:roadAxisIds)', $rootAlias));
                 $queryBuilder->andWhere(sprintf('%s.isSensitive = :isSensitive', $rootAlias));
-                $queryBuilder->setParameter('locationIds', $locationIds);
-                $queryBuilder->setParameter('isSensitive', false);
+                $queryBuilder->setParameter('roadAxisIds', $roadAxisIds);
+                $queryBuilder->setParameter('isSensitive', true);
             }
         }
     }

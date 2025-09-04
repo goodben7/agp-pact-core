@@ -18,4 +18,6 @@ interface UserProxyInterface
     public const PERSON_WORLD_BANK = 'WBK';
     public const PERSON_COMPLAINANT = 'CMP';
     public const PERSON_ADMINISTRATOR_MANAGER = 'ADM_MGR';
+    public const PERSON_USER = 'USR';
+    public const PERSON_EMPLOYEE = 'EMP';
 }
