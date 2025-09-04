@@ -133,6 +133,7 @@ readonly class ComplaintWorkflowManager
             'currentAssignee' => 'setCurrentAssignee',
             'involvedCompany' => 'setInvolvedCompany',
             'closed' => 'setClosed',
+            'currentAssignedCompany' => 'setCurrentAssignedCompany'
         ];
 
         foreach ($fieldSetterMap as $fieldName => $setterMethod) {
@@ -263,6 +264,9 @@ readonly class ComplaintWorkflowManager
                                         case 'api/complainants':
                                             $entity = $this->em->getRepository(Complainant::class)->find($id);
                                             break;
+                                        case 'api/prejudices':
+                                            $entity = $this->em->getRepository(Prejudice::class)->find($id);
+                                            break;
                                     }
                                 }
                                 if ($entity) {
@@ -299,6 +303,9 @@ readonly class ComplaintWorkflowManager
                                     break;
                                 case 'api/complainants':
                                     $entity = $this->em->getRepository(Complainant::class)->find($id);
+                                    break;
+                                case 'api/prejudices':
+                                    $entity = $this->em->getRepository(Prejudice::class)->find($id);
                                     break;
                             }
                         }
