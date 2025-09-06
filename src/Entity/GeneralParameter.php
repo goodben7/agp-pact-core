@@ -61,19 +61,19 @@ class GeneralParameter
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'report_template:get', 'report_template:list', 'complaint:get', 'complaint:list', 'prejudice:get', 'attached_file:get', 'species:get', 'species:list'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'report_template:get', 'report_template:list', 'complaint:get', 'complaint:list', 'prejudice:get', 'attached_file:get', 'species:get', 'species:list', 'default_assignment_rule:get', 'default_assignment_rule:list'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch', 'report_template:get', 'report_template:list', 'complaint:get', 'complaint:list', 'prejudice:get', 'attached_file:get', 'species:get', 'species:list'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch', 'report_template:get', 'report_template:list', 'complaint:get', 'complaint:list', 'prejudice:get', 'attached_file:get', 'species:get', 'species:list', 'default_assignment_rule:get', 'default_assignment_rule:list'])]
     private ?string $category = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch', 'report_template:get', 'report_template:list', 'complaint:get', 'complaint:list', 'prejudice:get', 'attached_file:get', 'location:list:descendants', 'species:get', 'species:list'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch', 'report_template:get', 'report_template:list', 'complaint:get', 'complaint:list', 'prejudice:get', 'attached_file:get', 'location:list:descendants', 'species:get', 'species:list', 'default_assignment_rule:get', 'default_assignment_rule:list'])]
     private ?string $value = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch', 'attached_file:get', 'species:get', 'species:list', 'prejudice:get'])]
+    #[Groups(['general_parameter:get', 'general_parameter:list', 'road_axis:get', 'road_axis:list', 'location:get', 'location:list', 'complaint:get', 'complaint:list', 'company:get', 'complainant:list', 'complainant:get', 'general_parameter:patch', 'attached_file:get', 'species:get', 'species:list', 'prejudice:get', 'default_assignment_rule:get', 'default_assignment_rule:list'])]
     private ?string $code = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
