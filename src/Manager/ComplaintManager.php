@@ -211,6 +211,9 @@ readonly class ComplaintManager
             );
         }
 
+        if ($company)
+            $complaint->setInvolvedCompany($company);
+
         return $complaint;
     }
 
