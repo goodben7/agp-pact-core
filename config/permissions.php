@@ -85,11 +85,6 @@ return static function (): iterable {
     yield Permission::new('ROLE_SPECIES_PRICE_CREATE', 'Créer un prix d\'espèce');
     yield Permission::new('ROLE_SPECIES_PRICE_UPDATE', 'Modifier un prix d\'espèce');
 
-    yield Permission::new('ROLE_VICTIM_LIST', 'Consulter la liste des victimes');
-    yield Permission::new('ROLE_VICTIM_DETAILS', 'Consulter les détails d\'une victime');
-    yield Permission::new('ROLE_VICTIM_CREATE', 'Créer une victime');
-    yield Permission::new('ROLE_VICTIM_UPDATE', 'Modifier une victime');
-
     yield Permission::new('ROLE_WORKFLOW_STEP_LIST', 'Consulter la liste des étapes de traitement');
     yield Permission::new('ROLE_WORKFLOW_STEP_DETAILS', 'Consulter les détails d\'une étape de traitement');
     yield Permission::new('ROLE_WORKFLOW_STEP_CREATE', 'Créer une étape de traitement');
