@@ -3,10 +3,10 @@
 namespace App\Manager;
 
 use App\Entity\Complaint;
-use App\Entity\DefaultAssignmentRule;
 use App\Entity\Location;
 use App\Entity\RoadAxis;
 use App\Entity\WorkflowStep;
+use App\Entity\Company;
 use App\Provider\AssignableCompaniesProvider;
 use App\Repository\ComplaintRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,7 +17,9 @@ readonly class AssignmentManager
         private EntityManagerInterface $em,
         private AssignableCompaniesProvider $assignableCompaniesProvider,
         private ComplaintRepository $complaintRepository
-    ) {}
+    ) 
+    {
+    }
 
     public function assignDefaultActor(Complaint $complaint): void
     {
@@ -31,37 +33,57 @@ readonly class AssignmentManager
             return;
         }
 
-        // Assigner la première compagnie de la collection si elle existe
-        $assignedCompanies = $rule->getAssignedCompanies();
-        if (!$assignedCompanies->isEmpty()) {
-            $company = $assignedCompanies->first();
-
-            // Vérifier si la compagnie peut traiter les plaintes sensibles si nécessaire
-            if ($complaint->getIsSensitive() && !$company->isCanProcessSensitiveComplaint()) {
-                // Chercher une autre compagnie dans la règle
-                foreach ($assignedCompanies as $alternativeCompany) {
-                    if ($alternativeCompany->isCanProcessSensitiveComplaint()) {
-                        $company = $alternativeCompany;
-                        break;
-                    }
-                }
-            }
-
-            $complaint->setInvolvedCompany($company);
-        }
-
-        // Assigner le premier profil de la collection si il existe
+        // Assigner une compagnie basée sur les profils (GeneralParameter) assignés
         $assignedProfiles = $rule->getAssignedProfiles();
         if (!$assignedProfiles->isEmpty()) {
-            $profile = $assignedProfiles->first();
-            // Trouver un utilisateur avec ce profil et la bonne localisation/axe
-            // C'est la partie la plus complexe : comment choisir UN utilisateur parmi plusieurs ?
-            // Pour l'instant, on peut se contenter d'assigner l'entreprise.
-            // $user = $this->findUserByProfileAndLocation($profile, $location, $roadAxis);
-            // if ($user) {
-            //     $complaint->setCurrentAssignee($user);
-            // }
+            $companyType = $assignedProfiles->first(); // GeneralParameter représentant le type de compagnie
+            
+            // Trouver une compagnie ayant ce type
+            $company = $this->findCompanyByType($companyType, $complaint->getIsSensitive(), $location, $roadAxis);
+            
+            if ($company) {
+                $complaint->setInvolvedCompany($company);
+            }
         }
+    }
+
+    /**
+     * Trouve une compagnie par type (GeneralParameter) en tenant compte des critères
+     */
+    private function findCompanyByType(
+        \App\Entity\GeneralParameter $companyType, 
+        bool $isSensitive = false, 
+        ?Location $location = null, 
+        ?RoadAxis $roadAxis = null
+    ): ?Company {
+        $companyRepository = $this->em->getRepository(Company::class);
+        
+        $queryBuilder = $companyRepository->createQueryBuilder('c')
+            ->where('c.type = :type')
+            ->andWhere('c.active = true')
+            ->andWhere('c.deleted = false OR c.deleted IS NULL')
+            ->setParameter('type', $companyType);
+
+        // Filtrer par capacité à traiter les plaintes sensibles
+        if ($isSensitive) {
+            $queryBuilder->andWhere('c.canProcessSensitiveComplaint = true');
+        }
+
+        // Filtrer par localisation si spécifiée
+        if ($location) {
+            $queryBuilder->join('c.locations', 'l')
+                ->andWhere('l = :location')
+                ->setParameter('location', $location);
+        }
+
+        // Filtrer par axe routier si spécifié
+        if ($roadAxis) {
+            $queryBuilder->join('c.roadAxes', 'r')
+                ->andWhere('r = :roadAxis')
+                ->setParameter('roadAxis', $roadAxis);
+        }
+
+        return $queryBuilder->getQuery()->getOneOrNullResult();
     }
 
     /**
@@ -71,9 +93,9 @@ readonly class AssignmentManager
     {
         return $this->complaintRepository->findAssignableCompanies(
             $complaint->getCurrentWorkflowStep(),
+            $complaint->getIsSensitive(),
             $complaint->getLocation(),
-            $complaint->getRoadAxis(),
-            $complaint->getIsSensitive()
+            $complaint->getRoadAxis()
         );
     }
 

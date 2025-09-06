@@ -24,7 +24,6 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use App\State\Complaint\CreateComplaintProcessor;
-use App\State\Complaint\UpdateComplaintProcessor;
 use Symfony\Component\Serializer\Attribute\Groups;
 use App\State\Complaint\ComplaintApplyActionProcessor;
 

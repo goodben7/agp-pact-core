@@ -63,11 +63,7 @@ class DefaultAssignmentRule
     #[Groups(['default_assignment_rule:get', 'default_assignment_rule:list', 'default_assignment_rule:post', 'default_assignment_rule:patch'])]
     private ?bool $roadAxis = null;
 
-    #[ORM\ManyToMany(targetEntity: Company::class)]
-    #[Groups(['default_assignment_rule:get', 'default_assignment_rule:list', 'default_assignment_rule:post', 'default_assignment_rule:patch'])]
-    private Collection $assignedCompanies;
-
-    #[ORM\ManyToMany(targetEntity: Profile::class)]
+    #[ORM\ManyToMany(targetEntity: GeneralParameter::class)]
     #[Groups(['default_assignment_rule:get', 'default_assignment_rule:list', 'default_assignment_rule:post', 'default_assignment_rule:patch'])]
     private Collection $assignedProfiles;
 
@@ -81,7 +77,6 @@ class DefaultAssignmentRule
 
     public function __construct()
     {
-        $this->assignedCompanies = new ArrayCollection();
         $this->assignedProfiles = new ArrayCollection();
     }
 
@@ -127,38 +122,14 @@ class DefaultAssignmentRule
     }
 
     /**
-     * @return Collection<int, Company>
-     */
-    public function getAssignedCompanies(): Collection
-    {
-        return $this->assignedCompanies;
-    }
-
-    public function addAssignedCompany(Company $assignedCompany): static
-    {
-        if (!$this->assignedCompanies->contains($assignedCompany)) {
-            $this->assignedCompanies->add($assignedCompany);
-        }
-
-        return $this;
-    }
-
-    public function removeAssignedCompany(Company $assignedCompany): static
-    {
-        $this->assignedCompanies->removeElement($assignedCompany);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Profile>
+     * @return Collection<int, GeneralParameter>
      */
     public function getAssignedProfiles(): Collection
     {
         return $this->assignedProfiles;
     }
 
-    public function addAssignedProfile(Profile $assignedProfile): static
+    public function addAssignedProfile(GeneralParameter $assignedProfile): static
     {
         if (!$this->assignedProfiles->contains($assignedProfile)) {
             $this->assignedProfiles->add($assignedProfile);
@@ -167,7 +138,7 @@ class DefaultAssignmentRule
         return $this;
     }
 
-    public function removeAssignedProfile(Profile $assignedProfile): static
+    public function removeAssignedProfile(GeneralParameter $assignedProfile): static
     {
         $this->assignedProfiles->removeElement($assignedProfile);
 
