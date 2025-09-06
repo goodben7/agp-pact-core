@@ -133,6 +133,7 @@ readonly class ComplaintWorkflowManager
             'currentAssignee' => 'setCurrentAssignee',
             'involvedCompany' => 'setInvolvedCompany',
             'closed' => 'setClosed',
+            'currentAssignedCompany' => 'setCurrentAssignedCompany'
         ];
 
         foreach ($fieldSetterMap as $fieldName => $setterMethod) {
@@ -249,6 +250,7 @@ readonly class ComplaintWorkflowManager
                                     $resource = $fieldConfig['optionsResource'];
                                     switch ($resource) {
                                         case 'api/companies':
+                                        case 'api/assignable-companies':
                                             $entity = $this->em->getRepository(Company::class)->find($id);
                                             break;
                                         case 'api/users':
@@ -262,6 +264,9 @@ readonly class ComplaintWorkflowManager
                                             break;
                                         case 'api/complainants':
                                             $entity = $this->em->getRepository(Complainant::class)->find($id);
+                                            break;
+                                        case 'api/prejudices':
+                                            $entity = $this->em->getRepository(Prejudice::class)->find($id);
                                             break;
                                     }
                                 }
@@ -286,6 +291,7 @@ readonly class ComplaintWorkflowManager
                             $resource = $fieldConfig['optionsResource'];
                             switch ($resource) {
                                 case 'api/companies':
+                                case 'api/assignable-companies':
                                     $entity = $this->em->getRepository(Company::class)->find($id);
                                     break;
                                 case 'api/users':
@@ -300,6 +306,9 @@ readonly class ComplaintWorkflowManager
                                 case 'api/complainants':
                                     $entity = $this->em->getRepository(Complainant::class)->find($id);
                                     break;
+                                case 'api/prejudices':
+                                    $entity = $this->em->getRepository(Prejudice::class)->find($id);
+                                    break;
                             }
                         }
                         $extracted[$fieldName] = $entity;
@@ -310,7 +319,12 @@ readonly class ComplaintWorkflowManager
 
                 case 'boolean':
                 case 'checkbox':
-                    $extracted[$fieldName] = filter_var($fieldValue, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                    // Gérer le cas des chaînes vides pour les booléens
+                    if ($fieldValue === '' || $fieldValue === null) {
+                        $extracted[$fieldName] = null;
+                    } else {
+                        $extracted[$fieldName] = filter_var($fieldValue, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                    }
                     break;
 
                 case 'number':
@@ -436,6 +450,7 @@ readonly class ComplaintWorkflowManager
                                     $entity = null;
                                     switch ($resource) {
                                         case 'api/companies':
+                                        case 'api/assignable-companies':
                                             $entity = $this->em->getRepository(Company::class)->find($id);
                                             break;
                                         case 'api/users':
@@ -483,9 +498,14 @@ readonly class ComplaintWorkflowManager
 
                 case 'boolean':
                 case 'checkbox':
-                    $fieldConstraints[] = new Assert\Type([
-                        'type' => 'bool',
-                        'message' => sprintf('%s must be a boolean value.', $fieldLabel)
+                    // Permettre les chaînes vides pour les booléens
+                    $fieldConstraints[] = new Assert\Callback([
+                        'callback' => function ($value, $context) use ($fieldLabel) {
+                            if ($value !== null && $value !== '' && !is_bool($value) && !in_array($value, ['0', '1', 'true', 'false'], true)) {
+                                $context->buildViolation(sprintf('%s must be a boolean value or empty.', $fieldLabel))
+                                    ->addViolation();
+                            }
+                        }
                     ]);
                     break;
             }
