@@ -1,0 +1,111 @@
+<?php
+
+namespace App\Service\Import\Strategy;
+
+use App\Dto\CreateTenantDto;
+use App\Entity\ImportItem;
+use App\Message\Command\CreateTenantCommand;
+use App\Service\ImporterStrategyInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
+readonly class TenantImporterStrategy implements ImporterStrategyInterface
+{
+    private const ENTITY_TYPE = 'tenant';
+
+    public function __construct(
+        private PropertyAccessorInterface $propertyAccessor,
+        private ValidatorInterface $validator,
+        private MessageBusInterface $messageBus
+    )
+    {
+    }
+
+    public function process(ImportItem $item): void
+    {
+        $mappingConfig = $item->getBatch()->getMapping()->getMappingConfiguration();
+        $rowData = $item->getRowData();
+
+        $dto = new CreateTenantDto();
+
+        foreach ($mappingConfig['columns'] as $columnMap) {
+            $fileHeader = $columnMap['fileHeader'];
+            $entityProperty = $columnMap['entityProperty'];
+
+            if (isset($rowData[$fileHeader]) && !empty(trim($rowData[$fileHeader]))) {
+                $value = trim($rowData[$fileHeader]);
+
+                if (in_array($entityProperty, ['age', 'numberWorkingDaysPerWeek'])) {
+                    $value = (int) $value;
+                } elseif (in_array($entityProperty, ['formerPap', 'vulnerability', 'noticeAgreementVacatingPremises'])) {
+                    $value = (bool) $value;
+                }
+
+                $this->propertyAccessor->setValue($dto, $entityProperty, $value);
+            }
+        }
+
+        $violations = $this->validator->validate($dto);
+        if (count($violations) > 0) {
+            $errorMessages = [];
+            foreach ($violations as $violation) {
+                $errorMessages[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
+            }
+            throw new \InvalidArgumentException(implode("\n", $errorMessages));
+        }
+
+        $command = new CreateTenantCommand(
+            code: $dto->code,
+            fullname: $dto->fullname,
+            sexe: $dto->sexe,
+            age: $dto->age,
+            phone: $dto->phone,
+            identificationNumber: $dto->identificationNumber,
+            formerPap: $dto->formerPap,
+            province: $dto->province,
+            territory: $dto->territory,
+            village: $dto->village,
+            longitude: $dto->longitude,
+            latitude: $dto->latitude,
+            orientation: $dto->orientation,
+            vulnerability: $dto->vulnerability,
+            vulnerabilityType: $dto->vulnerabilityType,
+            length: $dto->length,
+            wide: $dto->wide,
+            areaAllocatedSquareMeters: $dto->areaAllocatedSquareMeters,
+            cuPerSquareMeter: $dto->cuPerSquareMeter,
+            capitalGain: $dto->capitalGain,
+            totalPropertyUsd: $dto->totalPropertyUsd,
+            totalBatisUsd: $dto->totalBatisUsd,
+            commercialActivity: $dto->commercialActivity,
+            numberWorkingDaysPerWeek: $dto->numberWorkingDaysPerWeek,
+            averageDailyIncome: $dto->averageDailyIncome,
+            monthlyIncome: $dto->monthlyIncome,
+            totalCompensationThreeMonths: $dto->totalCompensationThreeMonths,
+            affectedCultivatedArea: $dto->affectedCultivatedArea,
+            equivalentUsd: $dto->equivalentUsd,
+            tree: $dto->tree,
+            totalFarmIncome: $dto->totalFarmIncome,
+            lossRentalIncome: $dto->lossRentalIncome,
+            movingAssistance: $dto->movingAssistance,
+            assistanceVulnerablePersons: $dto->assistanceVulnerablePersons,
+            rentalGuaranteeAssistance: $dto->rentalGuaranteeAssistance,
+            noticeAgreementVacatingPremises: $dto->noticeAgreementVacatingPremises,
+            tenantMonthlyRent: $dto->tenantMonthlyRent,
+            lessorName: $dto->lessorName,
+            totalRent: $dto->totalRent,
+            totalLossEmploymentIncome: $dto->totalLossEmploymentIncome,
+            totalLossBusinessIncome: $dto->totalLossBusinessIncome,
+            kilometerPoint: $dto->kilometerPoint,
+            category: $dto->category,
+            totalGeneral: $dto->totalGeneral
+        );
+        $this->messageBus->dispatch($command);
+    }
+
+    public function supports(string $entityType): bool
+    {
+        return self::ENTITY_TYPE === $entityType;
+    }
+}

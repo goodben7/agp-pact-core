@@ -79,3 +79,12 @@ services:
     App\MessageHandler\ProcessImportBatchMessageHandler:
         bind:
             $importUploadsDirectory: '%kernel.project_dir%/public/uploads/imports'
+
+    App\Service\Import\Strategy\OwnerImporterStrategy:
+        tags: ['app.importer_strategy']
+
+    App\Service\Import\Strategy\TenantImporterStrategy:
+        tags: ['app.importer_strategy']
+
+    App\Service\Import\Strategy\TombsImporterStrategy:
+        tags: ['app.importer_strategy']
