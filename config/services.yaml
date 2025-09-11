@@ -70,3 +70,12 @@ services:
             $projectDir: '%kernel.project_dir%'
 
     App\Service\ReportDataCollectorService:
+
+    # Configuration pour ImporterStrategyFactory
+    App\Factory\Import\ImporterStrategyFactory:
+        arguments:
+            $strategies: !tagged_iterator 'app.importer_strategy'
+
+    App\MessageHandler\ProcessImportBatchMessageHandler:
+        bind:
+            $importUploadsDirectory: '%kernel.project_dir%/public/uploads/imports'
