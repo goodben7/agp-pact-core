@@ -36,7 +36,6 @@ readonly class OwnerImporterStrategy implements ImporterStrategyInterface
             if (isset($rowData[$fileHeader]) && !empty(trim($rowData[$fileHeader]))) {
                 $value = trim($rowData[$fileHeader]);
 
-                // Conversion des types spécifiques
                 if (in_array($entityProperty, ['age', 'numberWorkingDaysPerWeek'])) {
                     $value = (int) $value;
                 } elseif (in_array($entityProperty, ['formerPap', 'vulnerability', 'noticeAgreementVacatingPremises'])) {

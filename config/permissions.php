@@ -174,4 +174,19 @@ return static function (): iterable {
     yield Permission::new('ROLE_PAR_CREATE', "Créer une Personne Affectée par le Projet (PAP)");
     yield Permission::new('ROLE_PAR_UPDATE', "Modifier une Personne Affectée par le Projet (PAP)");
     yield Permission::new('ROLE_PAR_DELETE', "Supprimer une Personne Affectée par le Projet (PAP)");
+    
+    yield Permission::new('ROLE_IMPORT_MAPPING_LIST', "Lister les modèles d'import");
+    yield Permission::new('ROLE_IMPORT_MAPPING_DETAILS', "Voir les détails d'un modèle d'import");
+    yield Permission::new('ROLE_IMPORT_MAPPING_CREATE', "Créer un modèle d'import");
+    yield Permission::new('ROLE_IMPORT_MAPPING_UPDATE', "Modifier un modèle d'import");
+    yield Permission::new('ROLE_IMPORT_MAPPING_DELETE', "Supprimer un modèle d'import");
+
+    yield Permission::new('ROLE_IMPORT_BATCH_LIST', "Lister les lots d'import");
+    yield Permission::new('ROLE_IMPORT_BATCH_DETAILS', "Voir les détails d'un lot d'import");
+    yield Permission::new('ROLE_IMPORT_BATCH_CREATE', "Créer un lot d'import");
+    yield Permission::new('ROLE_IMPORT_BATCH_UPDATE', "Modifier un lot d'import");
+    yield Permission::new('ROLE_IMPORT_BATCH_DELETE', "Supprimer un lot d'import");
+
+    yield Permission::new('ROLE_IMPORT_ITEM_LIST', "Lister les éléments d'import");
+    yield Permission::new('ROLE_IMPORT_ITEM_DETAILS', "Voir les détails d'un élément d'import");
 };

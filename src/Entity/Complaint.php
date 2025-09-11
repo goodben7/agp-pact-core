@@ -263,9 +263,9 @@ class Complaint
     #[Groups(['complaint:get'])]
     private Collection $availableActions;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Groups(['complaint:get', 'complaint:list'])]
-    private ?bool $isSensitive = false;
+    private ?bool $isSensitive = null;
 
     #[ORM\Column]
     #[Groups(['complaint:get'])]
@@ -889,7 +889,7 @@ class Complaint
      *
      * @return  self
      */
-    public function setIsSensitive(bool $isSensitive): static
+    public function setIsSensitive(?bool $isSensitive): static
     {
         $this->isSensitive = $isSensitive;
 
