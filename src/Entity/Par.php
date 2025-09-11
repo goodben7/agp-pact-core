@@ -29,28 +29,28 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
     normalizationContext: ['groups' => 'par:get'],
     operations: [
         new Get(
-            //security: 'is_granted("ROLE_PAR_DETAILS")',
+            security: 'is_granted("ROLE_PAR_DETAILS")',
             provider: ItemProvider::class
         ),
         new GetCollection(
-            //security: 'is_granted("ROLE_PAR_LIST")',
+            security: 'is_granted("ROLE_PAR_LIST")',
             provider: CollectionProvider::class
         ),
         new Post(
             uriTemplate: "pars/tombs",
-            //security: 'is_granted("ROLE_PAR_CREATE")',
+            security: 'is_granted("ROLE_PAR_CREATE")',
             input: CreateTombsDto::class,
             processor: CreateTombsProcessor::class,
         ),
         new Post(
             uriTemplate: "pars/owners",
-            //security: 'is_granted("ROLE_PAR_CREATE")',
+            security: 'is_granted("ROLE_PAR_CREATE")',
             input: CreateOwnerDto::class,
             processor: CreateOwnerProcessor::class,
         ),
         new Post(
             uriTemplate: "pars/tenants",
-            //security: 'is_granted("ROLE_PAR_CREATE")',
+            security: 'is_granted("ROLE_PAR_CREATE")',
             input: CreateTenantDto::class,
             processor: CreateTenantProcessor::class,
         ),

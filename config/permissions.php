@@ -137,12 +137,6 @@ return static function (): iterable {
 
     yield Permission::new('ROLE_VIEW_GENERATED_REPORTS', 'Générer des modèles de rapports');
 
-    yield Permission::new('ROLE_PAP_DETAILS', "Consulter les détails d'une Personne Affectée au Projet (PAP)");
-    yield Permission::new('ROLE_PAP_LIST', "Consulter la liste des Personnes Affectées au Projet (PAP)");
-    yield Permission::new('ROLE_PAP_CREATE', "Créer une Personne Affectée au Projet (PAP)");
-    yield Permission::new('ROLE_PAP_UPDATE', "Modifier une Personne Affectée au Projet (PAP)");
-    yield Permission::new('ROLE_PAP_DELETE', "Supprimer une Personne Affectée au Projet (PAP)");
-
     yield Permission::new('ROLE_PREJUDICE_DETAILS', "Consulter les détails d'un préjudice");
     yield Permission::new('ROLE_PREJUDICE_LIST', "Consulter la liste des préjudices");
     yield Permission::new('ROLE_PREJUDICE_CREATE', "Créer un préjudice");
@@ -174,4 +168,10 @@ return static function (): iterable {
     yield Permission::new('ROLE_DEFAULT_ASSIGNMENT_RULE_DETAILS', "Consulter les détails d'une règle d'assignation par défaut");
     yield Permission::new('ROLE_DEFAULT_ASSIGNMENT_RULE_CREATE', "Créer une règle d'assignation par défaut");
     yield Permission::new('ROLE_DEFAULT_ASSIGNMENT_RULE_UPDATE', "Modifier une règle d'assignation par défaut");
+
+    yield Permission::new('ROLE_PAR_DETAILS', "Consulter les détails d'une Personne Affectée par le Projet (PAP)");
+    yield Permission::new('ROLE_PAR_LIST', "Consulter la liste des Personnes Affectées par le Projet (PAP)");
+    yield Permission::new('ROLE_PAR_CREATE', "Créer une Personne Affectée par le Projet (PAP)");
+    yield Permission::new('ROLE_PAR_UPDATE', "Modifier une Personne Affectée par le Projet (PAP)");
+    yield Permission::new('ROLE_PAR_DELETE', "Supprimer une Personne Affectée par le Projet (PAP)");
 };
