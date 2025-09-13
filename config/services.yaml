@@ -72,7 +72,7 @@ services:
     App\Service\ReportDataCollectorService:
 
     # Configuration pour ImporterStrategyFactory
-    App\Factory\Import\ImporterStrategyFactory:
+    App\Factory\ImporterStrategyFactory:
         arguments:
             $strategies: !tagged_iterator 'app.importer_strategy'
 

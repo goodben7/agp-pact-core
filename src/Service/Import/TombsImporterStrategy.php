@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Import\Strategy;
+namespace App\Service\Import;
 
 use App\Dto\CreateTombsDto;
 use App\Entity\ImportItem;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Factory\Import;
+namespace App\Factory;
 
 use App\Service\ImporterStrategyInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;

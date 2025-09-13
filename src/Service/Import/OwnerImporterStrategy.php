@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Import\Strategy;
+namespace App\Service\Import;
 
 use App\Dto\CreateOwnerDto;
 use App\Entity\ImportItem;

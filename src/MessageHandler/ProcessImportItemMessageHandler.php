@@ -4,7 +4,7 @@ namespace App\MessageHandler;
 
 use App\Entity\ImportBatch;
 use App\Entity\ImportItem;
-use App\Factory\Import\ImporterStrategyFactory;
+use App\Factory\ImporterStrategyFactory;
 use App\Message\ProcessImportItemMessage;
 use App\Repository\ImportItemRepository;
 use Doctrine\ORM\EntityManagerInterface;

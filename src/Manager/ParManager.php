@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Constant\GeneralParameterCategory;
 use App\Exception\UnavailableDataException;
 use App\Message\Query\GetGeneralParameterDetails;
+use App\Message\Query\GetLocationDetails;
 use App\Model\NewTenantModel;
 
 class ParManager
@@ -31,21 +32,21 @@ class ParManager
         }
 
         if ($model->village !== null) {
-            $village = $this->queries->ask(new GetGeneralParameterDetails($model->village, GeneralParameterCategory::LOCATION_LEVEL));
+            $village = $this->queries->ask(new GetLocationDetails($model->village));
             if ($village == null) {
                 throw new UnavailableDataException("cannot find village with id : {$model->village}");
             }
         }
 
         if ($model->placeOfBirthDeceased !== null) {
-            $placeOfBirthDeceased = $this->queries->ask(new GetGeneralParameterDetails($model->placeOfBirthDeceased, GeneralParameterCategory::LOCATION_LEVEL));
+            $placeOfBirthDeceased = $this->queries->ask(new GetLocationDetails($model->placeOfBirthDeceased));
             if ($placeOfBirthDeceased == null) {
                 throw new UnavailableDataException("cannot find place of birth deceased with id : {$model->placeOfBirthDeceased}");
             }
         }
 
         if ($model->deceasedResidence !== null) {
-            $deceasedResidence = $this->queries->ask(new GetGeneralParameterDetails($model->deceasedResidence, GeneralParameterCategory::LOCATION_LEVEL));
+            $deceasedResidence = $this->queries->ask(new GetLocationDetails($model->deceasedResidence));
             if ($deceasedResidence == null) {
                 throw new UnavailableDataException("cannot find deceased residence with id : {$model->deceasedResidence}");
             }
@@ -85,21 +86,21 @@ class ParManager
         }
 
         if ($model->province !== null) {
-            $province = $this->queries->ask(new GetGeneralParameterDetails($model->province, GeneralParameterCategory::LOCATION_LEVEL));
+            $province = $this->queries->ask(new GetLocationDetails($model->province));
             if ($province == null ){
                 throw new UnavailableDataException("cannot find province with id : {$model->province}");
             }
         }
 
         if ($model->territory !== null) {
-            $territory = $this->queries->ask(new GetGeneralParameterDetails($model->territory, GeneralParameterCategory::LOCATION_LEVEL));
+            $territory = $this->queries->ask(new GetLocationDetails($model->territory));
             if ($territory == null ){
                 throw new UnavailableDataException("cannot find territory with id : {$model->territory}");
             }
         }
 
         if ($model->village !== null) {
-            $village = $this->queries->ask(new GetGeneralParameterDetails($model->village, GeneralParameterCategory::LOCATION_LEVEL));
+            $village = $this->queries->ask(new GetLocationDetails($model->village));
             if ($village == null ){
                 throw new UnavailableDataException("cannot find village with id : {$model->village}");
             }
@@ -172,21 +173,21 @@ class ParManager
         }
 
         if ($model->province !== null) {
-            $province = $this->queries->ask(new GetGeneralParameterDetails($model->province, GeneralParameterCategory::LOCATION_LEVEL));
+            $province = $this->queries->ask(new GetLocationDetails($model->province));
             if ($province == null) {
                 throw new UnavailableDataException("cannot find province with id : {$model->province}");
             }
         }
 
         if ($model->territory !== null) {
-            $territory = $this->queries->ask(new GetGeneralParameterDetails($model->territory, GeneralParameterCategory::LOCATION_LEVEL));
+            $territory = $this->queries->ask(new GetLocationDetails($model->territory));
             if ($territory == null) {
                 throw new UnavailableDataException("cannot find territory with id : {$model->territory}");
             }
         }
 
         if ($model->village !== null) {
-            $village = $this->queries->ask(new GetGeneralParameterDetails($model->village, GeneralParameterCategory::LOCATION_LEVEL));
+            $village = $this->queries->ask(new GetLocationDetails($model->village));
             if ($village == null) {
                 throw new UnavailableDataException("cannot find village with id : {$model->village}");
             }
