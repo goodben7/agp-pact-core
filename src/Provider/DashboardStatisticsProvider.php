@@ -94,7 +94,15 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
         $this->logger->info('Results for complaint counts: ' . json_encode($results));
     
         foreach ($results as $row) {
-            $categoryDto = $row['isSensitive'] ? $stats->sensitive : $stats->general;
+            // Gestion des 3 niveaux de sensibilité
+            if ($row['isSensitive'] === null) {
+                $categoryDto = $stats->general;
+            } elseif ($row['isSensitive'] === false) {
+                $categoryDto = $stats->sensitive;
+            } else { // $row['isSensitive'] === true
+                $categoryDto = $stats->hypersensitive;
+            }
+            
             $status = $row['status'];
             $count = (int)$row['count'];
     
@@ -121,7 +129,15 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
         $results = $qb->getQuery()->getResult();
 
         foreach ($results as $row) {
-            $categoryDto = $row['isSensitive'] ? $stats->sensitive : $stats->general;
+            // Gestion des 3 niveaux de sensibilité
+            if ($row['isSensitive'] === null) {
+                $categoryDto = $stats->general;
+            } elseif ($row['isSensitive'] === false) {
+                $categoryDto = $stats->sensitive;
+            } else { // $row['isSensitive'] === true
+                $categoryDto = $stats->hypersensitive;
+            }
+            
             $categoryDto->complaintsByStatus[] = ['status' => $row['status'], 'count' => (int)$row['count']];
         }
     }
@@ -146,7 +162,15 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
         $this->logger->info('Results for complaint types: ' . json_encode($results));
     
         foreach ($results as $row) {
-            $categoryDto = $row['isSensitive'] ? $stats->sensitive : $stats->general;
+            // Gestion des 3 niveaux de sensibilité
+            if ($row['isSensitive'] === null) {
+                $categoryDto = $stats->general;
+            } elseif ($row['isSensitive'] === false) {
+                $categoryDto = $stats->sensitive;
+            } else { // $row['isSensitive'] === true
+                $categoryDto = $stats->hypersensitive;
+            }
+            
             $categoryDto->complaintsByType[] = ['type' => $row['type'], 'count' => (int)$row['count']];
         }
     }
@@ -165,7 +189,16 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
 
         foreach ($results as $row) {
             if ($row['avg_days'] === null) continue;
-            $categoryDto = $row['isSensitive'] ? $stats->sensitive : $stats->general;
+            
+            // Gestion des 3 niveaux de sensibilité
+            if ($row['isSensitive'] === null) {
+                $categoryDto = $stats->general;
+            } elseif ($row['isSensitive'] === false) {
+                $categoryDto = $stats->sensitive;
+            } else { // $row['isSensitive'] === true
+                $categoryDto = $stats->hypersensitive;
+            }
+            
             $categoryDto->averageResolutionTimeDays = (float)$row['avg_days'];
         }
     }
@@ -183,16 +216,25 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
         $qb->groupBy('c.isSensitive', 'year', 'month')->orderBy('year, month');
         $results = $qb->getQuery()->getResult();
 
-        $data = ['general' => [], 'sensitive' => []];
+        $data = ['general' => [], 'sensitive' => [], 'hypersensitive' => []];
         $now = new \DateTimeImmutable();
         for ($i = 11; $i >= 0; $i--) {
             $monthKey = $now->modify("-{$i} months")->format('Y-m');
             $data['general'][$monthKey] = ['month' => $monthKey, 'count' => 0];
             $data['sensitive'][$monthKey] = ['month' => $monthKey, 'count' => 0];
+            $data['hypersensitive'][$monthKey] = ['month' => $monthKey, 'count' => 0];
         }
 
         foreach ($results as $row) {
-            $categoryKey = $row['isSensitive'] ? 'sensitive' : 'general';
+            // Gestion des 3 niveaux de sensibilité
+            if ($row['isSensitive'] === null) {
+                $categoryKey = 'general';
+            } elseif ($row['isSensitive'] === false) {
+                $categoryKey = 'sensitive';
+            } else { // $row['isSensitive'] === true
+                $categoryKey = 'hypersensitive';
+            }
+            
             $monthKey = sprintf('%d-%02d', $row['year'], $row['month']);
             if (isset($data[$categoryKey][$monthKey])) {
                 $data[$categoryKey][$monthKey]['count'] = (int)$row['count'];
@@ -201,6 +243,7 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
 
         $stats->general->complaintsDeclaredMonthly = array_values($data['general']);
         $stats->sensitive->complaintsDeclaredMonthly = array_values($data['sensitive']);
+        $stats->hypersensitive->complaintsDeclaredMonthly = array_values($data['hypersensitive']);
     }
 
     private function getClosure(?array $locationIds, ?string $complaintTypeId, ?string $startDate, ?string $endDate, ?string $involvedCompanyId): \Closure

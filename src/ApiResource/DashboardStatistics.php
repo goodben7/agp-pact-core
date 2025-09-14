@@ -35,6 +35,9 @@ final class DashboardStatistics
     public DashboardStatisticsCategory $sensitive;
 
     #[Groups(["dashboard_stats:read"])]
+    public DashboardStatisticsCategory $hypersensitive;
+
+    #[Groups(["dashboard_stats:read"])]
     public ?array $papsByVulnerability = null;
 
     public ?string $location = null;
@@ -47,5 +50,6 @@ final class DashboardStatistics
     {
         $this->general = new DashboardStatisticsCategory();
         $this->sensitive = new DashboardStatisticsCategory();
+        $this->hypersensitive = new DashboardStatisticsCategory();
     }
 }
