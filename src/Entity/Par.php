@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Get;
 use App\Doctrine\IdGenerator;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\Patch;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ParRepository;
 use ApiPlatform\Metadata\ApiFilter;
@@ -25,6 +26,7 @@ use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
+use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 
 #[ORM\Entity(repositoryClass: ParRepository::class)]
 #[ApiResource(
@@ -62,6 +64,11 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
             input: ValidateParDto::class,
             processor: ValidateParProcessor::class,
             status: 200
+        ),
+        new Patch(
+            denormalizationContext: ['groups' => 'par:patch',],
+            security: 'is_granted("ROLE_PAR_UPDATE")',
+            processor: PersistProcessor::class,
         ),
     ]
 )]
@@ -128,8 +135,8 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
     'paymentDate' => 'exact',
     'status' => 'exact',
 ])]
-#[ApiFilter(OrderFilter::class, properties: ['createdAt'])]
-#[ApiFilter(DateFilter::class, properties: ['createdAt'])]
+#[ApiFilter(OrderFilter::class, properties: ['createdAt', 'validatedAt'])]
+#[ApiFilter(DateFilter::class, properties: ['createdAt', 'validatedAt'])]
 class Par
 {
     public const ID_PREFIX = "PA";
@@ -154,215 +161,215 @@ class Par
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $type = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $code = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $fullname = null;
 
     #[ORM\Column(length: 16, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $sexe = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?int $age = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $phone = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $deceasedNameOrDescriptionVault = null;
 
     #[ORM\Column(length: 16, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $placeOfBirthDeceased = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?\DateTimeImmutable $dateOfBirthDeceased = null;
 
     #[ORM\Column(length: 16, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $deceasedResidence = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $spouseName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $measures = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $identificationNumber = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?bool $formerPap = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $kilometerPoint = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $category = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $typeLiability = null;
 
     #[ORM\Column(length: 16, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $province = null;
 
     #[ORM\Column(length: 16, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $territory = null;
 
     #[ORM\Column(length: 16, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $village = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $longitude = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $latitude = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $orientation = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?bool $vulnerability = null;
 
     #[ORM\Column(length: 16, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $vulnerabilityType = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $tenantMonthlyRent = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $lessorName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $totalRent = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $totalLossEmploymentIncome = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $totalLossBusinessIncome = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $referenceCoordinates = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $length = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $wide = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $areaAllocatedSquareMeters = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $cuPerSquareMeter = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $capitalGain = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $totalPropertyUsd = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $totalBatisUsd = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $commercialActivity = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?int $numberWorkingDaysPerWeek = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $averageDailyIncome = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $monthlyIncome = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $totalCompensationThreeMonths = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $affectedCultivatedArea = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $equivalentUsd = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $tree = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $totalFarmIncome = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $lossRentalIncome = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $movingAssistance = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $assistanceVulnerablePersons = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $rentalGuaranteeAssistance = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?bool $noticeAgreementVacatingPremises = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $totalGeneral = null;
 
     #[ORM\Column]
@@ -370,27 +377,27 @@ class Par
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?bool $isPaid = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $remainingAmount = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?\DateTimeImmutable $bankAccountCreationDate = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $bankAccount = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?\DateTimeImmutable $paymentDate = null;
 
     #[ORM\Column(length: 16, nullable: true)]
-    #[Groups(['par:get'])]
+    #[Groups(['par:get', 'par:patch'])]
     private ?string $roadAxis = null;
 
     #[ORM\Column(length: 1, options: ['default' => self::STATUS_PENDING], nullable: false)]
