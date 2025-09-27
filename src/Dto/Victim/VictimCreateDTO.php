@@ -23,4 +23,6 @@ class VictimCreateDTO
     public ?GeneralParameter $familyRelationship = null;
 
     public ?string $victimDescription = null;
+    
+    public ?GeneralParameter $relationshipProject = null;
 }

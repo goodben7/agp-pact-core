@@ -133,7 +133,8 @@ readonly class ComplaintManager
                     ->setAge($victimDto->age)
                     ->setVulnerabilityDegree($victimDto->vulnerabilityDegree)
                     ->setVictimDescription($victimDto->victimDescription)
-                    ->setFamilyRelationship($victimDto->familyRelationship);
+                    ->setFamilyRelationship($victimDto->familyRelationship)
+                    ->setRelationshipProject($victimDto->relationshipProject);
 
                 $complaint->addVictim($victim);
             }
@@ -146,7 +147,9 @@ readonly class ComplaintManager
                     ->setLastName($offenderDto->lastName)
                     ->setMiddleName($offenderDto->middleName)
                     ->setGender($offenderDto->gender)
-                    ->setDescription($offenderDto->description);
+                    ->setDescription($offenderDto->description)
+                    ->setRelationshipProject($offenderDto->relationshipProject)
+                    ->setAge($offenderDto->age);
 
                 $complaint->addOffender($offender);
             }

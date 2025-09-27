@@ -115,6 +115,11 @@ class Victim
     #[Groups(['victim:get', 'victim:post', 'victim:patch', 'complaint:get', 'complaint:list'])]
     private ?\DateTimeImmutable $dateOfbirth = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\Column(nullable: true)]
+    #[Groups(['victim:get', 'victim:post', 'victim:patch', 'complaint:get', 'complaint:list'])]
+    private ?GeneralParameter $relationshipProject = null;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -270,5 +275,25 @@ class Victim
     public function __toString(): string
     {
         return $this->getFullName();
+    }
+
+    /**
+     * Get the value of relationshipProject
+     */ 
+    public function getRelationshipProject(): GeneralParameter|null
+    {
+        return $this->relationshipProject;
+    }
+
+    /**
+     * Set the value of relationshipProject
+     *
+     * @return  self
+     */ 
+    public function setRelationshipProject(?GeneralParameter $relationshipProject)
+    {
+        $this->relationshipProject = $relationshipProject;
+
+        return $this;
     }
 }

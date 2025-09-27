@@ -96,6 +96,15 @@ class Offender
     #[Groups(['offender:get', 'offender:post'])]
     private ?Complaint $complaint = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\Column(nullable: true)]
+    #[Groups(['offender:get', 'offender:post', 'offender:patch', 'complaint:get', 'complaint:list'])]
+    private ?GeneralParameter $relationshipProject = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['offender:get', 'offender:post', 'offender:patch', 'complaint:get', 'complaint:list'])]
+    private ?int $age = null;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -195,5 +204,45 @@ class Offender
     public function __toString(): string
     {
         return $this->getFullName();
+    }
+
+    /**
+     * Get the value of relationshipProject
+     */ 
+    public function getRelationshipProject(): GeneralParameter|null
+    {
+        return $this->relationshipProject;
+    }
+
+    /**
+     * Set the value of relationshipProject
+     *
+     * @return  self
+     */ 
+    public function setRelationshipProject(?GeneralParameter $relationshipProject): static
+    {
+        $this->relationshipProject = $relationshipProject;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of age
+     */ 
+    public function getAge(): int|null
+    {
+        return $this->age;
+    }
+
+    /**
+     * Set the value of age
+     *
+     * @return  self
+     */ 
+    public function setAge(?int $age): static
+    {
+        $this->age = $age;
+
+        return $this;
     }
 }

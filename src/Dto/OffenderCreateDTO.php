@@ -17,4 +17,8 @@ class OffenderCreateDTO
     public ?GeneralParameter $gender = null;
 
     public ?string $description = null;
+
+    public ?GeneralParameter $relationshipProject = null;
+
+    public ?int $age = null;
 }
