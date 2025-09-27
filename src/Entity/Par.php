@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Dto\CreateOwnerDto;
 use App\Dto\CreateTombsDto;
+use App\Dto\ValidateParDto;
 use App\Dto\CreateTenantDto;
 use ApiPlatform\Metadata\Get;
 use App\Doctrine\IdGenerator;
@@ -14,6 +15,7 @@ use App\Repository\ParRepository;
 use ApiPlatform\Metadata\ApiFilter;
 use App\State\CreateOwnerProcessor;
 use App\State\CreateTombsProcessor;
+use App\State\ValidateParProcessor;
 use App\State\CreateTenantProcessor;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
@@ -53,6 +55,13 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
             security: 'is_granted("ROLE_PAR_CREATE")',
             input: CreateTenantDto::class,
             processor: CreateTenantProcessor::class,
+        ),
+        new Post(
+            uriTemplate: '/pars/validations',
+            security: 'is_granted("ROLE_PAR_VALIDATION")',
+            input: ValidateParDto::class,
+            processor: ValidateParProcessor::class,
+            status: 200
         ),
     ]
 )]
@@ -117,6 +126,7 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
     'bankAccountCreationDate' => 'exact',
     'bankAccount' => 'partial',
     'paymentDate' => 'exact',
+    'status' => 'exact',
 ])]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt'])]
 #[ApiFilter(DateFilter::class, properties: ['createdAt'])]
@@ -132,6 +142,9 @@ class Par
 
     public const ORIENTATION_COTE_DROIT = "CD";
     public const ORIENTATION_COTE_GAUCHE = "CG";
+
+    public const STATUS_PENDING = 'P';
+    public const STATUS_VALIDATED = 'V';
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -379,6 +392,14 @@ class Par
     #[ORM\Column(length: 16, nullable: true)]
     #[Groups(['par:get'])]
     private ?string $roadAxis = null;
+
+    #[ORM\Column(length: 1, options: ['default' => self::STATUS_PENDING], nullable: false)]
+    #[Groups(['par:get'])]
+    private ?string $status = self::STATUS_PENDING;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['par:get'])]
+    private ?\DateTimeImmutable $validatedAt = null;
 
     public function getId(): ?string
     {
@@ -1089,7 +1110,7 @@ class Par
         return $this;
     }
 
-    public function getPaymentDate(): ?string
+    public function getPaymentDate(): ?\DateTimeImmutable
     {
         return $this->paymentDate;
     }
@@ -1117,6 +1138,46 @@ class Par
     public function setRoadAxis(?string $roadAxis): static
     {
         $this->roadAxis = $roadAxis;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of status
+     */ 
+    public function getStatus(): string|null
+    {
+        return $this->status;
+    }
+
+    /**
+     * Set the value of status
+     *
+     * @return  self
+     */ 
+    public function setStatus(?string $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of validatedAt
+     */ 
+    public function getValidatedAt(): \DateTimeImmutable|null
+    {
+        return $this->validatedAt;
+    }
+
+    /**
+     * Set the value of validatedAt
+     *
+     * @return  self
+     */ 
+    public function setValidatedAt(?\DateTimeImmutable $validatedAt): static
+    {
+        $this->validatedAt = $validatedAt;
 
         return $this;
     }

@@ -174,6 +174,7 @@ return static function (): iterable {
     yield Permission::new('ROLE_PAR_CREATE', "Créer une Personne Affectée par le Projet (PAP)");
     yield Permission::new('ROLE_PAR_UPDATE', "Modifier une Personne Affectée par le Projet (PAP)");
     yield Permission::new('ROLE_PAR_DELETE', "Supprimer une Personne Affectée par le Projet (PAP)");
+    yield Permission::new('ROLE_PAR_VALIDATION', "Valider une Personne Affectée par le Projet (PAP)"); 
     
     yield Permission::new('ROLE_IMPORT_MAPPING_LIST', "Lister les modèles d'import");
     yield Permission::new('ROLE_IMPORT_MAPPING_DETAILS', "Voir les détails d'un modèle d'import");

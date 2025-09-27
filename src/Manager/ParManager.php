@@ -12,6 +12,7 @@ use App\Message\Query\GetLocationDetails;
 use App\Message\Query\GetRoadAxisDetails;
 use App\Constant\GeneralParameterCategory;
 use App\Exception\UnavailableDataException;
+use App\Exception\InvalidActionInputException;
 use App\Message\Query\GetGeneralParameterDetails;
 
 class ParManager
@@ -294,5 +295,22 @@ class ParManager
         $this->em->flush();
         
         return $par;
+    }
+
+    public function validate(Par $par) : Par
+    {
+        if ($par->getStatus() !== Par::STATUS_PENDING) {
+            throw new InvalidActionInputException('Action not allowed : invalid par state'); 
+        }
+
+
+        $par->setStatus(Par::STATUS_VALIDATED);
+        $par->setValidatedAt(new \DateTimeImmutable('now'));
+
+        $this->em->persist($par);
+        $this->em->flush();
+
+
+        return $par; 
     }
 }
