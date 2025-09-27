@@ -99,13 +99,15 @@ readonly class ComplaintManager
             ->setCreatedBy($userId);
 
 
-        $isSensitive = false;
+        $isSensitive = null;
         if (!empty($data->incidentCauses)) {
             foreach ($data->incidentCauses as $incidentCause) {
                 $complaint->addIncidentCause($incidentCause);
                 // Check if the incident cause (Prejudice) is sensible
                 if ($incidentCause->isSensible()) {
                     $isSensitive = true;
+                } elseif (!$incidentCause->isSensible())  {
+                    $isSensitive = false;
                 }
             }
         }
