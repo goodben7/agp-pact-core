@@ -5,13 +5,14 @@ namespace App\Manager;
 use App\Entity\Par;
 use App\Model\NewOwnerModel;
 use App\Model\NewTombsModel;
+use App\Model\NewTenantModel;
 use App\Message\Query\QueryBusInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Message\Query\GetLocationDetails;
+use App\Message\Query\GetRoadAxisDetails;
 use App\Constant\GeneralParameterCategory;
 use App\Exception\UnavailableDataException;
 use App\Message\Query\GetGeneralParameterDetails;
-use App\Message\Query\GetLocationDetails;
-use App\Model\NewTenantModel;
 
 class ParManager
 {
@@ -24,6 +25,13 @@ class ParManager
 
     public function CreateTombs(NewTombsModel $model): Par
     {
+        if ($model->roadAxis !== null) {
+            $roadAxis = $this->queries->ask(new GetRoadAxisDetails($model->roadAxis));
+            if ($roadAxis === null) {
+                throw new UnavailableDataException("cannot find road axis with id : {$model->roadAxis}");
+            }
+        }
+
         if ($model->declarantSexe !== null) {
             $sexe = $this->queries->ask(new GetGeneralParameterDetails($model->declarantSexe, GeneralParameterCategory::GENDER));
             if ($sexe == null) {
@@ -74,6 +82,7 @@ class ParManager
         $par->setBankAccount($model->bankAccount);
         $par->setPaymentDate($model->paymentDate);
         $par->setCreatedAt(new \DateTimeImmutable());
+        $par->setRoadAxis($model->roadAxis);
         
         $this->em->persist($par);
         $this->em->flush();
@@ -83,6 +92,13 @@ class ParManager
 
     public function CreateOwner(NewOwnerModel $model): Par
     {
+        if ($model->roadAxis !== null) {
+            $roadAxis = $this->queries->ask(new GetRoadAxisDetails($model->roadAxis));
+            if ($roadAxis === null) {
+                throw new UnavailableDataException("cannot find road axis with id : {$model->roadAxis}");
+            }
+        }
+
         if ($model->sexe !== null) {
             $sexe = $this->queries->ask(new GetGeneralParameterDetails($model->sexe, GeneralParameterCategory::GENDER));
             if ($sexe == null ){
@@ -166,6 +182,7 @@ class ParManager
         $par->setBankAccount($model->bankAccount);
         $par->setPaymentDate($model->paymentDate);
         $par->setCreatedAt(new \DateTimeImmutable());
+        $par->setRoadAxis($model->roadAxis);
         
         $this->em->persist($par);
         $this->em->flush();
@@ -175,6 +192,13 @@ class ParManager
 
     public function CreateTenant(NewTenantModel $model): Par
     {
+        if ($model->roadAxis !== null) {
+            $roadAxis = $this->queries->ask(new GetRoadAxisDetails($model->roadAxis));
+            if ($roadAxis === null) {
+                throw new UnavailableDataException("cannot find road axis with id : {$model->roadAxis}");
+            }
+        }
+
         if ($model->sexe !== null) {
             $sexe = $this->queries->ask(new GetGeneralParameterDetails($model->sexe, GeneralParameterCategory::GENDER));
             if ($sexe == null) {
@@ -264,6 +288,7 @@ class ParManager
         $par->setBankAccount($model->bankAccount);
         $par->setPaymentDate($model->paymentDate);
         $par->setCreatedAt(new \DateTimeImmutable());
+        $par->setRoadAxis($model->roadAxis);
         
         $this->em->persist($par);
         $this->em->flush();

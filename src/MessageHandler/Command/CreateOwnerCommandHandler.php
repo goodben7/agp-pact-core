@@ -70,7 +70,8 @@ class CreateOwnerCommandHandler implements CommandHandlerInterface
                 $command->remainingAmount,
                 $command->bankAccountCreationDate,
                 $command->bankAccount,
-                $command->paymentDate
+                $command->paymentDate,
+                $command->roadAxis,
             );
 
             return $this->manager->CreateOwner($model);

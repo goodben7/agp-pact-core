@@ -62,7 +62,8 @@ class CreateOwnerProcessor implements ProcessorInterface
             $data->remainingAmount,
             $data->bankAccountCreationDate,
             $data->bankAccount,
-            $data->paymentDate
+            $data->paymentDate,
+            $data->roadAxis,
         );
 
         return $this->bus->dispatch($command);

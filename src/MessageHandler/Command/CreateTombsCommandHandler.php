@@ -44,7 +44,8 @@ class CreateTombsCommandHandler implements CommandHandlerInterface
                 $command->remainingAmount,
                 $command->bankAccountCreationDate,
                 $command->bankAccount,
-                $command->paymentDate
+                $command->paymentDate,
+                $command->roadAxis,
             );
 
             return $this->manager->CreateTombs($model);

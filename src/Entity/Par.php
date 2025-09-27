@@ -376,6 +376,10 @@ class Par
     #[Groups(['par:get'])]
     private ?\DateTimeImmutable $paymentDate = null;
 
+    #[ORM\Column(length: 16, nullable: true)]
+    #[Groups(['par:get'])]
+    private ?string $roadAxis = null;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -1093,6 +1097,26 @@ class Par
     public function setPaymentDate(?\DateTimeImmutable $paymentDate): static
     {
         $this->paymentDate = $paymentDate;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of roadAxis
+     */ 
+    public function getRoadAxis(): string|null
+    {
+        return $this->roadAxis;
+    }
+
+    /**
+     * Set the value of roadAxis
+     *
+     * @return  self
+     */ 
+    public function setRoadAxis(?string $roadAxis): static
+    {
+        $this->roadAxis = $roadAxis;
 
         return $this;
     }

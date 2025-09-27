@@ -41,6 +41,8 @@ class NewTombsModel
         public ?string $bankAccount = null,
 
         public ?\DateTimeImmutable $paymentDate = null,
+
+        public ?string $roadAxis = null,
     )
     {  
     }
