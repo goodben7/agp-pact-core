@@ -79,7 +79,7 @@ class RoadAxis
      */
     #[ORM\ManyToMany(targetEntity: Location::class)]
     #[ORM\JoinTable(name: 'road_axis_province')]
-    #[Groups(['road_axis:get', 'road_axis:list'])]
+    #[Groups(['road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
     private Collection $province;
 
     /**
@@ -87,15 +87,14 @@ class RoadAxis
      */
     #[ORM\ManyToMany(targetEntity: Location::class)]
     #[ORM\JoinTable(name: 'road_axis_territory')]
-    #[Groups(['road_axis:get', 'road_axis:list'])]
-    private Collection $territory;
+    #[Groups(['road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]    private Collection $territory;
 
     /**
      * @var Collection<int, Location>
      */
     #[ORM\ManyToMany(targetEntity: Location::class)]
     #[ORM\JoinTable(name: 'road_axis_commune')]
-    #[Groups(['road_axis:get', 'road_axis:list'])]
+    #[Groups(['road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
     private Collection $commune;
 
     /**
@@ -103,7 +102,7 @@ class RoadAxis
      */
     #[ORM\ManyToMany(targetEntity: Location::class)]
     #[ORM\JoinTable(name: 'road_axis_quartier')]
-    #[Groups(['road_axis:get', 'road_axis:list'])]
+    #[Groups(['road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
     private Collection $quartier;
 
     /**
@@ -111,7 +110,7 @@ class RoadAxis
      */
     #[ORM\ManyToMany(targetEntity: Location::class)]
     #[ORM\JoinTable(name: 'road_axis_city')]
-    #[Groups(['road_axis:get', 'road_axis:list'])]
+    #[Groups(['road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
     private Collection $city;
 
     /**
@@ -119,7 +118,7 @@ class RoadAxis
      */
     #[ORM\ManyToMany(targetEntity: Location::class)]
     #[ORM\JoinTable(name: 'road_axis_secteur')]
-    #[Groups(['road_axis:get', 'road_axis:list'])]
+    #[Groups(['road_axis:get', 'road_axis:list', 'complaint:get', 'complaint:list'])]
     private Collection $secteur;
 
     public function __construct()
