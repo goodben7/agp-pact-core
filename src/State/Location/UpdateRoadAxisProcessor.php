@@ -26,7 +26,13 @@ readonly class UpdateRoadAxisProcessor implements ProcessorInterface
             $data->active,
             $data->startLocation,
             $data->endLocation,
-            $data->traversedLocationIds
+            $data->traversedLocationIds ?? [],
+            $data->provinceIds ?? [],
+            $data->territoryIds ?? [],
+            $data->communeIds ?? [],
+            $data->quartierId ?? [],
+            $data->cityIds ?? [],
+            $data->secteurIds ?? []
         );
  
         return $this->manager->updateFrom($model, $uriVariables['id']); 
