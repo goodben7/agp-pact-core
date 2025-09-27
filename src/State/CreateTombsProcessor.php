@@ -31,7 +31,12 @@ class CreateTombsProcessor implements ProcessorInterface
             $data->deceasedResidence,
             $data->spouseName,
             $data->measures,
-            $data->totalGeneral
+            $data->totalGeneral,
+            $data->isPaid,
+            $data->remainingAmount,
+            $data->bankAccountCreationDate,
+            $data->bankAccount,
+            $data->paymentDate
         );
 
         return $this->bus->dispatch($command);

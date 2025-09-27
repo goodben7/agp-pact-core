@@ -70,7 +70,12 @@ class CreateTenantCommandHandler implements CommandHandlerInterface
                 $command->totalLossBusinessIncome,
                 $command->kilometerPoint,
                 $command->category,
-                $command->totalGeneral
+                $command->totalGeneral,
+                $command->isPaid,
+                $command->remainingAmount,
+                $command->bankAccountCreationDate,
+                $command->bankAccount,
+                $command->paymentDate
             );
 
             return $this->manager->CreateTenant($model);

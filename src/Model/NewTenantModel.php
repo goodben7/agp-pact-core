@@ -53,6 +53,16 @@ class NewTenantModel
         public ?string $category = null,
         
         public ?string $totalGeneral = null,
+
+        public ?bool $isPaid = null,
+
+        public ?string $remainingAmount = null,
+
+        public ?\DateTimeImmutable $bankAccountCreationDate = null,
+
+        public ?string $bankAccount = null,
+
+        public ?\DateTimeImmutable $paymentDate = null,
     )
     {
     }

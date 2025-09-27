@@ -65,7 +65,12 @@ class CreateOwnerCommandHandler implements CommandHandlerInterface
                 $command->movingAssistance,
                 $command->assistanceVulnerablePersons,
                 $command->noticeAgreementVacatingPremises,
-                $command->totalGeneral
+                $command->totalGeneral,
+                $command->isPaid,
+                $command->remainingAmount,
+                $command->bankAccountCreationDate,
+                $command->bankAccount,
+                $command->paymentDate
             );
 
             return $this->manager->CreateOwner($model);

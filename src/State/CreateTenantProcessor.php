@@ -62,7 +62,12 @@ class CreateTenantProcessor implements ProcessorInterface
             $data->totalLossBusinessIncome,
             $data->kilometerPoint,
             $data->category,
-            $data->totalGeneral
+            $data->totalGeneral,
+            $data->isPaid,
+            $data->remainingAmount,
+            $data->bankAccountCreationDate,
+            $data->bankAccount,
+            $data->paymentDate
         );
 
         return $this->bus->dispatch($command);

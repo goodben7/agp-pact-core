@@ -112,6 +112,11 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
     'noticeAgreementVacatingPremises' => 'exact',
     'totalGeneral' => 'exact',
     'createdAt' => 'exact',
+    'isPaid' => 'exact',
+    'remainingAmount' => 'exact',
+    'bankAccountCreationDate' => 'exact',
+    'bankAccount' => 'partial',
+    'paymentDate' => 'exact',
 ])]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt'])]
 #[ApiFilter(DateFilter::class, properties: ['createdAt'])]
@@ -350,6 +355,26 @@ class Par
     #[ORM\Column]
     #[Groups(['par:get'])]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['par:get'])]
+    private ?bool $isPaid = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['par:get'])]
+    private ?string $remainingAmount = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['par:get'])]
+    private ?\DateTimeImmutable $bankAccountCreationDate = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['par:get'])]
+    private ?string $bankAccount = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['par:get'])]
+    private ?\DateTimeImmutable $paymentDate = null;
 
     public function getId(): ?string
     {
@@ -1008,6 +1033,66 @@ class Par
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function isPaid(): ?bool
+    {
+        return $this->isPaid;
+    }
+
+    public function setIsPaid(?bool $isPaid): static
+    {
+        $this->isPaid = $isPaid;
+
+        return $this;
+    }
+
+    public function getRemainingAmount(): ?string
+    {
+        return $this->remainingAmount;
+    }
+
+    public function setRemainingAmount(?string $remainingAmount): static
+    {
+        $this->remainingAmount = $remainingAmount;
+
+        return $this;
+    }
+
+    public function getBankAccountCreationDate(): ?\DateTimeImmutable
+    {
+        return $this->bankAccountCreationDate;
+    }
+
+    public function setBankAccountCreationDate(?\DateTimeImmutable $bankAccountCreationDate): static
+    {
+        $this->bankAccountCreationDate = $bankAccountCreationDate;
+
+        return $this;
+    }
+
+    public function getBankAccount(): ?string
+    {
+        return $this->bankAccount;
+    }
+
+    public function setBankAccount(?string $bankAccount): static
+    {
+        $this->bankAccount = $bankAccount;
+
+        return $this;
+    }
+
+    public function getPaymentDate(): ?string
+    {
+        return $this->paymentDate;
+    }
+
+    public function setPaymentDate(?\DateTimeImmutable $paymentDate): static
+    {
+        $this->paymentDate = $paymentDate;
 
         return $this;
     }

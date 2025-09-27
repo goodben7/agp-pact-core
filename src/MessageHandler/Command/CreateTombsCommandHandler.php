@@ -39,7 +39,12 @@ class CreateTombsCommandHandler implements CommandHandlerInterface
                 $command->deceasedResidence,
                 $command->spouseName,
                 $command->measures,
-                $command->totalGeneral
+                $command->totalGeneral,
+                $command->isPaid,
+                $command->remainingAmount,
+                $command->bankAccountCreationDate,
+                $command->bankAccount,
+                $command->paymentDate
             );
 
             return $this->manager->CreateTombs($model);

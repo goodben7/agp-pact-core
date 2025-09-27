@@ -57,7 +57,12 @@ class CreateOwnerProcessor implements ProcessorInterface
             $data->movingAssistance,
             $data->assistanceVulnerablePersons,
             $data->noticeAgreementVacatingPremises,
-            $data->totalGeneral
+            $data->totalGeneral,
+            $data->isPaid,
+            $data->remainingAmount,
+            $data->bankAccountCreationDate,
+            $data->bankAccount,
+            $data->paymentDate
         );
 
         return $this->bus->dispatch($command);

@@ -68,6 +68,11 @@ class ParManager
         $par->setSpouseName($model->spouseName);
         $par->setMeasures($model->measures);
         $par->setTotalGeneral($model->totalGeneral);
+        $par->setIsPaid($model->isPaid);
+        $par->setRemainingAmount($model->remainingAmount);
+        $par->setBankAccountCreationDate($model->bankAccountCreationDate);
+        $par->setBankAccount($model->bankAccount);
+        $par->setPaymentDate($model->paymentDate);
         $par->setCreatedAt(new \DateTimeImmutable());
         
         $this->em->persist($par);
@@ -155,6 +160,11 @@ class ParManager
         $par->setAssistanceVulnerablePersons($model->assistanceVulnerablePersons);
         $par->setNoticeAgreementVacatingPremises($model->noticeAgreementVacatingPremises);
         $par->setTotalGeneral($model->totalGeneral);
+        $par->setIsPaid($model->isPaid);
+        $par->setRemainingAmount($model->remainingAmount);
+        $par->setBankAccountCreationDate($model->bankAccountCreationDate);
+        $par->setBankAccount($model->bankAccount);
+        $par->setPaymentDate($model->paymentDate);
         $par->setCreatedAt(new \DateTimeImmutable());
         
         $this->em->persist($par);
@@ -248,6 +258,11 @@ class ParManager
         $par->setKilometerPoint($model->kilometerPoint);
         $par->setCategory($model->category);
         $par->setTotalGeneral($model->totalGeneral);
+        $par->setIsPaid($model->isPaid);
+        $par->setRemainingAmount($model->remainingAmount);
+        $par->setBankAccountCreationDate($model->bankAccountCreationDate);
+        $par->setBankAccount($model->bankAccount);
+        $par->setPaymentDate($model->paymentDate);
         $par->setCreatedAt(new \DateTimeImmutable());
         
         $this->em->persist($par);
