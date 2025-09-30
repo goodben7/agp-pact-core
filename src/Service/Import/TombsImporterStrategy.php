@@ -36,12 +36,16 @@ readonly class TombsImporterStrategy implements ImporterStrategyInterface
             if (isset($rowData[$fileHeader]) && !empty(trim($rowData[$fileHeader]))) {
                 $value = trim($rowData[$fileHeader]);
 
+                // Gestion des types de données
                 if ($entityProperty === 'declarantAge') {
                     $value = (int) $value;
-                } elseif ($entityProperty === 'dateOfBirthDeceased' && isset($columnMap['format'])) {
-                    $date = \DateTimeImmutable::createFromFormat($columnMap['format'], $value);
+                } elseif (in_array($entityProperty, ['isPaid'])) {
+                    $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                } elseif (in_array($entityProperty, ['dateOfBirthDeceased', 'bankAccountCreationDate', 'paymentDate'])) {
+                    $format = $columnMap['format'] ?? 'Y-m-d';
+                    $date = \DateTimeImmutable::createFromFormat($format, $value);
                     if (!$date) {
-                        throw new \InvalidArgumentException("Format de date invalide pour '{$fileHeader}'. Attendu : '{$columnMap['format']}'. Reçu : '{$value}'.");
+                        throw new \InvalidArgumentException("Format de date invalide pour '{$fileHeader}'. Attendu : '{$format}'. Reçu : '{$value}'.");
                     }
                     $value = $date;
                 }
@@ -72,7 +76,13 @@ readonly class TombsImporterStrategy implements ImporterStrategyInterface
             deceasedResidence: $dto->deceasedResidence,
             spouseName: $dto->spouseName,
             measures: $dto->measures,
-            totalGeneral: $dto->totalGeneral
+            totalGeneral: $dto->totalGeneral,
+            isPaid: $dto->isPaid,
+            remainingAmount: $dto->remainingAmount,
+            bankAccountCreationDate: $dto->bankAccountCreationDate,
+            bankAccount: $dto->bankAccount,
+            paymentDate: $dto->paymentDate,
+            roadAxis: $dto->roadAxis
         );
         $this->messageBus->dispatch($command);
     }

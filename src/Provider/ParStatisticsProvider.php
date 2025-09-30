@@ -300,31 +300,31 @@ final readonly class ParStatisticsProvider implements ProviderInterface
             $typeLiability, $orientation, $vulnerabilityType, $vulnerability,
             $formerPap, $startDate, $endDate
         ) {
-            if (!empty($type)) {
+            if ($type !== null && $type !== '') {
                 $qb->andWhere(sprintf('%s.type = :type', $alias))->setParameter('type', $type);
             }
-            if (!empty($province)) {
+            if ($province !== null && $province !== '') {
                 $qb->andWhere(sprintf('%s.province = :province', $alias))->setParameter('province', $province);
             }
-            if (!empty($territory)) {
+            if ($territory !== null && $territory !== '') {
                 $qb->andWhere(sprintf('%s.territory = :territory', $alias))->setParameter('territory', $territory);
             }
-            if (!empty($village)) {
+            if ($village !== null && $village !== '') {
                 $qb->andWhere(sprintf('%s.village = :village', $alias))->setParameter('village', $village);
             }
-            if (!empty($sexe)) {
+            if ($sexe !== null && $sexe !== '') {
                 $qb->andWhere(sprintf('%s.sexe = :sexe', $alias))->setParameter('sexe', $sexe);
             }
-            if (!empty($category)) {
+            if ($category !== null && $category !== '') {
                 $qb->andWhere(sprintf('%s.category = :category', $alias))->setParameter('category', $category);
             }
-            if (!empty($typeLiability)) {
+            if ($typeLiability !== null && $typeLiability !== '') {
                 $qb->andWhere(sprintf('%s.typeLiability = :typeLiability', $alias))->setParameter('typeLiability', $typeLiability);
             }
-            if (!empty($orientation)) {
+            if ($orientation !== null && $orientation !== '') {
                 $qb->andWhere(sprintf('%s.orientation = :orientation', $alias))->setParameter('orientation', $orientation);
             }
-            if (!empty($vulnerabilityType)) {
+            if ($vulnerabilityType !== null && $vulnerabilityType !== '') {
                 $qb->andWhere(sprintf('%s.vulnerabilityType = :vulnerabilityType', $alias))->setParameter('vulnerabilityType', $vulnerabilityType);
             }
             if ($vulnerability !== null) {
@@ -333,11 +333,19 @@ final readonly class ParStatisticsProvider implements ProviderInterface
             if ($formerPap !== null) {
                 $qb->andWhere(sprintf('%s.formerPap = :formerPap', $alias))->setParameter('formerPap', $formerPap);
             }
-            if (!empty($startDate)) {
-                $qb->andWhere(sprintf('%s.createdAt >= :startDate', $alias))->setParameter('startDate', new \DateTimeImmutable($startDate));
+            if ($startDate !== null && $startDate !== '') {
+                try {
+                    $qb->andWhere(sprintf('%s.createdAt >= :startDate', $alias))->setParameter('startDate', new \DateTimeImmutable($startDate));
+                } catch (\Exception $e) {
+                    // Ignorer les dates invalides
+                }
             }
-            if (!empty($endDate)) {
-                $qb->andWhere(sprintf('%s.createdAt <= :endDate', $alias))->setParameter('endDate', (new \DateTimeImmutable($endDate))->setTime(23, 59, 59));
+            if ($endDate !== null && $endDate !== '') {
+                try {
+                    $qb->andWhere(sprintf('%s.createdAt <= :endDate', $alias))->setParameter('endDate', (new \DateTimeImmutable($endDate))->setTime(23, 59, 59));
+                } catch (\Exception $e) {
+                    // Ignorer les dates invalides
+                }
             }
         };
     }

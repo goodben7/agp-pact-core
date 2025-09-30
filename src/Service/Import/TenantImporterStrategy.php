@@ -36,10 +36,18 @@ readonly class TenantImporterStrategy implements ImporterStrategyInterface
             if (isset($rowData[$fileHeader]) && !empty(trim($rowData[$fileHeader]))) {
                 $value = trim($rowData[$fileHeader]);
 
+                // Gestion des types de données
                 if (in_array($entityProperty, ['age', 'numberWorkingDaysPerWeek'])) {
                     $value = (int) $value;
-                } elseif (in_array($entityProperty, ['formerPap', 'vulnerability', 'noticeAgreementVacatingPremises'])) {
-                    $value = (bool) $value;
+                } elseif (in_array($entityProperty, ['formerPap', 'vulnerability', 'noticeAgreementVacatingPremises', 'isPaid'])) {
+                    $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                } elseif (in_array($entityProperty, ['bankAccountCreationDate', 'paymentDate'])) {
+                    $format = $columnMap['format'] ?? 'Y-m-d';
+                    $date = \DateTimeImmutable::createFromFormat($format, $value);
+                    if (!$date) {
+                        throw new \InvalidArgumentException("Format de date invalide pour '{$fileHeader}'. Attendu : '{$format}'. Reçu : '{$value}'.");
+                    }
+                    $value = $date;
                 }
 
                 $this->propertyAccessor->setValue($dto, $entityProperty, $value);
@@ -99,7 +107,13 @@ readonly class TenantImporterStrategy implements ImporterStrategyInterface
             totalLossBusinessIncome: $dto->totalLossBusinessIncome,
             kilometerPoint: $dto->kilometerPoint,
             category: $dto->category,
-            totalGeneral: $dto->totalGeneral
+            totalGeneral: $dto->totalGeneral,
+            isPaid: $dto->isPaid,
+            remainingAmount: $dto->remainingAmount,
+            bankAccountCreationDate: $dto->bankAccountCreationDate,
+            bankAccount: $dto->bankAccount,
+            paymentDate: $dto->paymentDate,
+            roadAxis: $dto->roadAxis
         );
         $this->messageBus->dispatch($command);
     }
