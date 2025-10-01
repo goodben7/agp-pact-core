@@ -5,7 +5,6 @@ namespace App\ApiResource;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use App\Dto\ParStatisticsCategory;
 use App\Provider\ParStatisticsProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
@@ -40,8 +39,57 @@ use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 #[ApiFilter(DateFilter::class, properties: ['createdAt'])]
 final class ParStatistics
 {
+    // Statistiques principales
     #[Groups(["par_stats:read"])]
-    public ParStatisticsCategory $general;
+    public int $totalPars = 0;
+
+    #[Groups(["par_stats:read"])]
+    public int $tombsPars = 0;
+
+    #[Groups(["par_stats:read"])]
+    public int $ownerPars = 0;
+
+    #[Groups(["par_stats:read"])]
+    public int $tenantPars = 0;
+
+    #[Groups(["par_stats:read"])]
+    public int $minorPars = 0;
+
+    #[Groups(["par_stats:read"])]
+    public int $otherPars = 0;
+
+    #[Groups(["par_stats:read"])]
+    public array $parsByType = [];
+
+    #[Groups(["par_stats:read"])]
+    public array $parsByVulnerability = [];
+
+    #[Groups(["par_stats:read"])]
+    public array $parsByProvince = [];
+
+    #[Groups(["par_stats:read"])]
+    public array $parsByTerritory = [];
+
+    #[Groups(["par_stats:read"])]
+    public array $parsByVillage = [];
+
+    #[Groups(["par_stats:read"])]
+    public array $parsCreatedMonthly = [];
+
+    #[Groups(["par_stats:read"])]
+    public float $averageAge = 0.0;
+
+    #[Groups(["par_stats:read"])]
+    public array $parsByGender = [];
+
+    #[Groups(["par_stats:read"])]
+    public int $vulnerablePars = 0;
+
+    #[Groups(["par_stats:read"])]
+    public int $formerPapCount = 0;
+
+    #[Groups(["par_stats:read"])]
+    public float $totalCompensationAmount = 0.0;
 
     // Propriétés pour les filtres
     public ?string $type = null;
@@ -56,9 +104,4 @@ final class ParStatistics
     public ?bool $vulnerability = null;
     public ?bool $formerPap = null;
     public ?\DateTimeInterface $createdAt = null;
-
-    public function __construct()
-    {
-        $this->general = new ParStatisticsCategory();
-    }
 }

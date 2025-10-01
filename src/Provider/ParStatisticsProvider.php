@@ -79,23 +79,23 @@ final readonly class ParStatisticsProvider implements ProviderInterface
         
         foreach ($results as $row) {
             $count = (int)$row['count'];
-            $stats->general->totalPars += $count;
+            $stats->totalPars += $count;
             
             switch ($row['type']) {
                 case Par::TYPE_TOMBS:
-                    $stats->general->tombsPars = $count;
+                    $stats->tombsPars = $count;
                     break;
                 case Par::TYPE_OWNER:
-                    $stats->general->ownerPars = $count;
+                    $stats->ownerPars = $count;
                     break;
                 case Par::TYPE_TENANT:
-                    $stats->general->tenantPars = $count;
+                    $stats->tenantPars = $count;
                     break;
                 case Par::TYPE_MINOR:
-                    $stats->general->minorPars = $count;
+                    $stats->minorPars = $count;
                     break;
                 case Par::TYPE_OTHER:
-                    $stats->general->otherPars = $count;
+                    $stats->otherPars = $count;
                     break;
             }
         }
@@ -113,7 +113,7 @@ final readonly class ParStatisticsProvider implements ProviderInterface
         $results = $qb->getQuery()->getResult();
         
         foreach ($results as $row) {
-            $stats->general->parsByType[] = [
+            $stats->parsByType[] = [
                 'type' => $row['type'],
                 'count' => (int)$row['count']
             ];
@@ -133,10 +133,10 @@ final readonly class ParStatisticsProvider implements ProviderInterface
         
         foreach ($results as $row) {
             if ($row['vulnerability']) {
-                $stats->general->vulnerablePars += (int)$row['count'];
+                $stats->vulnerablePars += (int)$row['count'];
             }
             
-            $stats->general->parsByVulnerability[] = [
+            $stats->parsByVulnerability[] = [
                 'vulnerability' => $row['vulnerability'],
                 'vulnerabilityType' => $row['vulnerabilityType'],
                 'count' => (int)$row['count']
@@ -157,7 +157,7 @@ final readonly class ParStatisticsProvider implements ProviderInterface
         
         $results = $qb->getQuery()->getResult();
         foreach ($results as $row) {
-            $stats->general->parsByProvince[] = [
+            $stats->parsByProvince[] = [
                 'province' => $row['province'],
                 'count' => (int)$row['count']
             ];
@@ -174,7 +174,7 @@ final readonly class ParStatisticsProvider implements ProviderInterface
         
         $results = $qb->getQuery()->getResult();
         foreach ($results as $row) {
-            $stats->general->parsByTerritory[] = [
+            $stats->parsByTerritory[] = [
                 'territory' => $row['territory'],
                 'count' => (int)$row['count']
             ];
@@ -191,7 +191,7 @@ final readonly class ParStatisticsProvider implements ProviderInterface
         
         $results = $qb->getQuery()->getResult();
         foreach ($results as $row) {
-            $stats->general->parsByVillage[] = [
+            $stats->parsByVillage[] = [
                 'village' => $row['village'],
                 'count' => (int)$row['count']
             ];
@@ -211,7 +211,7 @@ final readonly class ParStatisticsProvider implements ProviderInterface
         $results = $qb->getQuery()->getResult();
         
         foreach ($results as $row) {
-            $stats->general->parsByGender[] = [
+            $stats->parsByGender[] = [
                 'gender' => $row['sexe'],
                 'count' => (int)$row['count']
             ];
@@ -228,7 +228,7 @@ final readonly class ParStatisticsProvider implements ProviderInterface
         $applyFilters($qb, 'p');
         
         $result = $qb->getQuery()->getSingleScalarResult();
-        $stats->general->averageAge = $result ? (float)$result : 0.0;
+        $stats->averageAge = $result ? (float)$result : 0.0;
     }
 
     private function populateCompensationStats(ParStatistics $stats, \Closure $applyFilters): void
@@ -243,7 +243,7 @@ final readonly class ParStatisticsProvider implements ProviderInterface
         $applyFilters($qb, 'p');
         
         $result = $qb->getQuery()->getSingleScalarResult();
-        $stats->general->formerPapCount = (int)$result;
+        $stats->formerPapCount = (int)$result;
 
         // Calculer le montant total de compensation
         $qb = $this->entityManager->createQueryBuilder()
@@ -254,7 +254,7 @@ final readonly class ParStatisticsProvider implements ProviderInterface
         $applyFilters($qb, 'p');
         
         $result = $qb->getQuery()->getSingleScalarResult();
-        $stats->general->totalCompensationAmount = $result ? (float)$result : 0.0;
+        $stats->totalCompensationAmount = $result ? (float)$result : 0.0;
     }
 
     private function populateParsCreatedMonthly(ParStatistics $stats, \Closure $applyFilters): void
@@ -286,7 +286,7 @@ final readonly class ParStatisticsProvider implements ProviderInterface
             }
         }
 
-        $stats->general->parsCreatedMonthly = array_values($data);
+        $stats->parsCreatedMonthly = array_values($data);
     }
 
     private function getFiltersClosure(
@@ -300,31 +300,31 @@ final readonly class ParStatisticsProvider implements ProviderInterface
             $typeLiability, $orientation, $vulnerabilityType, $vulnerability,
             $formerPap, $startDate, $endDate
         ) {
-            if ($type !== null && $type !== '') {
+            if (!empty($type)) {
                 $qb->andWhere(sprintf('%s.type = :type', $alias))->setParameter('type', $type);
             }
-            if ($province !== null && $province !== '') {
+            if (!empty($province)) {
                 $qb->andWhere(sprintf('%s.province = :province', $alias))->setParameter('province', $province);
             }
-            if ($territory !== null && $territory !== '') {
+            if (!empty($territory)) {
                 $qb->andWhere(sprintf('%s.territory = :territory', $alias))->setParameter('territory', $territory);
             }
-            if ($village !== null && $village !== '') {
+            if (!empty($village)) {
                 $qb->andWhere(sprintf('%s.village = :village', $alias))->setParameter('village', $village);
             }
-            if ($sexe !== null && $sexe !== '') {
+            if (!empty($sexe)) {
                 $qb->andWhere(sprintf('%s.sexe = :sexe', $alias))->setParameter('sexe', $sexe);
             }
-            if ($category !== null && $category !== '') {
+            if (!empty($category)) {
                 $qb->andWhere(sprintf('%s.category = :category', $alias))->setParameter('category', $category);
             }
-            if ($typeLiability !== null && $typeLiability !== '') {
+            if (!empty($typeLiability)) {
                 $qb->andWhere(sprintf('%s.typeLiability = :typeLiability', $alias))->setParameter('typeLiability', $typeLiability);
             }
-            if ($orientation !== null && $orientation !== '') {
+            if (!empty($orientation)) {
                 $qb->andWhere(sprintf('%s.orientation = :orientation', $alias))->setParameter('orientation', $orientation);
             }
-            if ($vulnerabilityType !== null && $vulnerabilityType !== '') {
+            if (!empty($vulnerabilityType)) {
                 $qb->andWhere(sprintf('%s.vulnerabilityType = :vulnerabilityType', $alias))->setParameter('vulnerabilityType', $vulnerabilityType);
             }
             if ($vulnerability !== null) {
@@ -333,19 +333,11 @@ final readonly class ParStatisticsProvider implements ProviderInterface
             if ($formerPap !== null) {
                 $qb->andWhere(sprintf('%s.formerPap = :formerPap', $alias))->setParameter('formerPap', $formerPap);
             }
-            if ($startDate !== null && $startDate !== '') {
-                try {
-                    $qb->andWhere(sprintf('%s.createdAt >= :startDate', $alias))->setParameter('startDate', new \DateTimeImmutable($startDate));
-                } catch (\Exception $e) {
-                    // Ignorer les dates invalides
-                }
+            if (!empty($startDate)) {
+                $qb->andWhere(sprintf('%s.createdAt >= :startDate', $alias))->setParameter('startDate', new \DateTimeImmutable($startDate));
             }
-            if ($endDate !== null && $endDate !== '') {
-                try {
-                    $qb->andWhere(sprintf('%s.createdAt <= :endDate', $alias))->setParameter('endDate', (new \DateTimeImmutable($endDate))->setTime(23, 59, 59));
-                } catch (\Exception $e) {
-                    // Ignorer les dates invalides
-                }
+            if (!empty($endDate)) {
+                $qb->andWhere(sprintf('%s.createdAt <= :endDate', $alias))->setParameter('endDate', (new \DateTimeImmutable($endDate))->setTime(23, 59, 59));
             }
         };
     }
