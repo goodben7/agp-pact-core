@@ -58,6 +58,12 @@ final readonly class ParStatisticsProvider implements ProviderInterface
             $this->populateAverageAge($stats, $applyFilters);
             $this->populateParsCreatedMonthly($stats, $applyFilters);
             $this->populateCompensationStats($stats, $applyFilters);
+            
+            // Nouvelles statistiques pour le tableau de bord
+            $this->populatePaymentStatusStats($stats, $applyFilters);
+            $this->populateBankAccountStats($stats, $applyFilters);
+            $this->populateCoordinatesStats($stats, $applyFilters);
+            $this->populatePaymentHistory($stats, $applyFilters);
         } catch (\Exception $e) {
             $this->logger->error('Error fetching par statistics: ' . $e->getMessage(), ['exception' => $e]);
             return new ParStatistics();
@@ -340,5 +346,182 @@ final readonly class ParStatisticsProvider implements ProviderInterface
                 $qb->andWhere(sprintf('%s.createdAt <= :endDate', $alias))->setParameter('endDate', (new \DateTimeImmutable($endDate))->setTime(23, 59, 59));
             }
         };
+    }
+
+    private function populatePaymentStatusStats(ParStatistics $stats, \Closure $applyFilters): void
+    {
+        // Statistiques du statut de paiement
+        $qb = $this->entityManager->createQueryBuilder()
+            ->select('
+                SUM(CASE WHEN p.isPaid = true THEN 1 ELSE 0 END) as paid_count,
+                SUM(CASE WHEN p.isPaid = false OR p.isPaid IS NULL THEN 1 ELSE 0 END) as unpaid_count,
+                SUM(CASE WHEN p.remainingAmount IS NOT NULL AND p.remainingAmount != \'\' AND p.remainingAmount != \'0\' THEN 1 ELSE 0 END) as partially_paid_count
+            ')
+            ->from(Par::class, 'p');
+        
+        $applyFilters($qb, 'p');
+        
+        $result = $qb->getQuery()->getSingleResult();
+        
+        $stats->paidPars = (int)$result['paid_count'];
+        $stats->unpaidPars = (int)$result['unpaid_count'];
+        $stats->partiallyPaidPars = (int)$result['partially_paid_count'];
+        
+        // Détail par statut de paiement
+        $stats->parsByPaymentStatus = [
+            ['status' => 'paid', 'count' => $stats->paidPars],
+            ['status' => 'unpaid', 'count' => $stats->unpaidPars],
+            ['status' => 'partially_paid', 'count' => $stats->partiallyPaidPars]
+        ];
+    }
+
+    private function populateBankAccountStats(ParStatistics $stats, \Closure $applyFilters): void
+    {
+        // Statistiques des comptes bancaires
+        $qb = $this->entityManager->createQueryBuilder()
+            ->select('
+                SUM(CASE WHEN p.bankAccount IS NOT NULL AND p.bankAccount != \'\' THEN 1 ELSE 0 END) as with_account,
+                SUM(CASE WHEN p.bankAccount IS NULL OR p.bankAccount = \'\' THEN 1 ELSE 0 END) as without_account
+            ')
+            ->from(Par::class, 'p');
+        
+        $applyFilters($qb, 'p');
+        
+        $result = $qb->getQuery()->getSingleResult();
+        
+        $stats->parsWithBankAccount = (int)$result['with_account'];
+        $stats->parsWithoutBankAccount = (int)$result['without_account'];
+        
+        $stats->parsByBankAccountStatus = [
+            ['status' => 'with_account', 'count' => $stats->parsWithBankAccount],
+            ['status' => 'without_account', 'count' => $stats->parsWithoutBankAccount]
+        ];
+
+        // Création de comptes bancaires par mois
+        $twelveMonthsAgo = (new \DateTimeImmutable())->modify('-11 months')->modify('first day of this month')->setTime(0, 0, 0);
+
+        $qb = $this->entityManager->createQueryBuilder()
+            ->select('YEAR(p.bankAccountCreationDate) as year, MONTH(p.bankAccountCreationDate) as month, COUNT(p.id) as count')
+            ->from(Par::class, 'p')
+            ->where('p.bankAccountCreationDate >= :startDate')
+            ->andWhere('p.bankAccountCreationDate IS NOT NULL')
+            ->setParameter('startDate', $twelveMonthsAgo);
+        
+        $applyFilters($qb, 'p');
+        $qb->groupBy('year', 'month')->orderBy('year, month');
+        
+        $results = $qb->getQuery()->getResult();
+
+        $data = [];
+        $now = new \DateTimeImmutable();
+        for ($i = 11; $i >= 0; $i--) {
+            $monthKey = $now->modify("-{$i} months")->format('Y-m');
+            $data[$monthKey] = ['month' => $monthKey, 'count' => 0];
+        }
+
+        foreach ($results as $row) {
+            $monthKey = sprintf('%d-%02d', $row['year'], $row['month']);
+            if (isset($data[$monthKey])) {
+                $data[$monthKey]['count'] = (int)$row['count'];
+            }
+        }
+
+        $stats->bankAccountCreationMonthly = array_values($data);
+    }
+
+    private function populateCoordinatesStats(ParStatistics $stats, \Closure $applyFilters): void
+    {
+        // Statistiques des coordonnées géographiques
+        $qb = $this->entityManager->createQueryBuilder()
+            ->select('
+                SUM(CASE WHEN p.longitude IS NOT NULL AND p.longitude != \'\' AND p.latitude IS NOT NULL AND p.latitude != \'\' THEN 1 ELSE 0 END) as with_coordinates,
+                SUM(CASE WHEN p.longitude IS NULL OR p.longitude = \'\' OR p.latitude IS NULL OR p.latitude = \'\' THEN 1 ELSE 0 END) as without_coordinates
+            ')
+            ->from(Par::class, 'p');
+        
+        $applyFilters($qb, 'p');
+        
+        $result = $qb->getQuery()->getSingleResult();
+        
+        $stats->parsWithCoordinates = (int)$result['with_coordinates'];
+        $stats->parsWithoutCoordinates = (int)$result['without_coordinates'];
+        
+        $stats->parsByCoordinatesStatus = [
+            ['status' => 'with_coordinates', 'count' => $stats->parsWithCoordinates],
+            ['status' => 'without_coordinates', 'count' => $stats->parsWithoutCoordinates]
+        ];
+
+        // Statistiques par orientation
+        $qb = $this->entityManager->createQueryBuilder()
+            ->select('p.orientation, COUNT(p.id) AS count')
+            ->from(Par::class, 'p')
+            ->where('p.orientation IS NOT NULL');
+        
+        $applyFilters($qb, 'p');
+        $qb->groupBy('p.orientation');
+        
+        $results = $qb->getQuery()->getResult();
+        
+        foreach ($results as $row) {
+            $stats->parsByOrientation[] = [
+                'orientation' => $row['orientation'],
+                'count' => (int)$row['count']
+            ];
+        }
+    }
+
+    private function populatePaymentHistory(ParStatistics $stats, \Closure $applyFilters): void
+    {
+        // Historique des paiements par mois
+        $twelveMonthsAgo = (new \DateTimeImmutable())->modify('-11 months')->modify('first day of this month')->setTime(0, 0, 0);
+
+        $qb = $this->entityManager->createQueryBuilder()
+            ->select('YEAR(p.paymentDate) as year, MONTH(p.paymentDate) as month, COUNT(p.id) as count')
+            ->from(Par::class, 'p')
+            ->where('p.paymentDate >= :startDate')
+            ->andWhere('p.paymentDate IS NOT NULL')
+            ->setParameter('startDate', $twelveMonthsAgo);
+        
+        $applyFilters($qb, 'p');
+        $qb->groupBy('year', 'month')->orderBy('year, month');
+        
+        $results = $qb->getQuery()->getResult();
+
+        $data = [];
+        $now = new \DateTimeImmutable();
+        for ($i = 11; $i >= 0; $i--) {
+            $monthKey = $now->modify("-{$i} months")->format('Y-m');
+            $data[$monthKey] = ['month' => $monthKey, 'count' => 0];
+        }
+
+        foreach ($results as $row) {
+            $monthKey = sprintf('%d-%02d', $row['year'], $row['month']);
+            if (isset($data[$monthKey])) {
+                $data[$monthKey]['count'] = (int)$row['count'];
+            }
+        }
+
+        $stats->paymentsMonthly = array_values($data);
+
+        // Historique détaillé des paiements récents (derniers 50)
+        $qb = $this->entityManager->createQueryBuilder()
+            ->select('p.id, p.fullname, p.paymentDate, p.totalGeneral, p.remainingAmount')
+            ->from(Par::class, 'p')
+            ->where('p.paymentDate IS NOT NULL');
+        
+        $applyFilters($qb, 'p');
+        $qb->orderBy('p.paymentDate', 'DESC')->setMaxResults(50);
+        
+        $results = $qb->getQuery()->getResult();
+        
+        foreach ($results as $row) {
+            $stats->paymentHistory[] = [
+                'id' => $row['id'],
+                'fullname' => $row['fullname'],
+                'paymentDate' => $row['paymentDate']?->format('Y-m-d'),
+                'totalAmount' => $row['totalGeneral'],
+                'remainingAmount' => $row['remainingAmount']
+            ];
+        }
     }
 }
