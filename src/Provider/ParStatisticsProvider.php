@@ -253,14 +253,22 @@ final readonly class ParStatisticsProvider implements ProviderInterface
 
         // Calculer le montant total de compensation
         $qb = $this->entityManager->createQueryBuilder()
-            ->select('SUM(CAST(p.totalGeneral AS DECIMAL(15,2))) as total_compensation')
+            ->select('p.totalGeneral')
             ->from(Par::class, 'p')
             ->where('p.totalGeneral IS NOT NULL AND p.totalGeneral != \'\'');
         
         $applyFilters($qb, 'p');
         
-        $result = $qb->getQuery()->getSingleScalarResult();
-        $stats->totalCompensationAmount = $result ? (float)$result : 0.0;
+        $results = $qb->getQuery()->getScalarResult();
+        $totalCompensation = 0.0;
+        
+        foreach ($results as $row) {
+            // Convert string to float and add to total
+            $value = str_replace(',', '.', $row['totalGeneral']); // Handle possible comma as decimal separator
+            $totalCompensation += (float)$value;
+        }
+        
+        $stats->totalCompensationAmount = $totalCompensation;
     }
 
     private function populateParsCreatedMonthly(ParStatistics $stats, \Closure $applyFilters): void
