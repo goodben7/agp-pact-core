@@ -503,4 +503,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public static function createFromPayload($username, array $payload): User
+    {
+        $user = new self();
+        
+        if (filter_var($username, FILTER_VALIDATE_EMAIL)) {
+            $user->setEmail($username);
+        } else {
+            $user->setPhone($username);
+        }
+        
+        if (isset($payload['roles']) && is_array($payload['roles'])) {
+            $user->setRoles($payload['roles']);
+        }
+        
+        return $user;
+    }
 }
