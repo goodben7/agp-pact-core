@@ -7,7 +7,6 @@ use App\Dto\Complaint\AssignCompanyRequest;
 use App\Entity\Company;
 use App\Entity\Victim;
 use App\Entity\Complaint;
-use App\Entity\Prejudice;
 use App\Entity\Complainant;
 use App\Entity\AttachedFile;
 use App\Entity\WorkflowStep;
@@ -21,7 +20,6 @@ use App\Dto\Complaint\ComplaintCreateDTO;
 use App\Exception\UnavailableDataException;
 use App\Message\ComplaintRegisteredMessage;
 use Symfony\Bundle\SecurityBundle\Security;
-use App\Constant\GeneralParameterComplaintType;
 use App\Entity\Offender;
 use App\Entity\User;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -103,10 +101,12 @@ readonly class ComplaintManager
         if (!empty($data->incidentCauses)) {
             foreach ($data->incidentCauses as $incidentCause) {
                 $complaint->addIncidentCause($incidentCause);
-                // Check if the incident cause (Prejudice) is sensible
-                if ($incidentCause->isSensible()) {
+                // Check if the incident cause (Prejudice) is sensitive
+                if (is_null($incidentCause->isSensible())) {
+                    $isSensitive = null;
+                } elseif ($incidentCause->isSensible())  {
                     $isSensitive = true;
-                } elseif (!$incidentCause->isSensible())  {
+                } else {
                     $isSensitive = false;
                 }
             }
