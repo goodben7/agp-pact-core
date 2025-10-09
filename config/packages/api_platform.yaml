@@ -29,4 +29,6 @@ api_platform:
         pagination_enabled: false
     use_symfony_listeners: true
     eager_loading:
-        max_joins: 100
+        enabled: false
+        max_joins: 30
+        fetch_partial: true
