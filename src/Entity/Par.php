@@ -12,6 +12,8 @@ use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use App\Repository\ParRepository;
 use ApiPlatform\Metadata\ApiFilter;
 use App\State\CreateOwnerProcessor;
@@ -408,6 +410,14 @@ class Par
     #[Groups(['par:get'])]
     private ?\DateTimeImmutable $validatedAt = null;
 
+    #[ORM\OneToMany(mappedBy: 'par', targetEntity: PaymentHistory::class)]
+    #[Groups(['par:get'])]
+    private Collection $paymentHistories;
+
+    public function __construct()
+    {
+        $this->paymentHistories = new ArrayCollection();
+    }
     public function getId(): ?string
     {
         return $this->id;
@@ -1185,6 +1195,36 @@ class Par
     public function setValidatedAt(?\DateTimeImmutable $validatedAt): static
     {
         $this->validatedAt = $validatedAt;
+
+        return $this;
+    }
+    
+    /**
+     * @return Collection<int, PaymentHistory>
+     */
+    public function getPaymentHistories(): Collection
+    {
+        return $this->paymentHistories;
+    }
+    
+    public function addPaymentHistory(PaymentHistory $paymentHistory): static
+    {
+        if (!$this->paymentHistories->contains($paymentHistory)) {
+            $this->paymentHistories->add($paymentHistory);
+            $paymentHistory->setPar($this);
+        }
+
+        return $this;
+    }
+
+    public function removePaymentHistory(PaymentHistory $paymentHistory): static
+    {
+        if ($this->paymentHistories->removeElement($paymentHistory)) {
+            // set the owning side to null (unless already changed)
+            if ($paymentHistory->getPar() === $this) {
+                $paymentHistory->setPar(null);
+            }
+        }
 
         return $this;
     }

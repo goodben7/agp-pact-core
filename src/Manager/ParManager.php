@@ -6,6 +6,8 @@ use App\Entity\Par;
 use App\Model\NewOwnerModel;
 use App\Model\NewTombsModel;
 use App\Model\NewTenantModel;
+use App\Entity\PaymentHistory;
+use App\Model\NewPaymentHistoryModel;
 use App\Message\Query\QueryBusInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Message\Query\GetLocationDetails;
@@ -22,6 +24,47 @@ class ParManager
         private QueryBusInterface $queries,
     )
     {
+    }
+    
+    
+    public function recordPayment(NewPaymentHistoryModel $model): PaymentHistory
+    {
+        $par = $this->em->getRepository(Par::class)->find($model->parId);
+        if (!$par) {
+            throw new \InvalidArgumentException("PAR non trouvé avec l'ID: {$model->parId}");
+        }
+        
+        $paymentHistory = new PaymentHistory();
+        $paymentHistory->setPar($par);
+        $paymentHistory->setPaymentDate($model->paymentDate);
+        $paymentHistory->setAmount($model->amount);
+        $paymentHistory->setTransactionReference($model->transactionReference);
+        $paymentHistory->setPaymentMethod($model->paymentMethod);
+        $paymentHistory->setNotes($model->notes);
+        $paymentHistory->setCreatedAt(new \DateTimeImmutable());
+        
+        $totalGeneral = (float) $par->getTotalGeneral() ?: 0;
+        $remainingAmount = (float) $par->getRemainingAmount() ?: $totalGeneral;
+        $paidAmount = (float) $model->amount;
+        
+        $newRemainingAmount = max(0, $remainingAmount - $paidAmount);
+        $par->setRemainingAmount((string) $newRemainingAmount);
+        
+        if ($newRemainingAmount <= 0) {
+            $par->setIsPaid(true);
+        } else {
+            $par->setIsPaid(false);
+        }
+        
+        if ($par->getPaymentDate() === null) {
+            $par->setPaymentDate($model->paymentDate);
+        }
+        
+        $this->em->persist($paymentHistory);
+        $this->em->persist($par);
+        $this->em->flush();
+        
+        return $paymentHistory;
     }
 
     public function CreateTombs(NewTombsModel $model): Par

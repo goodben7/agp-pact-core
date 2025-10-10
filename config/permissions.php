@@ -190,4 +190,9 @@ return static function (): iterable {
 
     yield Permission::new('ROLE_IMPORT_ITEM_LIST', "Lister les éléments d'import");
     yield Permission::new('ROLE_IMPORT_ITEM_DETAILS', "Voir les détails d'un élément d'import");
+
+    yield Permission::new('ROLE_PAYMENT_HISTORY_LIST', "Consulter la liste des historiques de paiement");
+    yield Permission::new('ROLE_PAYMENT_HISTORY_DETAILS', "Consulter les détails d'un historique de paiement");
+    yield Permission::new('ROLE_PAYMENT_HISTORY_CREATE', "Créer un historique de paiement");
+    yield Permission::new('ROLE_PAYMENT_HISTORY_UPDATE', "Modifier un historique de paiement");
 };
