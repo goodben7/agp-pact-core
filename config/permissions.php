@@ -195,4 +195,8 @@ return static function (): iterable {
     yield Permission::new('ROLE_PAYMENT_HISTORY_DETAILS', "Consulter les détails d'un historique de paiement");
     yield Permission::new('ROLE_PAYMENT_HISTORY_CREATE', "Créer un historique de paiement");
     yield Permission::new('ROLE_PAYMENT_HISTORY_UPDATE', "Modifier un historique de paiement");
+
+    yield Permission::new('ROLE_TASK_LIST', "Consulter la liste des tâches");
+    yield Permission::new('ROLE_TASK_DETAILS', "Consulter les détails d'une tâche");
+    yield Permission::new('ROLE_TASK_CREATE', "Créer une tâche");
 };
