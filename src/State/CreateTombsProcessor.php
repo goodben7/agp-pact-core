@@ -30,6 +30,7 @@ class CreateTombsProcessor implements ProcessorInterface
             $data->dateOfBirthDeceased,
             $data->deceasedResidence,
             $data->spouseName,
+            $data->externalReferenceId,
             $data->measures,
             $data->totalGeneral,
             $data->isPaid,

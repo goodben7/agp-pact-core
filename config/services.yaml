@@ -94,3 +94,6 @@ services:
     App\Manager\TaskFileManager:
         arguments:
             $projectDir: '%kernel.project_dir%'
+            
+    App\Tasks\ParSynchronisationTaskRunner:
+        tags: ['sync.task_runner']

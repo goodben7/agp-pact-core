@@ -37,6 +37,7 @@ class CreateOwnerProcessor implements ProcessorInterface
             $data->orientation,
             $data->vulnerability,
             $data->vulnerabilityType,
+            $data->externalReferenceId,
             $data->length,
             $data->wide,
             $data->areaAllocatedSquareMeters,

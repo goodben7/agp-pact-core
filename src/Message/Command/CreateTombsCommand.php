@@ -27,6 +27,8 @@ class CreateTombsCommand implements CommandInterface
 
         public ?string $spouseName = null,
 
+        public ?string $externalReferenceId = null,
+
         public ?string $measures = null,
 
         public ?string $totalGeneral = null,

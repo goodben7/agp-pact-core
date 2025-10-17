@@ -26,6 +26,7 @@ class CreateTenantDto
         
         public ?bool $vulnerability = null,
         public ?string $vulnerabilityType = null,
+        public ?string $externalReferenceId = null,
         public ?string $length = null,
         public ?string $wide = null,
         public ?string $areaAllocatedSquareMeters = null,

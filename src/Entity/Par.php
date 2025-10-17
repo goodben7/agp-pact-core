@@ -31,6 +31,7 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 
 #[ORM\Entity(repositoryClass: ParRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EXTERNAL_REFERENCE_ID', fields: ['externalReferenceId'])]
 #[ApiResource(
     normalizationContext: ['groups' => 'par:get'],
     operations: [
@@ -136,6 +137,7 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
     'bankAccount' => 'partial',
     'paymentDate' => 'exact',
     'status' => 'exact',
+    'externalReferenceId' => 'exact',
 ])]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt', 'validatedAt'])]
 #[ApiFilter(DateFilter::class, properties: ['createdAt', 'validatedAt'])]
@@ -413,6 +415,10 @@ class Par
     #[ORM\OneToMany(mappedBy: 'par', targetEntity: PaymentHistory::class)]
     #[Groups(['par:get'])]
     private Collection $paymentHistories;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['par:get'])]
+    private ?string $externalReferenceId = null;
 
     public function __construct()
     {
@@ -1225,6 +1231,26 @@ class Par
                 $paymentHistory->setPar(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Get the value of externalReferenceId
+     */ 
+    public function getExternalReferenceId(): string|null
+    {
+        return $this->externalReferenceId;
+    }
+
+    /**
+     * Set the value of externalReferenceId
+     *
+     * @return  self
+     */ 
+    public function setExternalReferenceId(?string $externalReferenceId): static
+    {
+        $this->externalReferenceId = $externalReferenceId;
 
         return $this;
     }

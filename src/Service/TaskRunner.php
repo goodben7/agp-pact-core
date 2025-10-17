@@ -19,6 +19,13 @@ class TaskRunner
     )
     {
         $this->runners = iterator_to_array($runners);
+        
+        // Log all registered runners and their supported types
+        $this->logger->info("TaskRunner initialized with " . count($this->runners) . " runners");
+        foreach ($this->runners as $runner) {
+            $runnerClass = get_class($runner);
+            $this->logger->debug("Registered runner: {$runnerClass}");
+        }
     }
 
     public function run(Task $task): void
@@ -34,13 +41,37 @@ class TaskRunner
             $found = false; 
 
             \reset($this->runners);
+            
+            $this->logger->info("Looking for a runner to handle task {$task->getId()} of type {$task->getType()}");
+            $this->logger->debug("Available runners: " . count($this->runners));
 
             /** @var \App\Model\TaskRunnerInterface $runner */
             while (null != $runner = \current($this->runners)) {
-                if ($runner->support($task->getType())) {
+                $runnerClass = get_class($runner);
+                $this->logger->debug("Checking if runner {$runnerClass} supports task type {$task->getType()}");
+                
+                $taskType = $task->getType();
+                $this->logger->debug("Comparing task type '{$taskType}' with runner supported type");
+                
+                // Get the supported type from the runner if it has a SUPPORT_TYPE constant
+                $supportedType = null;
+                $reflection = new \ReflectionClass($runner);
+                if ($reflection->hasConstant('SUPPORT_TYPE')) {
+                    $supportedType = $reflection->getConstant('SUPPORT_TYPE');
+                    $this->logger->debug("Runner {$runnerClass} has SUPPORT_TYPE constant: '{$supportedType}'");
+                }
+                
+                if ($runner->support($taskType)) {
+                    $this->logger->info("Found compatible runner {$runnerClass} for task {$task->getId()} of type {$taskType}");
                     $found = true; 
                     $runner->run($task);
                     break;
+                } else {
+                    $this->logger->debug("Runner {$runnerClass} does not support task type '{$taskType}'");
+                    if ($supportedType !== null) {
+                        $this->logger->debug("Case-sensitive comparison: task type '{$taskType}' === '{$supportedType}' is " . ($taskType === $supportedType ? 'true' : 'false'));
+                        $this->logger->debug("Case-insensitive comparison: task type '{$taskType}' === '{$supportedType}' is " . (strtoupper($taskType) === strtoupper($supportedType) ? 'true' : 'false'));
+                    }
                 }
 
                 \next($this->runners);

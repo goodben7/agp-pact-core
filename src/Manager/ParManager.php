@@ -118,6 +118,7 @@ class ParManager
         $par->setDateOfBirthDeceased($model->dateOfBirthDeceased);
         $par->setDeceasedResidence($model->deceasedResidence);
         $par->setSpouseName($model->spouseName);
+        $par->setExternalReferenceId($model->externalReferenceId);
         $par->setMeasures($model->measures);
         $par->setTotalGeneral($model->totalGeneral);
         $par->setIsPaid($model->isPaid);
@@ -199,6 +200,7 @@ class ParManager
         $par->setOrientation($model->orientation);
         $par->setVulnerability($model->vulnerability);
         $par->setVulnerabilityType($model->vulnerabilityType);
+        $par->setExternalReferenceId($model->externalReferenceId);
         $par->setLength($model->length);
         $par->setWide($model->wide);
         $par->setAreaAllocatedSquareMeters($model->areaAllocatedSquareMeters);
@@ -297,6 +299,7 @@ class ParManager
         $par->setOrientation($model->orientation);
         $par->setVulnerability($model->vulnerability);
         $par->setVulnerabilityType($model->vulnerabilityType);
+        $par->setExternalReferenceId($model->externalReferenceId);
         $par->setLength($model->length);
         $par->setWide($model->wide);
         $par->setAreaAllocatedSquareMeters($model->areaAllocatedSquareMeters);
