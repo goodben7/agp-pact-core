@@ -94,7 +94,8 @@ readonly class ComplaintManager
             ->setComplainant($complainant)
             ->setAssignedTo($data->assignedTo)
             ->setDeclarationDate(new \DateTimeImmutable())
-            ->setCreatedBy($userId);
+            ->setCreatedBy($userId)
+            ->setExternalReferenceId($data->externalReferenceId);
 
 
         $isSensitive = null;

@@ -28,6 +28,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use App\State\Complaint\ComplaintApplyActionProcessor;
 
 #[ORM\Entity(repositoryClass: ComplaintRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EXTERNAL_REFERENCE_ID', fields: ['externalReferenceId'])]
 #[ApiResource(
     operations: [
         new GetCollection(
@@ -76,7 +77,8 @@ use App\State\Complaint\ComplaintApplyActionProcessor;
         'complainant.id' => 'exact',
         'currentWorkflowAction.id' => 'exact',
         'isSensitive' => 'exact',
-        'isReceivable' => 'exact'
+        'isReceivable' => 'exact',
+        'externalReferenceId' => 'exact',
     ]
 )]
 #[ApiFilter(
@@ -321,6 +323,9 @@ class Complaint
     #[Groups(['complaint:get', 'complaint:list'])]
     private ?Company $currentAssignedCompany = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['complaint:get', 'complaint:list'])]
+    private ?string $externalReferenceId = null;
 
     public function __construct()
     {
@@ -1081,6 +1086,26 @@ class Complaint
     public function setCurrentAssignedCompany(?Company $currentAssignedCompany): static
     {
         $this->currentAssignedCompany = $currentAssignedCompany;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of externalReferenceId
+     */ 
+    public function getExternalReferenceId(): string|null
+    {
+        return $this->externalReferenceId;
+    }
+
+    /**
+     * Set the value of externalReferenceId
+     *
+     * @return  self
+     */ 
+    public function setExternalReferenceId(?string $externalReferenceId): static
+    {
+        $this->externalReferenceId = $externalReferenceId;
 
         return $this;
     }
