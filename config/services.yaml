@@ -97,3 +97,5 @@ services:
             
     App\Tasks\ParSynchronisationTaskRunner:
         tags: ['sync.task_runner']
+    App\Tasks\ComplaintSynchronisationTaskRunner:
+        tags: ['sync.task_runner']
