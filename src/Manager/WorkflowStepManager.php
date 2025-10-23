@@ -3,9 +3,7 @@
 namespace App\Manager;
 
 
-use App\Constant\GeneralParameterCategory;
 use App\Dto\Workflow\WorkflowStepCreateDTO;
-use App\Entity\GeneralParameter;
 use App\Entity\WorkflowStep;
 use App\Entity\WorkflowStepUIConfiguration;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,10 +29,7 @@ readonly class WorkflowStepManager
             ->setEmergencyDuration($data->emergencyDuration)
             ->setExpectedDuration($data->expectedDuration);
 
-        if ($data->durationUnitId) {
-            $durationUnit = $this->em->getRepository(GeneralParameter::class)->findOneBy(['id' => $data->durationUnitId, 'category' => GeneralParameterCategory::DURATION_UNIT]);
-            if (!$durationUnit)
-                throw new \InvalidArgumentException('Duration unit not found');
+        if ($durationUnit =  $data->durationUnit) {
             $step->setDurationUnit($durationUnit);
         }
 

@@ -88,14 +88,17 @@ services:
 
     App\Service\Import\Strategy\TombsImporterStrategy:
         tags: ['app.importer_strategy']
+
     App\Service\TaskRunner:
         arguments:
             - !tagged_iterator sync.task_runner
+
     App\Manager\TaskFileManager:
         arguments:
             $projectDir: '%kernel.project_dir%'
             
     App\Tasks\ParSynchronisationTaskRunner:
         tags: ['sync.task_runner']
+        
     App\Tasks\ComplaintSynchronisationTaskRunner:
         tags: ['sync.task_runner']

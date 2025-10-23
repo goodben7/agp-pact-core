@@ -2,6 +2,8 @@
 
 namespace App\Dto\Workflow;
 
+use App\Entity\GeneralParameter;
+
 class WorkflowStepCreateDTO
 {
     public ?string $name = null;
@@ -22,7 +24,7 @@ class WorkflowStepCreateDTO
 
     public ?int $emergencyDuration = null;
 
-    public ?string $durationUnitId = null;
+    public ?GeneralParameter $durationUnit = null;
 
     public ?WorkflowStepUIConfigurationCreateDTO $uiConfiguration = null;
 }
