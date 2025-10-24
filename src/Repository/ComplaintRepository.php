@@ -70,7 +70,7 @@ class ComplaintRepository extends ServiceEntityRepository
      */
     private function findCompaniesByType(
         \App\Entity\GeneralParameter $companyType,
-        bool $isSensitive = false,
+        ?bool $isSensitive = null,
         ?Location $location = null,
         ?RoadAxis $roadAxis = null
     ): array 
