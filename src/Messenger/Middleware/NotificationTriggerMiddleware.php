@@ -123,7 +123,9 @@ readonly class NotificationTriggerMiddleware implements MiddlewareInterface
             return true;
         }
 
-        if ($template->getIsSensitive() !== $complaint->getIsSensitive()) {
+        $complaintSensitivity = $complaint->getIsSensitive() ?? false;
+
+        if ($template->getIsSensitive() !== $complaintSensitivity) {
             $this->logger->info(sprintf(
                 'Skipping notification for template "%s". Template sensibility (%s) does not match complaint sensibility (%s).',
                 $template->getName(),
