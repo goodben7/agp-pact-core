@@ -20,7 +20,6 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 
 #[ORM\Entity(repositoryClass: ComplainantRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USER', fields: ['userId'])]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_CONTACT_PHONE', fields: ['contactPhone'])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     operations: [

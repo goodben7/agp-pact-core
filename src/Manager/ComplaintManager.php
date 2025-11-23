@@ -42,19 +42,6 @@ readonly class ComplaintManager
 
         if (!$data->isAnonymous) {
             if ($data->newComplainant) {
-                $complainantRepository = $this->em->getRepository(Complainant::class);
-
-                if ($data->newComplainant->contactPhone) {
-                    $existingComplainant = $complainantRepository->findOneBy(['contactPhone' => $data->newComplainant->contactPhone]);
-                    if ($existingComplainant)
-                        $complainant = $existingComplainant;
-                }
-
-                if (!$complainant && $data->newComplainant->contactEmail) {
-                    $existingComplainant = $complainantRepository->findOneBy(['contactEmail' => $data->newComplainant->contactEmail]);
-                    if ($existingComplainant)
-                        $complainant = $existingComplainant;
-                }
 
                 if (!$complainant) {
                     $complainant = (new Complainant())
