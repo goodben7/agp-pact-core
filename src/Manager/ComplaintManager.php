@@ -217,6 +217,9 @@ readonly class ComplaintManager
             );
         }
 
+        if ($data->currentAssignedCompany)
+            $complaint->setCurrentAssignedCompany($data->currentAssignedCompany);
+
         if ($company)
             $complaint->setInvolvedCompany($company);
 

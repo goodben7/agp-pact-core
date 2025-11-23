@@ -53,4 +53,6 @@ class ComplaintCreateDTO
     public ?bool $isAnonymous = false;
 
     public ?string $externalReferenceId = null;
+
+    public ?Company $currentAssignedCompany = null;
 }
