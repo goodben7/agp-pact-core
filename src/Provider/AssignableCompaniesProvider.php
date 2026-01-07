@@ -28,6 +28,7 @@ readonly class AssignableCompaniesProvider implements ProviderInterface
             throw new NotFoundHttpException('Complaint ID is required');
         }
 
+        /** @var Complaint $complaint */
         $complaint = $this->em->getRepository(Complaint::class)->find($complaintId);
 
         if (!$complaint) {
@@ -38,7 +39,7 @@ readonly class AssignableCompaniesProvider implements ProviderInterface
         $request = $context['request'] ?? null;
         $workflowStepId = $request?->query->get('workflowStepId');
         $locationId = $request?->query->get('location');
-        $roadAxisId = $request?->query->get('roadAxis');
+        $roadAxisId = $complaint->getRoadAxis()->getId();
 
         // Utiliser les données de la plainte ou les paramètres fournis
         $workflowStep = $workflowStepId
