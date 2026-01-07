@@ -27,21 +27,29 @@ class ComplaintRepository extends ServiceEntityRepository
         ?Location $location,
         ?RoadAxis $roadAxis,
         ?bool $isSensitive = false
-    ): array 
-    {
+    ): array {
         // Trouver toutes les règles d'assignation applicables
         $rules = $this->findApplicableRules($workflowStep, $location, $roadAxis);
-    
+
         $assignableCompanies = [];
-    
+
         foreach ($rules as $rule) {
             // Utiliser assignedProfiles au lieu de assignedCompanies
             $assignedProfiles = $rule->getAssignedProfiles();
-    
+
             foreach ($assignedProfiles as $companyType) {
+                // Déterminer quels filtres appliquer selon la règle
+                $shouldFilterByLocation = $rule->getLocation() === true;
+                $shouldFilterByRoadAxis = $rule->getRoadAxis() === true;
+
                 // Trouver les compagnies par type (GeneralParameter)
-                $companies = $this->findCompaniesByType($companyType, $isSensitive, $location, $roadAxis);
-                
+                $companies = $this->findCompaniesByType(
+                    $companyType,
+                    $isSensitive,
+                    $shouldFilterByLocation ? $location : null,
+                    $shouldFilterByRoadAxis ? $roadAxis : null
+                );
+
                 foreach ($companies as $company) {
                     // Éviter les doublons
                     if (!in_array($company, $assignableCompanies, true)) {
@@ -50,12 +58,12 @@ class ComplaintRepository extends ServiceEntityRepository
                 }
             }
         }
-    
+
         // Si aucune règle spécifique, retourner toutes les compagnies actives compatibles
         if (empty($assignableCompanies)) {
             return $this->findDefaultAssignableCompanies($isSensitive, $location, $roadAxis);
         }
-    
+
         return $assignableCompanies;
     }
 
@@ -73,8 +81,7 @@ class ComplaintRepository extends ServiceEntityRepository
         ?bool $isSensitive = null,
         ?Location $location = null,
         ?RoadAxis $roadAxis = null
-    ): array 
-    {
+    ): array {
         $qb = $this->getEntityManager()->getRepository(Company::class)->createQueryBuilder('c')
             ->where('c.type = :type')
             ->andWhere('c.active = true')
@@ -115,8 +122,7 @@ class ComplaintRepository extends ServiceEntityRepository
         WorkflowStep $workflowStep,
         ?Location $location,
         ?RoadAxis $roadAxis
-    ): array 
-    {
+    ): array {
         $qb = $this->getEntityManager()->getRepository(DefaultAssignmentRule::class)->createQueryBuilder('r');
 
         $qb->where('r.workflowStep = :step')
@@ -162,8 +168,7 @@ class ComplaintRepository extends ServiceEntityRepository
         ?bool $isSensitive = false,
         ?Location $location = null,
         ?RoadAxis $roadAxis = null
-    ): array 
-    {
+    ): array {
         $qb = $this->getEntityManager()->getRepository(Company::class)->createQueryBuilder('c')
             ->where('c.active = true')
             ->andWhere('c.deleted = false OR c.deleted IS NULL');
