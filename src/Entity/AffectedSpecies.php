@@ -33,7 +33,8 @@ use App\State\AffectedSpecies\CreateAffectedSpeciesProcessor;
             processor: CreateAffectedSpeciesProcessor::class
         ),
         new Patch(
-            security: "is_granted('ROLE_AFFECTED_SPECIES_UPDATE')"
+            security: "is_granted('ROLE_AFFECTED_SPECIES_UPDATE')",
+            denormalizationContext: ['groups' => ['affected_species:patch']]
         ),
     ],
     normalizationContext: ['groups' => ['affected_species:get']]
@@ -65,25 +66,25 @@ class AffectedSpecies
 
     #[ORM\ManyToOne(inversedBy: 'affectedInstances')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list'])]
+    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list', 'affected_species:patch'])]
     private ?Species $speciesType = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list'])]
+    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list', 'affected_species:patch'])]
     private ?float $affectedQuantity = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list'])]
+    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list', 'affected_species:patch'])]
     private ?GeneralParameter $affectedUnit = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list'])]
+    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list', 'affected_species:patch'])]
     private ?string $description = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list'])]
+    #[Groups(['affected_species:list', 'affected_species:get', 'complaint:get', 'complaint:list', 'affected_species:patch'])]
     private ?GeneralParameter $assetType = null;
 
 
