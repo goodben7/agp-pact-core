@@ -23,14 +23,13 @@ readonly class NotificationTriggerMiddleware implements MiddlewareInterface
 {
     public function __construct(
         private NotificationTemplateRepository $notificationTemplateRepository,
-        private NotificationFactory            $notificationFactory,
-        private MessageBusInterface            $messageBus,
-        private StringTemplateRenderer         $templateRenderer,
-        private EntityManagerInterface         $entityManager,
-        private LoggerInterface                $logger,
-        private UserRepository                 $userRepository
-    )
-    {
+        private NotificationFactory $notificationFactory,
+        private MessageBusInterface $messageBus,
+        private StringTemplateRenderer $templateRenderer,
+        private EntityManagerInterface $entityManager,
+        private LoggerInterface $logger,
+        private UserRepository $userRepository
+    ) {
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
@@ -98,7 +97,10 @@ readonly class NotificationTriggerMiddleware implements MiddlewareInterface
         }
 
         $complaintId = $message->getComplaintId();
-        $complaint = $this->entityManager->getRepository(Complaint::class)->find($complaintId);
+        $complaint = $this->entityManager->getRepository(Complaint::class)->findOneBy([
+            'id' => $complaintId,
+            'deleted' => false
+        ]);
 
         if (!$complaint) {
             $this->logger->warning(sprintf('Complaint %s not found for notification triggering.', $complaintId));
@@ -221,10 +223,10 @@ readonly class NotificationTriggerMiddleware implements MiddlewareInterface
         $context = ['complaint' => $complaint, 'message' => $message];
 
         $renderedSubject = $template->getSubject()
-            ? $this->templateRenderer->render($template->getSubject(), (object)$context)
+            ? $this->templateRenderer->render($template->getSubject(), (object) $context)
             : null;
 
-        $renderedContent = $this->templateRenderer->render($template->getContent(), (object)$context);
+        $renderedContent = $this->templateRenderer->render($template->getContent(), (object) $context);
 
         foreach ($recipients as $recipientInfo) {
             $notificationEntity = $this->notificationFactory->createFromTemplate(

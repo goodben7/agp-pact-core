@@ -10,6 +10,7 @@ use App\Dto\Complaint\AssignCompanyRequest;
 use App\State\Complaint\ComplaintAssignCompanyProcessor;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -24,6 +25,7 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use App\State\Complaint\CreateComplaintProcessor;
+use App\State\Complaint\DeleteComplaintProcessor;
 use Symfony\Component\Serializer\Attribute\Groups;
 use App\State\Complaint\ComplaintApplyActionProcessor;
 
@@ -61,6 +63,10 @@ use App\State\Complaint\ComplaintApplyActionProcessor;
             uriTemplate: '/complaints/{id}/assign-company',
             processor: ComplaintAssignCompanyProcessor::class,
             input: AssignCompanyRequest::class,
+        ),
+        new Delete(
+            security: "is_granted('ROLE_COMPLAINT_DELETE')",
+            processor: DeleteComplaintProcessor::class
         ),
     ],
     normalizationContext: ['groups' => ['complaint:get']]
@@ -326,6 +332,18 @@ class Complaint
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['complaint:get', 'complaint:list'])]
     private ?string $externalReferenceId = null;
+
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+    #[Groups(['complaint:get', 'complaint:list'])]
+    private bool $deleted = false;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[Groups(['complaint:get'])]
+    private ?\DateTimeImmutable $deletedAt = null;
+
+    #[ORM\Column(length: 16, nullable: true)]
+    #[Groups(['complaint:get'])]
+    private ?string $deletedBy = null;
 
     public function __construct()
     {
@@ -1092,7 +1110,7 @@ class Complaint
 
     /**
      * Get the value of externalReferenceId
-     */ 
+     */
     public function getExternalReferenceId(): string|null
     {
         return $this->externalReferenceId;
@@ -1102,10 +1120,46 @@ class Complaint
      * Set the value of externalReferenceId
      *
      * @return  self
-     */ 
+     */
     public function setExternalReferenceId(?string $externalReferenceId): static
     {
         $this->externalReferenceId = $externalReferenceId;
+
+        return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(bool $deleted): static
+    {
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getDeletedAt(): ?\DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): static
+    {
+        $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    public function getDeletedBy(): ?string
+    {
+        return $this->deletedBy;
+    }
+
+    public function setDeletedBy(?string $deletedBy): static
+    {
+        $this->deletedBy = $deletedBy;
 
         return $this;
     }

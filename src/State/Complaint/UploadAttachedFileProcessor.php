@@ -14,9 +14,8 @@ readonly class UploadAttachedFileProcessor implements ProcessorInterface
 {
     public function __construct(
         private ComplaintManager $manager,
-        private EntityManagerInterface   $em
-    )
-    {
+        private EntityManagerInterface $em
+    ) {
     }
 
     /**
@@ -25,7 +24,10 @@ readonly class UploadAttachedFileProcessor implements ProcessorInterface
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Complaint
     {
-        $complaint = $this->em->getRepository(Complaint::class)->find($data->complaintId);
+        $complaint = $this->em->getRepository(Complaint::class)->findOneBy([
+            'id' => $data->complaintId,
+            'deleted' => false
+        ]);
         if (!$complaint) {
             throw new UnavailableDataException('Complaint not found.');
         }

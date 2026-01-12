@@ -17,10 +17,9 @@ readonly class ComplaintApplyActionProcessor implements ProcessorInterface
 {
     public function __construct(
         private ComplaintWorkflowManager $manager,
-        private EntityManagerInterface   $em,
-        private RequestStack             $requestStack
-    )
-    {
+        private EntityManagerInterface $em,
+        private RequestStack $requestStack
+    ) {
 
     }
 
@@ -42,7 +41,10 @@ readonly class ComplaintApplyActionProcessor implements ProcessorInterface
 
         $data->setFromArray($request->request->all() + $request->files->all() + $payload);
 
-        $complaint = $this->em->getRepository(Complaint::class)->findOneBy(['id' => $uriVariables['id']]);
+        $complaint = $this->em->getRepository(Complaint::class)->findOneBy([
+            'id' => $uriVariables['id'],
+            'deleted' => false
+        ]);
         if (!$complaint)
             throw new UnavailableDataException('Complaint not found.');
 

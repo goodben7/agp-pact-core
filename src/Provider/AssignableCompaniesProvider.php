@@ -17,7 +17,8 @@ readonly class AssignableCompaniesProvider implements ProviderInterface
     public function __construct(
         private EntityManagerInterface $em,
         private ComplaintRepository $complaintRepository
-    ) {}
+    ) {
+    }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
@@ -28,7 +29,10 @@ readonly class AssignableCompaniesProvider implements ProviderInterface
             throw new NotFoundHttpException('Complaint ID is required');
         }
 
-        $complaint = $this->em->getRepository(Complaint::class)->find($complaintId);
+        $complaint = $this->em->getRepository(Complaint::class)->findOneBy([
+            'id' => $complaintId,
+            'deleted' => false
+        ]);
 
         if (!$complaint) {
             throw new NotFoundHttpException('Complaint not found');

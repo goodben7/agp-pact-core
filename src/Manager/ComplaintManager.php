@@ -28,10 +28,9 @@ readonly class ComplaintManager
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private Security               $security,
-        private MessageBusInterface    $bus
-    )
-    {
+        private Security $security,
+        private MessageBusInterface $bus
+    ) {
     }
 
     public function create(ComplaintCreateDTO $data): Complaint
@@ -92,7 +91,7 @@ readonly class ComplaintManager
                 // Check if the incident cause (Prejudice) is sensitive
                 if (is_null($incidentCause->isSensible())) {
                     $isSensitive = null;
-                } elseif ($incidentCause->isSensible())  {
+                } elseif ($incidentCause->isSensible()) {
                     $isSensitive = true;
                 } else {
                     $isSensitive = false;
@@ -235,12 +234,15 @@ readonly class ComplaintManager
 
     public function assignToCompany(string $id, AssignCompanyRequest $data): Complaint
     {
-        $complaint = $this->em->getRepository(Complaint::class)->find($id);
+        $complaint = $this->em->getRepository(Complaint::class)->findOneBy([
+            'id' => $id,
+            'deleted' => false
+        ]);
         if (!$complaint)
-            throw new UnavailableDataException('Complaint not found');
+            throw new UnavailableDataException('Complaint not found.');
 
         $complaint->setCurrentAssignedCompany($data->company);
-        
+
         $this->em->flush();
 
         return $complaint;
