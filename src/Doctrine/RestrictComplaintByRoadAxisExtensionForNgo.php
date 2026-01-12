@@ -16,9 +16,10 @@ use App\Repository\MemberRepository;
 class RestrictComplaintByRoadAxisExtensionForNgo implements QueryCollectionExtensionInterface
 {
     public function __construct(
-        private Security         $security,
+        private Security $security,
         private MemberRepository $memberRepository
-    ) {}
+    ) {
+    }
 
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
@@ -37,7 +38,17 @@ class RestrictComplaintByRoadAxisExtensionForNgo implements QueryCollectionExten
         if (!$user)
             return;
 
-        if (UserProxyInterface::PERSON_NGO === $user->getPersonType() ) {
+        // Admins and super-admins see all complaints
+        if (
+            in_array($user->getPersonType(), [
+                UserProxyInterface::PERSON_ADMIN,
+                UserProxyInterface::PERSON_SUPER_ADMIN
+            ])
+        ) {
+            return;
+        }
+
+        if (UserProxyInterface::PERSON_NGO === $user->getPersonType()) {
             /**
              * @var Member $member
              */

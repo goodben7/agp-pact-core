@@ -34,9 +34,25 @@ class RestrictComplaintByCreatorExtension implements QueryCollectionExtensionInt
         if (!$user)
             return;
 
-        if (UserProxyInterface::PERSON_LAMBDA === $user->getPersonType() || UserProxyInterface::PERSON_COMPLAINANT === $user->getPersonType()) {
+        // Admins and super-admins see all complaints
+        if (
+            in_array($user->getPersonType(), [
+                UserProxyInterface::PERSON_ADMIN,
+                UserProxyInterface::PERSON_SUPER_ADMIN
+            ])
+        ) {
+            return;
+        }
+
+        // Lambda and complainant users only see their own complaints
+        if (
+            in_array($user->getPersonType(), [
+                UserProxyInterface::PERSON_LAMBDA,
+                UserProxyInterface::PERSON_COMPLAINANT
+            ])
+        ) {
             $rootAlias = $queryBuilder->getRootAliases()[0];
-            $queryBuilder->andWhere(sprintf('(%s.createdBy = :currentUser) AND (%s.createdBy IS NOT NULL)', $rootAlias, $rootAlias));
+            $queryBuilder->andWhere(sprintf('%s.createdBy = :currentUser', $rootAlias));
             $queryBuilder->setParameter('currentUser', $user->getId());
         }
     }

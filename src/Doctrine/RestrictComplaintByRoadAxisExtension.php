@@ -34,9 +34,19 @@ class RestrictComplaintByRoadAxisExtension implements QueryCollectionExtensionIn
         if (!$user)
             return;
 
+        // Admins and super-admins see all complaints
+        if (
+            in_array($user->getPersonType(), [
+                UserProxyInterface::PERSON_ADMIN,
+                UserProxyInterface::PERSON_SUPER_ADMIN
+            ])
+        ) {
+            return;
+        }
+
         if (UserProxyInterface::PERSON_ADMINISTRATOR_MANAGER === $user->getPersonType()) {
             $roadAxis = $user->getRoadAxis();
-            
+
             if ($roadAxis) {
                 $rootAlias = $queryBuilder->getRootAliases()[0];
                 $queryBuilder->andWhere(sprintf('%s.roadAxis = :roadAxisId', $rootAlias));
