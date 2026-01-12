@@ -54,16 +54,12 @@ class RestrictComplaintByLocationExtension implements QueryCollectionExtensionIn
              */
             $member = $this->memberRepository->findOneBy(['userId' => $user->getId()]);
 
-            if (!$member?->getCompany()?->getLocations()->isEmpty()) {
+            if ($member && $member->getCompany()) {
                 $rootAlias = $queryBuilder->getRootAliases()[0];
-                $locationIds = [];
-                foreach ($member->getCompany()->getLocations() as $location) {
-                    $locationIds[] = $location->getId();
-                }
-                $queryBuilder->andWhere(sprintf('%s.location IN (:locationIds)', $rootAlias));
-                $queryBuilder->andWhere(sprintf('(%s.isSensitive = :isSensitiveFalse OR %s.isSensitive IS NULL)', $rootAlias, $rootAlias));
-                $queryBuilder->setParameter('locationIds', $locationIds);
-                $queryBuilder->setParameter('isSensitiveFalse', false);
+                $companyId = $member->getCompany()->getId();
+                // Committee members only see complaints assigned to their company
+                $queryBuilder->andWhere(sprintf('%s.involvedCompany = :committeeCompanyId', $rootAlias));
+                $queryBuilder->setParameter('committeeCompanyId', $companyId);
             }
         }
     }

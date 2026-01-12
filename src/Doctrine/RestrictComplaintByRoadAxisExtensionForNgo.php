@@ -49,22 +49,10 @@ class RestrictComplaintByRoadAxisExtensionForNgo implements QueryCollectionExten
         }
 
         if (UserProxyInterface::PERSON_NGO === $user->getPersonType()) {
-            /**
-             * @var Member $member
-             */
-            $member = $this->memberRepository->findOneBy(['userId' => $user->getId()]);
-
-            if ($member && $member->getCompany() && !$member->getCompany()->getRoadAxes()->isEmpty()) {
-                $rootAlias = $queryBuilder->getRootAliases()[0];
-                $roadAxisIds = [];
-                foreach ($member->getCompany()->getRoadAxes() as $roadAxis) {
-                    $roadAxisIds[] = $roadAxis->getId();
-                }
-                $queryBuilder->andWhere(sprintf('%s.roadAxis IN (:roadAxisIds)', $rootAlias));
-                $queryBuilder->andWhere(sprintf('%s.isSensitive = :isSensitive', $rootAlias));
-                $queryBuilder->setParameter('roadAxisIds', $roadAxisIds);
-                $queryBuilder->setParameter('isSensitive', true);
-            }
+            // NGO members only see sensitive complaints (no roadAxis restriction)
+            $rootAlias = $queryBuilder->getRootAliases()[0];
+            $queryBuilder->andWhere(sprintf('%s.isSensitive = :isSensitive', $rootAlias));
+            $queryBuilder->setParameter('isSensitive', true);
         }
     }
 }

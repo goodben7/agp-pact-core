@@ -29,7 +29,8 @@ readonly class ComplaintManager
     public function __construct(
         private EntityManagerInterface $em,
         private Security $security,
-        private MessageBusInterface $bus
+        private MessageBusInterface $bus,
+        private \App\Repository\MemberRepository $memberRepository
     ) {
     }
 
@@ -206,8 +207,14 @@ readonly class ComplaintManager
         if ($data->currentAssignedCompany)
             $complaint->setCurrentAssignedCompany($data->currentAssignedCompany);
 
-        if ($company)
+        // Check if user is a member of a company and set involvedCompany
+        $member = $this->memberRepository->findOneBy(['userId' => $userId]);
+        if ($member && $member->getCompany()) {
+            $complaint->setInvolvedCompany($member->getCompany());
+        } elseif ($company) {
+            // Fallback to location-based company if user is not a member
             $complaint->setInvolvedCompany($company);
+        }
 
         return $complaint;
     }
