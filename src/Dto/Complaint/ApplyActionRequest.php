@@ -7,6 +7,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ApplyActionRequest
 {
+    public ?\DateTimeInterface $encodedAt = null;
+
     #[Assert\NotBlank]
     public ?string $actionId = null;
 
@@ -23,6 +25,19 @@ class ApplyActionRequest
             $this->actionId = $data['actionId'];
             unset($data['actionId']);
         }
+        if (isset($data['encodedAt'])) {
+            $value = $data['encodedAt'];
+            if (is_string($value) && $value !== '') {
+                try {
+                    $this->encodedAt = new \DateTimeImmutable($value);
+                } catch (\Exception $e) {
+                    $this->encodedAt = null;
+                }
+            } elseif ($value instanceof \DateTimeInterface) {
+                $this->encodedAt = \DateTimeImmutable::createFromInterface($value);
+            }
+            unset($data['encodedAt']);
+        }
 
         $this->dynamicFields = $data;
 
@@ -31,7 +46,11 @@ class ApplyActionRequest
 
     public function toArray(): array
     {
-        return $this->dynamicFields;
+        $arr = $this->dynamicFields;
+        if ($this->encodedAt instanceof \DateTimeInterface) {
+            $arr['encodedAt'] = $this->encodedAt->format(DATE_ATOM);
+        }
+        return $arr;
     }
 
     public function hasFile(): bool

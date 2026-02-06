@@ -192,6 +192,15 @@ readonly class ComplaintWorkflowManager
 
         //$this->assignmentManager->assignDefaultActor($complaint);
 
+        $actionDate = null;
+        if (isset($data['encodedAt']) && is_string($data['encodedAt'])) {
+            try {
+                $actionDate = new \DateTimeImmutable($data['encodedAt']);
+            } catch (\Exception $e) {
+                $actionDate = null;
+            }
+        }
+
         $history = (new ComplaintHistory())
             ->setComplaint($complaint)
             ->setOldWorkflowStep($oldStep)
@@ -199,7 +208,7 @@ readonly class ComplaintWorkflowManager
             ->setAction($action)
             ->setComments($comment)
             ->setActor($currentUser)
-            ->setActionDate(new \DateTimeImmutable());
+            ->setActionDate($actionDate ?? new \DateTimeImmutable());
 
         $this->em->persist($history);
         $this->em->flush();
