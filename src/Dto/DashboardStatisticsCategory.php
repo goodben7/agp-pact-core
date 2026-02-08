@@ -29,4 +29,16 @@ final class DashboardStatisticsCategory
 
     #[Groups(["dashboard_stats:read"])]
     public array $complaintsDeclaredMonthly = [];
+
+    #[Groups(['dashboard_stats:read'])]
+    public int $unprocessedComplaints = 0; // (b)
+
+    #[Groups(['dashboard_stats:read'])]
+    public int $validatedInProgressComplaints = 0; // (c)
+
+    #[Groups(['dashboard_stats:read'])]
+    public int $nonValidatedComplaints = 0; // (d)
+
+    #[Groups(['dashboard_stats:read'])]
+    public int $validatedResolvedComplaints = 0; // (e)
 }

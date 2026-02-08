@@ -63,6 +63,8 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
             $this->populateComplaintsByStatus($stats, $applyCommonFilters);
             $this->populateComplaintsByType($stats, $applyCommonFilters);
             $this->populateAverageResolutionTime($stats, $applyCommonFilters);
+            $this->populateComplaintLifecycleStats($stats, $applyCommonFilters);
+
     
             $monthlyFiltersClosure = $this->getClosure($locationIds, $complaintTypeId, null, null, $involvedCompanyId);
             $this->populateComplaintsDeclaredMonthly($stats, $monthlyFiltersClosure);
@@ -310,4 +312,43 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
 
         return array_unique($descendantIds);
     }
+
+    private function populateComplaintLifecycleStats(
+        DashboardStatistics $stats,
+        \Closure $applyCommonFilters
+    ): void {
+        $qb = $this->entityManager->createQueryBuilder()
+            ->select('
+                c.isSensitive,
+                COUNT(c.id) as total,
+                SUM(CASE WHEN c.currentWorkflowStep IS NULL THEN 1 ELSE 0 END) as unprocessed,
+                SUM(CASE WHEN c.isReceivable = true AND c.closed = false THEN 1 ELSE 0 END) as validatedInProgress,
+                SUM(CASE WHEN c.isReceivable = false THEN 1 ELSE 0 END) as nonValidated,
+                SUM(CASE WHEN c.isReceivable = true AND c.closed = true THEN 1 ELSE 0 END) as validatedResolved
+            ')
+            ->from(Complaint::class, 'c');
+
+        $applyCommonFilters($qb, 'c');
+        $qb->groupBy('c.isSensitive');
+
+        $results = $qb->getQuery()->getResult();
+
+        foreach ($results as $row) {
+            // mapping sensibilité (tu maîtrises déjà 👌)
+            if ($row['isSensitive'] === null) {
+                $category = $stats->general;
+            } elseif ($row['isSensitive'] === false) {
+                $category = $stats->sensitive;
+            } else {
+                $category = $stats->hypersensitive;
+            }
+
+            $category->totalComplaints = (int) $row['total'];
+            $category->unprocessedComplaints = (int) $row['unprocessed'];
+            $category->validatedInProgressComplaints = (int) $row['validatedInProgress'];
+            $category->nonValidatedComplaints = (int) $row['nonValidated'];
+            $category->validatedResolvedComplaints = (int) $row['validatedResolved'];
+        }
+    }
+
 }
