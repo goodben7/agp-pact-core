@@ -324,7 +324,8 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
                 SUM(CASE WHEN c.currentWorkflowStep IS NULL THEN 1 ELSE 0 END) as unprocessed,
                 SUM(CASE WHEN c.isReceivable = true AND c.closed = false THEN 1 ELSE 0 END) as validatedInProgress,
                 SUM(CASE WHEN c.isReceivable = false THEN 1 ELSE 0 END) as nonValidated,
-                SUM(CASE WHEN c.isReceivable = true AND c.closed = true THEN 1 ELSE 0 END) as validatedResolved
+                SUM(CASE WHEN c.isReceivable = true AND c.closed = true THEN 1 ELSE 0 END) as validatedResolved,
+                SUM(CASE WHEN c.isReceivable IS NULL THEN 1 ELSE 0 END) as receivabilityUndefined
             ')
             ->from(Complaint::class, 'c');
 
@@ -348,6 +349,7 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
             $category->validatedInProgressComplaints = (int) $row['validatedInProgress'];
             $category->nonValidatedComplaints = (int) $row['nonValidated'];
             $category->validatedResolvedComplaints = (int) $row['validatedResolved'];
+            $category->receivabilityUndefinedComplaints = (int) $row['receivabilityUndefined'];
         }
     }
 

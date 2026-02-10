@@ -41,4 +41,7 @@ final class DashboardStatisticsCategory
 
     #[Groups(['dashboard_stats:read'])]
     public int $validatedResolvedComplaints = 0; // (e)
+
+    #[Groups(['dashboard_stats:read'])]
+    public int $receivabilityUndefinedComplaints = 0;
 }
