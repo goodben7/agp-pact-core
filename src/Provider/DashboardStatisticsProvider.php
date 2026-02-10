@@ -39,8 +39,8 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
         $involvedCompanyId = $filters['involvedCompany'] ?? null;
         $roadAxisId = $filters['roadAxisId'] ?? null;
         $complaintTypeId = $filters['complaintTypeId'] ?? null;
-        $startDate = $filters['declarationDate']['after'] ?? null;
-        $endDate = $filters['declarationDate']['before'] ?? null;
+        $startDate = $filters['incidentDate']['after'] ?? null;
+        $endDate = $filters['incidentDate']['before'] ?? null;
     
         try {
             $locationIds = $this->getLocationIdsForFilter($locationId, $roadAxisId);
@@ -180,7 +180,7 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
     private function populateAverageResolutionTime(DashboardStatistics $stats, \Closure $applyCommonFilters): void
     {
         $qb = $this->entityManager->createQueryBuilder()
-            ->select('c.isSensitive, AVG(DATE_DIFF(c.closureDate, c.declarationDate)) as avg_days')
+            ->select('c.isSensitive, AVG(DATE_DIFF(c.closureDate, c.incidentDate)) as avg_days')
             ->from(Complaint::class, 'c')
             ->where('c.closureDate IS NOT NULL')
             ->andWhere('c.closed = :isClosed')
@@ -210,9 +210,9 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
         $twelveMonthsAgo = (new \DateTimeImmutable())->modify('-11 months')->modify('first day of this month')->setTime(0, 0, 0);
 
         $qb = $this->entityManager->createQueryBuilder()
-            ->select('c.isSensitive, YEAR(c.declarationDate) as year, MONTH(c.declarationDate) as month, COUNT(c.id) as count')
+            ->select('c.isSensitive, YEAR(c.incidentDate) as year, MONTH(c.incidentDate) as month, COUNT(c.id) as count')
             ->from(Complaint::class, 'c')
-            ->where('c.declarationDate >= :startDate')
+            ->where('c.incidentDate >= :startDate')
             ->setParameter('startDate', $twelveMonthsAgo);
         $applyMonthlyFilters($qb, 'c');
         $qb->groupBy('c.isSensitive', 'year', 'month')->orderBy('year, month');
@@ -260,10 +260,10 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
                 $qb->andWhere(sprintf('%s.complaintType = :complaintTypeId', $alias))->setParameter('complaintTypeId', $complaintTypeId);
             }
             if (!empty($startDate)) {
-                $qb->andWhere(sprintf('%s.declarationDate >= :startDate', $alias))->setParameter('startDate', new \DateTimeImmutable($startDate));
+                $qb->andWhere(sprintf('%s.incidentDate >= :startDate', $alias))->setParameter('startDate', new \DateTimeImmutable($startDate));
             }
             if (!empty($endDate)) {
-                $qb->andWhere(sprintf('%s.declarationDate <= :endDate', $alias))->setParameter('endDate', (new \DateTimeImmutable($endDate))->setTime(23, 59, 59));
+                $qb->andWhere(sprintf('%s.incidentDate <= :endDate', $alias))->setParameter('endDate', (new \DateTimeImmutable($endDate))->setTime(23, 59, 59));
             }
             if (!empty($involvedCompanyId)) {
                 $qb->andWhere(sprintf('%s.involvedCompany = :involvedCompanyId', $alias))->setParameter('involvedCompanyId', $involvedCompanyId);
