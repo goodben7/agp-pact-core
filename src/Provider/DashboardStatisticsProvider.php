@@ -286,13 +286,25 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
         if (!empty($roadAxisId)) {
             $roadAxis = $this->roadAxisRepository->find($roadAxisId);
             if ($roadAxis) {
-                if ($roadAxis->getStartLocation()) {
-                    $locationIds[] = $roadAxis->getStartLocation()->getId();
-                }
-                if ($roadAxis->getEndLocation()) {
-                    $locationIds[] = $roadAxis->getEndLocation()->getId();
-                }
                 foreach ($roadAxis->getTraversedLocations() as $loc) {
+                    $locationIds[] = $loc->getId();
+                }
+                foreach ($roadAxis->getProvince() as $loc) {
+                    $locationIds[] = $loc->getId();
+                }
+                foreach ($roadAxis->getTerritory() as $loc) {
+                    $locationIds[] = $loc->getId();
+                }
+                foreach ($roadAxis->getCommune() as $loc) {
+                    $locationIds[] = $loc->getId();
+                }
+                foreach ($roadAxis->getQuartier() as $loc) {
+                    $locationIds[] = $loc->getId();
+                }
+                foreach ($roadAxis->getCity() as $loc) {
+                    $locationIds[] = $loc->getId();
+                }
+                foreach ($roadAxis->getSecteur() as $loc) {
                     $locationIds[] = $loc->getId();
                 }
             }
