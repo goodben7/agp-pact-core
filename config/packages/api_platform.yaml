@@ -26,7 +26,10 @@ api_platform:
         extra_properties:
             standard_put: true
             rfc_7807_compliant_errors: true
-        pagination_enabled: false
+        pagination_enabled: true
+        pagination_items_per_page: 30
+        pagination_client_items_per_page: true
+        pagination_maximum_items_per_page: 200
     use_symfony_listeners: true
     eager_loading:
         enabled: false
