@@ -14,11 +14,15 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\Doctrine\IdGenerator;
 use App\Dto\Kobo\KoboAssetSnapshotDto;
+use App\Dto\ParV2\ValidateParV2Dto;
 use App\Dto\ParV2\SyncParV2RequestDto;
 use App\Dto\ParV2\SyncParV2ResultDto;
-use App\Repository\ParV2Repository;
 use App\Provider\KoboAssetSnapshotsProvider;
+use App\Repository\ParV2Repository;
 use App\State\ParV2\SyncParV2Processor;
+use App\State\ParV2\ValidateParV2Processor;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -31,26 +35,33 @@ use Symfony\Component\Serializer\Annotation\Groups;
             uriTemplate: '/parv2s',
             normalizationContext: ['groups' => ['par_v2:list']],
             provider: CollectionProvider::class,
-            //security: 'is_granted("ROLE_PAR_LIST")'
+            security: 'is_granted("ROLE_PAR_LIST")'
         ),
         new Get(
             uriTemplate: '/parv2s/{id}',
             normalizationContext: ['groups' => ['par_v2:get']],
             provider: ItemProvider::class,
-            //security: 'is_granted("ROLE_PAR_DETAILS")'
+            security: 'is_granted("ROLE_PAR_DETAILS")'
         ),
         new GetCollection(
             uriTemplate: '/kobo/forms',
             output: KoboAssetSnapshotDto::class,
             provider: KoboAssetSnapshotsProvider::class,
-            //security: 'is_granted("ROLE_PAR_LIST")'
+            security: 'is_granted("ROLE_PAR_LIST")'
         ),
         new Post(
             uriTemplate: '/parv2s/sync',
             input: SyncParV2RequestDto::class,
             output: SyncParV2ResultDto::class,
             processor: SyncParV2Processor::class,
-            //security: 'is_granted("ROLE_PAR_CREATE")'
+            security: 'is_granted("ROLE_PAR_CREATE")'
+        ),
+        new Post(
+            uriTemplate: '/parv2s/validations',
+            security: 'is_granted("ROLE_PAR_VALIDATION")',
+            input: ValidateParV2Dto::class,
+            processor: ValidateParV2Processor::class, 
+            status: 200
         ),
     ],
     formats: ['json' => ['application/json']]
@@ -63,12 +74,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
     'lieuActifAffecte' => 'exact',
     'submittedBy' => 'exact',
     'koboStatus' => 'exact',
+    'status' => 'exact',
+    'validatedBy' => 'exact',
 ])]
-#[ApiFilter(OrderFilter::class, properties: ['createdAt', 'submissionTime', 'koboId'])]
-#[ApiFilter(DateFilter::class, properties: ['startAt', 'endAt', 'dateInventaire', 'submissionTime', 'createdAt'])]
+#[ApiFilter(OrderFilter::class, properties: ['createdAt', 'submissionTime', 'koboId', 'validatedAt'])]
+#[ApiFilter(DateFilter::class, properties: ['startAt', 'endAt', 'dateInventaire', 'submissionTime', 'createdAt', 'validatedAt'])]
 class ParV2
 {
     public const ID_PREFIX = 'PV';
+
+    public const STATUS_PENDING = 'P';
+    public const STATUS_VALIDATED = 'V';
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -259,12 +275,30 @@ class ParV2
     #[Groups(['par_v2:get'])]
     private array $rawPayload = [];
 
+    #[ORM\Column(length: 1, options: ['default' => self::STATUS_PENDING], nullable: false)]
+    #[Groups(['par_v2:get', 'par_v2:list'])]
+    private ?string $status = self::STATUS_PENDING;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['par_v2:get', 'par_v2:list'])]
+    private ?\DateTimeImmutable $validatedAt = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'validated_by', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['par_v2:get', 'par_v2:list'])]
+    private ?User $validatedBy = null;
+
+    #[ORM\OneToMany(mappedBy: 'par_v2', targetEntity: PaymentHistory::class)]
+    #[Groups(['par_v2:get'])]
+    private Collection $paymentHistories;
+
     #[ORM\Column(options: ['default' => 'CURRENT_TIMESTAMP'])]
     #[Groups(['par_v2:get', 'par_v2:list'])]
     private \DateTimeImmutable $createdAt;
 
     public function __construct()
     {
+        $this->paymentHistories = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
     }
 
@@ -876,5 +910,91 @@ class ParV2
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getPaymentHistories(): Collection
+    {
+        return $this->paymentHistories;
+    }
+
+    public function addPaymentHistory(PaymentHistory $paymentHistory): static
+    {
+        if (!$this->paymentHistories->contains($paymentHistory)) {
+            $this->paymentHistories->add($paymentHistory);
+            $paymentHistory->setPar_v2($this);
+        }
+
+        return $this;
+    }
+
+    public function removePaymentHistory(PaymentHistory $paymentHistory): static
+    {
+        if ($this->paymentHistories->removeElement($paymentHistory)) {
+            if ($paymentHistory->getPar_v2() === $this) {
+                $paymentHistory->setPar_v2(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the value of status
+     */ 
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * Set the value of status
+     *
+     * @return  self
+     */ 
+    public function setStatus($status)
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of validatedAt
+     */ 
+    public function getValidatedAt(): ?\DateTimeImmutable
+    {
+        return $this->validatedAt;
+    }
+
+    /**
+     * Set the value of validatedAt
+     *
+     * @return  self
+     */ 
+    public function setValidatedAt(?\DateTimeImmutable $validatedAt): static
+    {
+        $this->validatedAt = $validatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of validatedBy
+     */ 
+    public function getValidatedBy(): ?User
+    {
+        return $this->validatedBy;
+    }
+
+    /**
+     * Set the value of validatedBy
+     *
+     * @return  self
+     */ 
+    public function setValidatedBy(?User $validatedBy): static
+    {
+        $this->validatedBy = $validatedBy;
+
+        return $this;
     }
 }

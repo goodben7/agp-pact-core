@@ -52,7 +52,8 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
     'par' => 'exact',
     'amount' => 'exact',
     'paymentMethod' => 'exact',
-    'transactionReference' => 'partial'
+    'transactionReference' => 'partial',
+    'par_v2' => 'exact',
 ])]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt', 'paymentDate'])]
 #[ApiFilter(DateFilter::class, properties: ['createdAt', 'paymentDate'])]
@@ -71,20 +72,25 @@ class PaymentHistory
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(IdGenerator::class)]
     #[ORM\Column(length: 16)]
-    #[Groups(['payment_history:get', 'par:get'])]
+    #[Groups(['payment_history:get', 'par:get', 'par_v2:get'])]
     private ?string $id = null;
 
     #[ORM\ManyToOne(targetEntity: Par::class, inversedBy: 'paymentHistories')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['payment_history:get'])]
     private ?Par $par = null;
 
+    #[ORM\ManyToOne(targetEntity: ParV2::class, inversedBy: 'paymentHistories')]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['payment_history:get'])]
+    private ?ParV2 $par_v2 = null;
+
     #[ORM\Column]
-    #[Groups(['payment_history:get', 'payment_history:patch', 'par:get'])]
+    #[Groups(['payment_history:get', 'payment_history:patch', 'par:get', 'par_v2:get'])]
     private ?\DateTimeImmutable $paymentDate = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['payment_history:get', 'par:get'])]
+    #[Groups(['payment_history:get', 'par:get', 'par_v2:get'])]
     private ?string $amount = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -188,6 +194,26 @@ class PaymentHistory
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of par_v2
+     */ 
+    public function getPar_v2()
+    {
+        return $this->par_v2;
+    }
+
+    /**
+     * Set the value of par_v2
+     *
+     * @return  self
+     */ 
+    public function setPar_v2(?ParV2 $par_v2): static
+    {
+        $this->par_v2 = $par_v2;
 
         return $this;
     }

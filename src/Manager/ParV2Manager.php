@@ -3,17 +3,21 @@
 namespace App\Manager;
 
 use App\Entity\ParV2;
-use App\Repository\ParV2Repository;
+use App\Entity\User;
+use App\Exception\InvalidActionInputException;
 use App\Model\NewParV2Model;
+use App\Repository\ParV2Repository;
 use App\Service\Kobo\KoboApiClient;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 
 final class ParV2Manager
 {
     public function __construct(
         private EntityManagerInterface $em,
         private ParV2Repository $repository,
-        private KoboApiClient $kobo
+        private KoboApiClient $kobo,
+        private Security $security,
     )
     {
     }
@@ -163,5 +167,26 @@ final class ParV2Manager
         $this->em->flush();
 
         return $parV2;
+    }
+
+    public function validate(ParV2 $par_v2) : ParV2
+    {
+        /** @var User $currentUser */
+        $currentUser = $this->security->getUser();
+        
+        if ($par_v2->getStatus() !== ParV2::STATUS_PENDING) { 
+            throw new InvalidActionInputException('Action not allowed : invalid par state'); 
+        }
+
+
+        $par_v2->setStatus(ParV2::STATUS_VALIDATED); 
+        $par_v2->setValidatedAt(new \DateTimeImmutable('now'));
+        $par_v2->setValidatedBy($currentUser);
+
+        $this->em->persist($par_v2);
+        $this->em->flush();
+
+
+        return $par_v2; 
     }
 }
