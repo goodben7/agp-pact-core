@@ -55,4 +55,5 @@ class ComplaintCreateDTO
     public ?string $externalReferenceId = null;
 
     public ?Company $currentAssignedCompany = null;
+    public ?\DateTimeImmutable $declarationDate = null;
 }

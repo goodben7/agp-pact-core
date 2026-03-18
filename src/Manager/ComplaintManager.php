@@ -80,7 +80,7 @@ readonly class ComplaintManager
             ->setLongitude($data->longitude)
             ->setComplainant($complainant)
             ->setAssignedTo($data->assignedTo)
-            ->setDeclarationDate(new \DateTimeImmutable())
+            ->setDeclarationDate($data->declarationDate ?? new \DateTimeImmutable())
             ->setCreatedBy($userId)
             ->setExternalReferenceId($data->externalReferenceId);
 
