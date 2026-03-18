@@ -48,6 +48,10 @@ services:
     App\Service\MailNotificationSender:
         tags: [ 'app.notification_sender' ]
 
+    App\Service\Kobo\KoboApiClient:
+        arguments:
+            $token: '%env(KOBO_API_TOKEN)%'
+
 
     App\Provider\Auth\MultiFieldUserProvider:
         arguments:
