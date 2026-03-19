@@ -46,7 +46,11 @@ final readonly class ComplaintListLightProvider implements ProviderInterface
                 'ic.name as involvedCompanyName',
                 'cp.id as complainantId',
                 'cp.displayName as complainantName',
-                'cp.contactPhone as complainantPhone'
+                'cp.contactPhone as complainantPhone',
+                'ca.id as currentAssigneeId',
+                'ca.displayName as currentAssigneeName',
+                'cac.id as currentAssignedCompanyId',
+                'cac.name as currentAssignedCompanyName'
             )
             ->from(Complaint::class, 'c')
             ->leftJoin('c.complaintType', 'ct')
@@ -55,7 +59,9 @@ final readonly class ComplaintListLightProvider implements ProviderInterface
             ->leftJoin('c.location', 'l')
             ->leftJoin('c.roadAxis', 'ra')
             ->leftJoin('c.involvedCompany', 'ic')
-            ->leftJoin('c.complainant', 'cp');
+            ->leftJoin('c.complainant', 'cp')
+            ->leftJoin('c.currentAssignee', 'ca')
+            ->leftJoin('c.currentAssignedCompany', 'cac');
 
         $this->applyFilters($qb, $filters);
         $this->applyPagination($qb);
@@ -88,6 +94,10 @@ final readonly class ComplaintListLightProvider implements ProviderInterface
             $dto->complainantId = $row['complainantId'] ?? null;
             $dto->complainantName = $row['complainantName'] ?? null;
             $dto->complainantPhone = $row['complainantPhone'] ?? null;
+            $dto->currentAssigneeId = $row['currentAssigneeId'] ?? null;
+            $dto->currentAssigneeName = $row['currentAssigneeName'] ?? null;
+            $dto->currentAssignedCompanyId = $row['currentAssignedCompanyId'] ?? null;
+            $dto->currentAssignedCompanyName = $row['currentAssignedCompanyName'] ?? null;
 
             $items[] = $dto;
         }

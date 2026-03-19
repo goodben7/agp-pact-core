@@ -105,4 +105,16 @@ final class ComplaintListLight
 
     #[Groups(['complaint_light:list'])]
     public ?string $treatmentLevel = null;
+
+    #[Groups(['complaint_light:list'])]
+    public ?string $currentAssigneeId = null;
+
+    #[Groups(['complaint_light:list'])]
+    public ?string $currentAssigneeName = null;
+
+    #[Groups(['complaint_light:list'])]
+    public ?string $currentAssignedCompanyId = null;
+
+    #[Groups(['complaint_light:list'])]
+    public ?string $currentAssignedCompanyName = null;
 }
