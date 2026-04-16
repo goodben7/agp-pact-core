@@ -29,9 +29,9 @@ class ComplaintCreateDTO
 
     public ?Location $location = null;
 
-    public ?float $latitude = null;
+    public float|string|null $latitude = null;
 
-    public ?float $longitude = null;
+    public float|string|null $longitude = null;
 
     public ?ComplainantCreateDTO $newComplainant = null;
 
@@ -56,4 +56,6 @@ class ComplaintCreateDTO
 
     public ?Company $currentAssignedCompany = null;
     public ?\DateTimeImmutable $declarationDate = null;
+
+    public ?string $code = null;
 }

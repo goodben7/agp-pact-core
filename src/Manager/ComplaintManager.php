@@ -69,6 +69,9 @@ readonly class ComplaintManager
 
         $userId = $user?->getId();
 
+        $latitude = is_numeric($data->latitude) ? (float) $data->latitude : null;
+        $longitude = is_numeric($data->longitude) ? (float) $data->longitude : null;
+
         $complaint = (new Complaint())
             ->setComplaintType($data->complaintType)
             ->setIncidentDate($data->incidentDate)
@@ -76,13 +79,14 @@ readonly class ComplaintManager
             ->setRoadAxis($data->roadAxis)
             ->setLocationDetail($data->locationDetail)
             ->setLocation($data->location)
-            ->setLatitude($data->latitude)
-            ->setLongitude($data->longitude)
+            ->setLatitude($latitude)
+            ->setLongitude($longitude)
             ->setComplainant($complainant)
             ->setAssignedTo($data->assignedTo)
             ->setDeclarationDate($data->declarationDate ?? new \DateTimeImmutable())
             ->setCreatedBy($userId)
-            ->setExternalReferenceId($data->externalReferenceId);
+            ->setExternalReferenceId($data->externalReferenceId)
+            ->setCode($data->code);
 
 
         $isSensitive = null;

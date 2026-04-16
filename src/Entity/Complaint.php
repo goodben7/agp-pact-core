@@ -345,6 +345,9 @@ class Complaint
     #[Groups(['complaint:get'])]
     private ?string $deletedBy = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $code = null;
+
     public function __construct()
     {
         $this->victims = new ArrayCollection();
@@ -1160,6 +1163,18 @@ class Complaint
     public function setDeletedBy(?string $deletedBy): static
     {
         $this->deletedBy = $deletedBy;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): static
+    {
+        $this->code = $code;
 
         return $this;
     }
