@@ -107,6 +107,8 @@ final readonly class ComplaintListLightProvider implements ProviderInterface
 
     private function applyFilters(QueryBuilder $qb, array $filters): void
     {
+        $qb->andWhere('c.deleted = false');
+
         if (!empty($filters['id'])) {
             $qb->andWhere('c.id = :id')->setParameter('id', $filters['id']);
         }
