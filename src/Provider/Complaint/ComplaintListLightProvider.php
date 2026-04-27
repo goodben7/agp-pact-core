@@ -26,6 +26,7 @@ final readonly class ComplaintListLightProvider implements ProviderInterface
         $qb = $this->entityManager->createQueryBuilder()
             ->select(
                 'c.id as id',
+                'c.deleted as deleted',
                 'c.declarationDate as declarationDate',
                 'c.incidentDate as incidentDate',
                 'c.closureDate as closureDate',
@@ -73,6 +74,7 @@ final readonly class ComplaintListLightProvider implements ProviderInterface
         foreach ($rows as $row) {
             $dto = new ComplaintListLight();
             $dto->id = (string) $row['id'];
+            $dto->deleted = $row['deleted'] ?? null;
             $dto->declarationDate = $row['declarationDate'] ?? null;
             $dto->incidentDate = $row['incidentDate'] ?? null;
             $dto->closureDate = $row['closureDate'] ?? null;

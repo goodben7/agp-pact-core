@@ -44,6 +44,9 @@ final class ComplaintListLight
     public string $id;
 
     #[Groups(['complaint_light:list'])]
+    public ?bool $deleted = null;
+
+    #[Groups(['complaint_light:list'])]
     public ?string $complaintTypeId = null;
 
     #[Groups(['complaint_light:list'])]
