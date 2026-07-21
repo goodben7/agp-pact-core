@@ -213,7 +213,9 @@ readonly class ComplaintManager
 
         // Check if user is a member of a company and set involvedCompany
         $member = $this->memberRepository->findOneBy(['userId' => $userId]);
-        if ($member && $member->getCompany()) {
+        if ($data->involvedCompany) {
+            $complaint->setInvolvedCompany($data->involvedCompany);
+        } elseif ($member && $member->getCompany()) {
             $complaint->setInvolvedCompany($member->getCompany());
         } elseif ($company) {
             // Fallback to location-based company if user is not a member
