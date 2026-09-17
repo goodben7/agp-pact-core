@@ -47,9 +47,11 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
             $this->logger->info('Location IDs for filter: ' . json_encode($locationIds));
             
             // Vérification simple du nombre total de plaintes
-            $totalComplaintsQb = $this->entityManager->createQueryBuilder()
-                ->select('COUNT(c.id)')
-                ->from(Complaint::class, 'c');
+              $totalComplaintsQb = $this->entityManager->createQueryBuilder()
+                  ->select('COUNT(c.id)')
+                  ->from(Complaint::class, 'c')
+                  ->where('(c.deleted = :deleted OR c.deleted IS NULL)')
+                  ->setParameter('deleted', false);
             $totalComplaints = $totalComplaintsQb->getQuery()->getSingleScalarResult();
             $this->logger->info('Total complaints in database: ' . $totalComplaints);
     
@@ -251,6 +253,9 @@ final readonly class DashboardStatisticsProvider implements ProviderInterface
     private function getClosure(?array $locationIds, ?string $complaintTypeId, ?string $startDate, ?string $endDate, ?string $involvedCompanyId): \Closure
     {
         return function (QueryBuilder $qb, string $alias) use ($locationIds, $complaintTypeId, $startDate, $endDate, $involvedCompanyId) {
+              $qb->andWhere(sprintf('(%s.deleted = :deleted OR %s.deleted IS NULL)', $alias, $alias))
+                  ->setParameter('deleted', false);
+
             if ($locationIds !== null && !empty($locationIds)) {
                 $qb->andWhere($qb->expr()->in(sprintf('%s.location', $alias), ':locationIds'))
                     ->setParameter('locationIds', $locationIds);
